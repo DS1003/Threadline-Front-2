@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { User, Mail, Lock, Phone, MapPin, Camera, Scissors } from 'lucide-react';
+import apiService from '../services/ApiService';
+import Loading from './animations/Loading';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -17,22 +19,38 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prevState => ({
-      ...prevState,
-      [name]: value
-    }));
+    setFormData({...formData, [name]: value });
   };
+
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [loadImage, setLoadImage] = useState(null);
 
   const handleFileChange = (e) => {
     setFormData(prevState => ({
       ...prevState,
       photo: e.target.files[0]
     }));
+
+    const file = e.target.files[0];
+    if (file) {
+      setLoadImage(URL.createObjectURL(file) );
+    }
   };
 
-  const handleSubmit = (e) => {
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log(formData);
+    setIsLoading(true);
+    try{
+      const response = await apiService.request('post', '/users/register', formData);
+      console.log(response);
+    }catch(err){
+      console.log(err);
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -189,16 +207,20 @@ const Register = () => {
               </div>
             </div>
             <div className="md:col-span-2">
-              <label htmlFor="photo" className="block text-sm font-medium text-gray-700 mb-2">Photo de profil (optionnel)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Photo de profil (optionnel)</label>
               <div className="flex items-center">
-                <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-[#EAB0B7]">
-                  <Camera className="h-full w-full text-white p-2" />
+              <span className="inline-block h-12 w-12 rounded-full overflow-hidden bg-[#EAB0B7]">
+                  {loadImage ? (
+                    <img src={loadImage} alt="Aperçu" className="h-full w-full object-cover" />
+                    ) : (
+                    <Camera className="h-full w-full text-white p-2" />
+                  )}
                 </span>
                 <label
                   htmlFor="photo"
-                  className="ml-5 bg-white py-2 px-3 border border-[#CC8C87] rounded-md shadow-sm text-sm leading-4 font-medium text-gray-700 hover:bg-[#FFF5F5] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CC8C87] cursor-pointer transition-all duration-300 ease-in-out"
+                  className="ml-5 bg-white py-2 px-3 border border-[#CC8C87] rounded-full shadow-sm text-sm leading-4 font-medium text-[#242424] hover:bg-[#EAB0B7] hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CC8C87] cursor-pointer transition duration-300"
                 >
-                  Changer
+                  Charger
                 </label>
                 <input
                   type="file"
@@ -213,9 +235,14 @@ const Register = () => {
             <div className="md:col-span-2">
               <button
                 type="submit"
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#CC8C87] hover:bg-[#EAB0B7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CC8C87] transition-all duration-300 ease-in-out"
+                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[#CC8C87] ${isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#EAB0B7] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#CC8C87] transition-all duration-300 ease-in-out'} `}
+                disabled={isLoading}
               >
-                S'inscrire
+                {
+                  isLoading ? (
+                    <Loading/>
+                  ) : ("S'inscrire")
+                }
               </button>
             </div>
           </form>

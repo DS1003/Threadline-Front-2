@@ -12,7 +12,6 @@ import {
   Grid,
   PlusCircle,
   Search,
-  Briefcase,
   ChevronDown
 } from 'lucide-react';
 
