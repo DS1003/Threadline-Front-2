@@ -45,7 +45,7 @@ const UserPosts = ({ posts }) => {
               <p className="text-gray-700">{post.content}</p>
               {post.image && (
                 <img
-                  src="https://avatars.githubusercontent.com/u/100100154?v=4"
+                  src="https://img.freepik.com/photos-gratuite/mannequin-ruban-mesurer_93675-130756.jpg?t=st=1728783485~exp=1728787085~hmac=a46502455c05477cbefe8a43004002abb3a554bce8fe195afbbacaa7ff5e123d&w=740"
                   alt="Post"
                   className="w-full h-90 object-cover rounded-lg"
                 />

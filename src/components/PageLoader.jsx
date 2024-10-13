@@ -19,7 +19,7 @@ const PageLoader = () => {
             clearInterval(progressInterval);
             clearInterval(colorInterval);
         };
-    }, []);
+    }, [colors.length]);
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-[#FFF5F5]">

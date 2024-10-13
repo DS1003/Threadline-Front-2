@@ -2,15 +2,14 @@ import React from 'react';
 
 function withAuth(Component) {
   return function AuthenticatedComponent(props) {
-    const isAuthenticated = localStorage.getItem('isAuthenticated');
-    console.log("Auth status:", isAuthenticated);
+    const token = localStorage.getItem('token');
+    console.log("Token:", token);
 
-    if (!isAuthenticated) {
+    if (!token) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="max-w-md w-full">
             <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-red-100">
-              {/* Icône de cadenas stylisée avec CSS */}
               <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
                 <svg
                   className="w-6 h-6 text-red-600"

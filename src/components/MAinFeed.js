@@ -7,8 +7,10 @@ import Sidebar from './Sidebar';
 import RightSidebar from './RightSidebar';
 import MessageButton from './MessageButton';
 import Balanced from './Balanced';
+import Navbar from './Navbar';
+import withAuth from '../hoc/withAuth';
 
-export default function MainFeed() {
+const MainFeed= () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -16,64 +18,95 @@ export default function MainFeed() {
     };
 
     const [balance, setBalance] = useState(500);
-  const [purchaseHistory, setPurchaseHistory] = useState([
-    { date: '2024-10-15', amount: 100 },
-    { date: '2024-10-01', amount: 50 },
-    { date: '2024-09-15', amount: 200 },
-  ]);
-
-  const handleRefresh = async () => {
-    // Simuler une mise à jour du solde
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setBalance(prevBalance => prevBalance + Math.floor(Math.random() * 50));
-  };
-
-  const handlePurchase = () => {
-    const amount = 100;
-    setBalance(prevBalance => prevBalance + amount);
-    setPurchaseHistory(prevHistory => [
-      { date: new Date().toISOString(), amount },
-      ...prevHistory
+    const [purchaseHistory, setPurchaseHistory] = useState([
+        { date: '2024-10-15', amount: 100 },
+        { date: '2024-10-01', amount: 50 },
+        { date: '2024-09-15', amount: 200 },
     ]);
-  };
+
+    const handleRefresh = async () => {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setBalance(prevBalance => prevBalance + Math.floor(Math.random() * 50));
+    };
+
+    const handlePurchase = () => {
+        const amount = 100;
+        setBalance(prevBalance => prevBalance + amount);
+        setPurchaseHistory(prevHistory => [
+            { date: new Date().toISOString(), amount },
+            ...prevHistory
+        ]);
+    };
 
     return (
-        <div className="max-w-8xl mx-auto ml-20 overflow-scroll relative">
-            {/* Conteneur Flex pour afficher ProfileInfo à gauche et les Stories à droite */}
-            <div className="flex gap-6 mt-20">
-                {/* Le profil sur la gauche */}
-                <div className="w-1/4 pl-8">
-                    <ProfileInfo />
-                    <Balanced 
-                       balance={balance} 
-                       lastPurchaseDate="2024-05-24"
-                       purchaseHistory={purchaseHistory}
-                       onRefresh={handleRefresh}
-                       onPurchase={handlePurchase}
-                    />
-                    <Sidebar/>
-                </div>
+        <div className="flex h-screen overflow-hidden">
+            <Navbar />
 
-                {/* Les Stories et le formulaire de création de post à droite */}
-                <div className="middleContent max-w-2xl ">
-                    {/* Les Stories */}
+            {/* Left sidebar - fixed */}
+            <div className="custom-scrollbar overflow-hidden w-1/4 p-8 fixed left-[10%] top-14 bottom-0">
+                <ProfileInfo />
+                <Balanced 
+                    balance={balance} 
+                    lastPurchaseDate="2024-05-24"
+                    purchaseHistory={purchaseHistory}
+                    onRefresh={handleRefresh}
+                    onPurchase={handlePurchase}
+                />
+                <Sidebar />
+            </div>
+
+            {/* Middle content - scrollable */}
+            <div className="custom-scrollbar flex-1 overflow-y-auto  ml-[calc(25%+10%)] mr-[25%] mt-[3.5%] p-6">
+                <div className="max-w-2xl mx-auto">
+                    {/* Stories */}
                     <div className="mb-6">
                         <StoryCircles />
                     </div>
-                    {/* Le formulaire de création de post */}
+                    {/* Create post form */}
                     <CreatePostCard />
                     <Post />
                     <Post />
+                    {/* Add more posts as needed */}
                 </div>
-
-                {/* Message button to toggle sidebar */}
-                <div className="fixed bottom-6 right-6 z-50">
-                    <MessageButton onClick={toggleSidebar} />
-                </div>
-
-                {/* RightSidebar */}
-                <RightSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
             </div>
+
+            {/* Right sidebar - if needed */}
+            <div className="w-1/4 fixed right-0 top-20 bottom-0 overflow-y-auto">
+                {/* Add content for the right sidebar if needed */}
+            </div>
+
+            {/* Message button to toggle sidebar */}
+            <div className="fixed bottom-6 right-6 z-50">
+                <MessageButton onClick={toggleSidebar} />
+            </div>
+
+            {/* RightSidebar */}
+            <RightSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         </div>
     );
-}
+}; export default withAuth(MainFeed) ;
+// 
+const styles = `
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+  }
+`;
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);

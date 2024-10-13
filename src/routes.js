@@ -11,13 +11,14 @@ import PageLoader from './components/PageLoader';
 
 // Lazy load the Dashboard component en ajoutant le page loader lors du chargement 
 const Dashboard = lazy(() => import('./components/Dashboard'));
+/* const MainFead = lazy(() => import('./components/MAinFeed')); */
 
 const AppRoutes = () => {
   
   return (
     <Suspense fallback={<PageLoader />}>
       <Routes>
-        <Route path="/" element={<MainFeed />} />
+        <Route path="/" element={<Login />} />
         <Route path="/loader" element={<PageLoader />} />
         <Route path="/feed" element={<MainFeed />} />
         <Route path="/about" element={<About />} />

@@ -33,7 +33,7 @@ export default function PostCard() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <img
-              src="https://avatars.githubusercontent.com/u/100100154?v=4"
+              src="https://img.freepik.com/photos-gratuite/mannequin-ruban-mesurer_93675-130756.jpg?t=st=1728783485~exp=1728787085~hmac=a46502455c05477cbefe8a43004002abb3a554bce8fe195afbbacaa7ff5e123d&w=740"
               alt="Cameron Williamson"
               className="w-10 h-10 rounded-full"
             />
@@ -51,7 +51,7 @@ export default function PostCard() {
         <div className="mb-4 space-y-2">
           <p className="text-gray-700">Here's a description of the post. It can be multiple lines long and provide context for the image below.</p>
           <img
-            src="https://avatars.githubusercontent.com/u/100100154?v=4"
+            src="https://img.freepik.com/photos-gratuite/mannequin-ruban-mesurer_93675-130756.jpg?t=st=1728783485~exp=1728787085~hmac=a46502455c05477cbefe8a43004002abb3a554bce8fe195afbbacaa7ff5e123d&w=740"
             alt="user-image"
             className="w-full h-90 object-cover rounded-lg"
           />
