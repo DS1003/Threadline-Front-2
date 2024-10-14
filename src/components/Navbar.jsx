@@ -142,25 +142,25 @@ const Navbar = () => {
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
                 </button>
                 
-                {/* Profile Dropdown */}
-                {isProfileMenuOpen && (
-                  <div className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-lg py-2 border border-[#EAB0B7]">
-                    <div className="px-4 py-3 border-b border-[#EAB0B7]">
+                       {/* Profile Dropdown */}
+                       {isProfileMenuOpen && (
+                  <div className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden transition-all duration-300 ease-in-out">
+                    <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
                       <div className="flex items-center">
                         <img 
                           src={user.avatar}
                           alt={user.name} 
-                          className="w-14 h-14 rounded-full object-cover mr-3"
+                          className="w-14 h-14 rounded-full object-cover mr-3 border-2 border-white"
                         />
                         <div>
-                          <p className="font-semibold text-[#242424]">{user.name}</p>
-                          <p className="text-sm text-[#77696A]">Voir votre profil</p>
+                          <p className="font-semibold text-white">{user.name}</p>
+                          <p className="text-sm text-white opacity-80">Voir votre profil</p>
                         </div>
                       </div>
                     </div>
                     <NavLink
                       to="/settings"
-                      className="flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2]"
+                      className="flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2] transition-all duration-200"
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
                       <div className="bg-[#EAB0B7] p-2 rounded-full mr-3">
@@ -170,7 +170,7 @@ const Navbar = () => {
                     </NavLink>
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2]"
+                      className="w-full flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2] transition-all duration-200"
                     >
                       <div className="bg-[#EAB0B7] p-2 rounded-full mr-3">
                         <LogOut className="w-5 h-5 text-white" />
@@ -183,12 +183,13 @@ const Navbar = () => {
             ) : (
               <NavLink
                 to="/login"
-                className="flex items-center px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7] transition-colors duration-200"
+                className="flex items-center px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7] transition-all duration-300"
               >
                 Connexion
               </NavLink>
             )}
           </div>
+
 
           {/* Mobile menu button */}
           <button
@@ -203,15 +204,15 @@ const Navbar = () => {
           </button>
         </div>
 
-        {/* Notifications Dropdown */}
-        {isNotificationsOpen && (
-          <div ref={notificationRef} className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-lg py-2 border border-[#EAB0B7] overflow-hidden">
-            <div className="px-4 py-3 border-b border-[#EAB0B7] bg-[#FDF1F2]">
-              <h3 className="font-semibold text-lg text-[#CC8C87]">Notifications</h3>
+         {/* Notifications Dropdown */}
+         {isNotificationsOpen && (
+          <div ref={notificationRef} className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden transition-all duration-300 ease-in-out">
+            <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
+              <h3 className="font-semibold text-lg text-white">Notifications</h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.map((notification) => (
-                <div key={notification.id} className="px-4 py-3 border-b border-[#EAB0B7] hover:bg-[#FDF1F2] transition-colors duration-200">
+                <div key={notification.id} className="px-4 py-3 border-b border-[#EAB0B7] hover:bg-[#FDF1F2] transition-all duration-200">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 mr-3">
                       {getNotificationIcon(notification.type)}
@@ -224,8 +225,8 @@ const Navbar = () => {
                 </div>
               ))}
             </div>
-            <div className="px-4 py-3 bg-[#FDF1F2]">
-              <button className="w-full text-center text-[#CC8C87] hover:underline font-medium">
+            <div className="px-4 py-3 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
+              <button className="w-full text-center text-white hover:underline font-medium transition-all duration-200">
                 Voir toutes les notifications
               </button>
             </div>
