@@ -1,24 +1,26 @@
-import React, { useState, useRef } from 'react';
-import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 
+// ... (StoryCircle component remains unchanged)
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
-  <div className="flex-shrink-0 w-28 relative">
+  <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
       onClick={isUser ? onAddStory : onViewStory}
-      className="w-full h-44 relative"
+      className="w-full h-36 sm:h-44 relative rounded-xl overflow-hidden group"
     >
       <img
         src={image}
         alt={`${user}'s story`}
-        className="w-full h-full object-cover rounded-xl"
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
       {isUser ? (
-        <div className="absolute bottom-2 left-2 right-2 bg-white bg-opacity-80 rounded-lg py-1 text-center">
+        <div className="absolute inset-x-2 bottom-2 bg-white bg-opacity-90 rounded-lg py-1 text-center transition-all duration-300 group-hover:bg-opacity-100">
           <Camera className="w-6 h-6 mx-auto text-[#CC8C87]" />
           <span className="text-xs font-medium text-[#242424]">Créer une story</span>
         </div>
       ) : (
-        <div className="absolute bottom-2 left-2 right-2">
+        <div className="absolute inset-x-2 bottom-2 text-center">
           <span className="text-xs font-medium text-white drop-shadow-lg">{user}</span>
         </div>
       )}
@@ -53,20 +55,20 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full max-w-md">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-bold">Créer une story</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-xl w-full max-w-md overflow-hidden shadow-xl">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200">
+          <h2 className="text-xl font-semibold text-gray-800">Créer une story</h2>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={24} />
           </button>
         </div>
-        <form onSubmit={handleSubmit} className="p-4">
+        <form onSubmit={handleSubmit} className="p-6">
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Que voulez-vous partager ?"
-            className="w-full h-32 p-2 border border-gray-300 rounded mb-4"
+            className="w-full h-32 p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <div className="mb-4">
             <input
@@ -79,7 +81,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded flex items-center"
+              className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center transition duration-300"
             >
               <Image size={20} className="mr-2" />
               <Film size={20} className="mr-2" />
@@ -87,18 +89,24 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
             </button>
           </div>
           {mediaPreview && (
-            <div className="mb-4">
+            <div className="mb-4 relative">
               {mediaPreview.startsWith('data:image') ? (
-                <img src={mediaPreview} alt="Aperçu" className="max-w-full h-auto rounded" />
+                <img src={mediaPreview} alt="Aperçu" className="w-full h-64 object-cover rounded-lg" />
               ) : (
-                <video src={mediaPreview} controls className="max-w-full h-auto rounded">
+                <video src={mediaPreview} controls className="w-full h-64 object-cover rounded-lg">
                   Votre navigateur ne supporte pas la lecture de vidéos.
                 </video>
               )}
+              <button
+                onClick={() => setMediaPreview(null)}
+                className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+              >
+                <X size={20} className="text-gray-600" />
+              </button>
             </div>
           )}
-          <button type="submit" className="bg-[#CC8C87] text-white px-4 py-2 rounded">
-            Publier
+          <button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition duration-300">
+            Publier la story
           </button>
         </form>
       </div>
@@ -124,61 +132,62 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 ">
-      <div className="bg-white rounded-lg w-full max-w-lg overflow-hidden">
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-xl font-bold">Story de {story.user}</h2>
+    <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
+      <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
+        <div className="flex justify-between items-center p-4 bg-gray-50">
+          <div className="flex items-center">
+            <img src={story.image} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
+          </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
             <X size={24} />
           </button>
         </div>
-        <div className="p-4">
-          <div className="bg-gray-200 h-64 flex items-center justify-center mb-4 rounded-xl">
-            {story.media ? (
-              story.media.startsWith('data:image') ? (
-                <img src={story.media} alt={story.user} className="w-full h-full object-cover rounded-xl" />
-              ) : (
-                <video src={story.media} controls className="w-full h-full object-cover rounded-xl">
-                  Votre navigateur ne supporte pas la lecture de vidéos.
-                </video>
-              )
+        <div className="relative">
+          {story.media ? (
+            story.media.startsWith('data:image') ? (
+              <img src={story.media} alt="Story" className="w-full h-[calc(100vh-250px)] object-cover" />
             ) : (
-              <img src={story.image} alt={story.user} className="w-full h-full object-cover rounded-xl" />
-            )}
-          </div>
-          {story.content && (
-            <p className="mb-4 text-gray-700">{story.content}</p>
+              <video src={story.media} controls className="w-full h-[calc(100vh-250px)] object-cover">
+                Votre navigateur ne supporte pas la lecture de vidéos.
+              </video>
+            )
+          ) : (
+            <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+              <p className="text-3xl font-bold text-white text-center px-6">{story.content}</p>
+            </div>
           )}
-          <div className="flex justify-between mb-4">
-            <button onClick={handleLike} className={`flex items-center ${liked ? 'text-red-500' : 'text-gray-500'}`}>
-              <Heart size={20} className={liked ? 'fill-current' : ''} />
-              <span className="ml-1">J'aime</span>
-            </button>
-            <button onClick={handleShare} className="flex items-center text-gray-500">
-              <Share2 size={20} />
-              <span className="ml-1">Partager</span>
-            </button>
-            <button onClick={() => document.getElementById('comment-input').focus()} className="flex items-center text-gray-500">
-              <MessageCircle size={20} />
-              <span className="ml-1">Commenter</span>
-            </button>
+          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
+            <div className="flex justify-between items-center">
+              <button onClick={handleLike} className={`flex items-center ${liked ? 'text-red-500' : 'text-white'}`}>
+                <Heart size={24} className={liked ? 'fill-current' : ''} />
+                <span className="ml-2 text-sm">{liked ? 'Aimé' : 'Aimer'}</span>
+              </button>
+              <button onClick={handleShare} className="flex items-center text-white">
+                <Share2 size={24} />
+                <span className="ml-2 text-sm">Partager</span>
+              </button>
+            </div>
           </div>
-          <div className="mb-4 max-h-40 overflow-y-auto custom-scrollbar">
-            <h3 className="font-bold mb-2">Commentaires</h3>
-            {comments.map((c, index) => (
-              <p key={index} className="mb-1"><strong>{c.user}:</strong> {c.text}</p>
+        </div>
+        <div className="p-4">
+          <h3 className="font-semibold mb-2 text-gray-700">Commentaires</h3>
+          <div className="max-h-32 overflow-y-auto mb-4 space-y-2">
+            {comments.map((comment, index) => (
+              <div key={index} className="bg-gray-100 rounded-lg p-2">
+                <span className="font-semibold text-gray-800">{comment.user}:</span> {comment.text}
+              </div>
             ))}
           </div>
           <form onSubmit={handleComment} className="flex">
             <input
-              id="comment-input"
               type="text"
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Ajouter un commentaire..."
-              className="flex-grow p-2 border border-gray-300 rounded-l"
+              className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
-            <button type="submit" className="bg-[#CC8C87] text-white px-4 py-2 rounded-r">
+            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300">
               <Send size={20} />
             </button>
           </form>
@@ -188,6 +197,7 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
   );
 };
 
+// ... (The rest of the Stories component remains unchanged)
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -203,11 +213,17 @@ const Stories = () => {
     { id: 8, user: "Marc D.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
   ]);
 
+  const [currentPage, setCurrentPage] = useState(0);
+  const storiesPerPage = 5;
+  const totalPages = Math.ceil(stories.length / storiesPerPage);
+
+  const carouselRef = useRef(null);
+
   const handleAddStory = ({ content, media }) => {
     const newStory = {
       id: stories.length + 1,
       user: "Vous",
-      image: "https://avatars.githubusercontent.com/u/100100154?v=4",
+      image: media || "https://avatars.githubusercontent.com/u/100100154?v=4",
       content: content,
       media: media,
       isUser: true,
@@ -220,15 +236,65 @@ const Stories = () => {
     setIsViewModalOpen(true);
   };
 
+  const nextPage = () => {
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+  };
+
+  const prevPage = () => {
+    setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
+  };
+
+  useEffect(() => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollTo({
+        left: currentPage * carouselRef.current.offsetWidth,
+        behavior: 'smooth'
+      });
+    }
+  }, [currentPage]);
+
   return (
-    <div className="bg-gray-50 mx-w-2xl rounded-xl shadow-md p-4 mb-6 overflow-x-auto custom-scrollbar">
-      <div className="flex space-x-2">
+    <div className="bg-white rounded-xl shadow-lg p-6 mb-6 relative">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-2xl font-bold text-[#242424]">Stories</h2>
+        <div className="flex space-x-2">
+          <button
+            onClick={prevPage}
+            disabled={currentPage === 0}
+            className={`p-2 rounded-full ${currentPage === 0 ? 'text-gray-300' : 'text-[#CC8C87] hover:bg-[#FDF1F2]'}`}
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button
+            onClick={nextPage}
+            disabled={currentPage === totalPages - 1}
+            className={`p-2 rounded-full ${currentPage === totalPages - 1 ? 'text-gray-300' : 'text-[#CC8C87] hover:bg-[#FDF1F2]'}`}
+          >
+            <ChevronRight size={24} />
+          </button>
+        </div>
+      </div>
+      <div
+        ref={carouselRef}
+        className="flex space-x-4 overflow-x-hidden scroll-smooth"
+      >
         {stories.map((story) => (
           <StoryCircle
             key={story.id}
             {...story}
             onAddStory={() => setIsAddModalOpen(true)}
             onViewStory={() => handleViewStory(story)}
+          />
+        ))}
+      </div>
+      <div className="flex justify-center mt-4 space-x-2">
+        {Array.from({ length: totalPages }).map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentPage(index)}
+            className={`w-2 h-2 rounded-full ${
+              index === currentPage ? 'bg-[#CC8C87]' : 'bg-gray-300'
+            }`}
           />
         ))}
       </div>
@@ -261,12 +327,12 @@ const styles = `
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #888;
+    background: transparent;
     border-radius: 4px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: #555;
+    background: transparent;
   }
 `;
 

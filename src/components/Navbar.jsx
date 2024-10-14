@@ -9,6 +9,7 @@ import {
   LogOut,
   Menu,
   X,
+  PlusCircle,
   Search,
   ChevronDown
 } from 'lucide-react';
@@ -28,18 +29,11 @@ const Navbar = () => {
   };
 
   const notifications = [
-    { id: 1, content: "Nouveau message de Alice", time: "Il y a 5 minutes" },
-    { id: 2, content: "Bob a aimé votre publication", time: "Il y a 1 heure" },
-    { id: 3, content: "Vous avez un nouveau follower", time: "Il y a 2 heures" },
-    { id: 4, content: "Rappel : Évènement demain", time: "Il y a 1 jour" },
-    { id: 5, content: "Nouvelle mise à jour disponible", time: "Il y a 2 jours" },
-    { id: 6, content: "Nouvelle offre de service", time: "Il y a 3 jours" },
-    { id: 7, content: "Nouvelle offre de service", time: "Il y a 4 jours" },
-    { id: 8, content: "Nouvelle offre de service", time: "Il y a 5 jours" },
-    { id: 9, content: "Nouvelle offre de service", time: "Il y a 6 jours" },
-    { id: 10, content: "Nouvelle offre de service", time: "Il y a 7 jours" },
-    { id: 11, content: "Nouvelle offre de service", time: "Il y a 8 jours" },
-
+    { id: 1, content: "Nouveau message de Alice", time: "Il y a 5 minutes", type: "message" },
+    { id: 2, content: "Bob a aimé votre publication", time: "Il y a 1 heure", type: "like" },
+    { id: 3, content: "Vous avez un nouveau follower", time: "Il y a 2 heures", type: "follow" },
+    { id: 4, content: "Rappel : Évènement demain", time: "Il y a 1 jour", type: "event" },
+    { id: 5, content: "Nouvelle mise à jour disponible", time: "Il y a 2 jours", type: "update" },
   ];
 
   useEffect(() => {
@@ -83,6 +77,21 @@ const Navbar = () => {
       )}
     </button>
   );
+
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'message':
+        return <Mail className="w-5 h-5 text-blue-500" />;
+      case 'like':
+        return <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>;
+      case 'follow':
+        return <Users className="w-5 h-5 text-green-500" />;
+      case 'event':
+        return <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+      default:
+        return <Bell className="w-5 h-5 text-gray-500" />;
+    }
+  };
 
   return (
     <nav className={`fixed w-full z-50 transition-all duration-300 ${
@@ -133,7 +142,6 @@ const Navbar = () => {
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
                 </button>
                 
-
                 {/* Profile Dropdown */}
                 {isProfileMenuOpen && (
                   <div className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-lg py-2 border border-[#EAB0B7]">
@@ -197,20 +205,27 @@ const Navbar = () => {
 
         {/* Notifications Dropdown */}
         {isNotificationsOpen && (
-          <div ref={notificationRef} className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-lg py-2 border border-[#EAB0B7]">
-            <div className="px-4 py-3 border-b border-[#EAB0B7]">
-              <h3 className="font-semibold text-lg text-[#242424]">Notifications</h3>
+          <div ref={notificationRef} className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-lg py-2 border border-[#EAB0B7] overflow-hidden">
+            <div className="px-4 py-3 border-b border-[#EAB0B7] bg-[#FDF1F2]">
+              <h3 className="font-semibold text-lg text-[#CC8C87]">Notifications</h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.map((notification) => (
                 <div key={notification.id} className="px-4 py-3 border-b border-[#EAB0B7] hover:bg-[#FDF1F2] transition-colors duration-200">
-                  <p className="text-sm text-[#242424]">{notification.content}</p>
-                  <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-3">
+                      {getNotificationIcon(notification.type)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-[#242424]">{notification.content}</p>
+                      <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
-            <div className="px-4 py-3">
-              <button className="w-full text-center text-[#CC8C87] hover:underline">
+            <div className="px-4 py-3 bg-[#FDF1F2]">
+              <button className="w-full text-center text-[#CC8C87] hover:underline font-medium">
                 Voir toutes les notifications
               </button>
             </div>
@@ -221,6 +236,73 @@ const Navbar = () => {
         {isMenuOpen && (
           <div className="md:hidden bg-white border-t border-[#EAB0B7] py-4">
             {/* ... (le contenu du menu mobile reste inchangé) ... */}
+            <div className="space-y-2 px-2">
+              {isAuthenticated && (
+                <div className="flex items-center px-3 py-2 border-b border-[#EAB0B7] mb-2">
+                  <img 
+                    src={user.avatar}
+                    alt={user.name} 
+                    className="w-10 h-10 rounded-full mr-3 object-cover"
+                  />
+                  <span className="font-semibold text-[#242424]">{user.name}</span>
+                </div>
+              )}
+              <div className="px-3 py-2">
+                <input
+                  type="text"
+                  placeholder="Rechercher sur Theardline"
+                  className="w-full px-4 py-2 rounded-full bg-[#FDF1F2] text-[#242424] placeholder-[#77696A] focus:outline-none focus:ring-2 focus:ring-[#EAB0B7]"
+                />
+              </div>
+              <NavLink to="/" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
+                <Layout className="w-5 h-5 mr-3" />
+                Accueil
+              </NavLink>
+              <NavLink to="/network" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
+                <Users className="w-5 h-5 mr-3" />
+                Mon réseau
+              </NavLink>
+              <NavLink to="/create" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
+                <PlusCircle className="w-5 h-5 mr-3" />
+                Créer
+              </NavLink>
+              <NavLink to="/messages" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
+                <Mail className="w-5 h-5 mr-3" />
+                Messages
+              </NavLink>
+              <NavLink to="/notifications" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
+                <Bell className="w-5 h-5 mr-3" />
+                Notifications
+              </NavLink>
+              
+              {isAuthenticated ? (
+                <>
+                  <NavLink
+                    to="/settings"
+                    className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <User className="w-5 h-5 mr-3" />
+                    Paramètres
+                  </NavLink>
+                  <button
+                    onClick={handleLogout}
+                    className="w-full flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md"
+                  >
+                    <LogOut className="w-5 h-5 mr-3" />
+                    Déconnexion
+                  </button>
+                </>
+              ) : (
+                <NavLink
+                  to="/login"
+                  className="flex items-center px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Connexion
+                </NavLink>
+              )}
+            </div>
           </div>
         )}
       </div>
