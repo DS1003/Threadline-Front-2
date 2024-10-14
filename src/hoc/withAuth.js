@@ -12,7 +12,7 @@ function withAuth(Component) {
             <div className="bg-white p-8 rounded-lg shadow-lg border-2 border-red-100">
               <div className="mx-auto w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
                 <svg
-                  className="w-6 h-6 text-red-600"
+                  className="w-6 h-6 text-[#CC8C87]"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -38,7 +38,7 @@ function withAuth(Component) {
               <div className="flex justify-center">
                 <a
                   href="/login"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors duration-200 shadow-md hover:shadow-lg"
+                  className="inline-flex items-center px-6 py-3 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white rounded-md transition-colors duration-200 shadow-md hover:shadow-lg"
                 >
                   <span>Connexion</span>
                   <svg
