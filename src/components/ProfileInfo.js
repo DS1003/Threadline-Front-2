@@ -14,7 +14,7 @@ export default function Component() {
       <div className="flex items-center gap-3 mb-4">
         <img
           src="https://avatars.githubusercontent.com/u/100100154?v=4"
-          alt="Profile picture"
+          alt="Profilepicture"
           className="w-12 h-12 rounded-full"
         />
         <div>
