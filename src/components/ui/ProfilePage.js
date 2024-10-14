@@ -1,11 +1,15 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import ProfileHeader from './ProfileHeader';
 import UserInfo from './UserInfo';
 import UserPosts from './UserPosts';
 import InstagramStyleFavorites from './InstagramStyleFavorites';
 import UserMeasurements from './UserMeasurements';
+import UpdateRoleUser from './UpdateRoleUser';
 
 const ProfilePage = () => {
+  const [userRole, setUserRole] = useState(''); // État pour stocker le rôle de l'utilisateur
+  
+
   const user = {
     name: 'Jane Doe',
     tagline: 'Photographer | Traveler | Coffee Lover',
@@ -17,6 +21,23 @@ const ProfilePage = () => {
     relationshipStatus: 'Single',
   };
 
+  const handleRoleUpdate = (newRole) => {
+    setUserRole(newRole);
+    localStorage.setItem('userRole', newRole); // Mettre à jour le localStorage
+  };
+  
+
+  // Récupérer le rôle de l'utilisateur depuis localStorage ou une autre source au chargement du composant
+  useEffect(() => {
+    const savedRole = localStorage.getItem('userRole'); // Récupérer le rôle depuis localStorage
+    console.log('Rôle récupéré depuis localStorage:', savedRole); // Ajouter un log pour vérifier la valeur
+  
+    if (savedRole) {
+      setUserRole(savedRole); // Mettre à jour l'état avec le rôle récupéré
+    }
+  }, []);
+  
+  
   const posts = [
     {
       id: 1,
@@ -62,15 +83,19 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="bg-gray-100  min-h-screen ">
+    <div className="bg-gray-100 min-h-screen">
       <ProfileHeader user={user} />
-      <div className="container mt-14   mx-auto px-4 py-8">
+      <div className="container mt-14 mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
             <UserInfo user={user} />
+            {/* Vérifier le rôle avant d'afficher le bouton de mise à jour */}
+            {userRole !== 'TAILOR' && userRole !== 'SELLER' && (
+  <UpdateRoleUser onRoleUpdate={handleRoleUpdate} />
+)}
+
             <UserMeasurements measurements={measurements} />
             <InstagramStyleFavorites posts={posts} />
-
           </div>
           <div className="md:col-span-2">
             <UserPosts posts={posts} />

@@ -1,7 +1,14 @@
 import React from 'react'
 import { VerifiedIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom';
 
 export default function Component() {
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate('/profile'); // Remplacez '/profile' par l'URL de destination souhaitée
+  };
+  
   return (
     <div className="w-full  h-fit max-w-lg mb-3  bg-white rounded-lg shadow-sm p-4 relative">
       <div className="flex items-center gap-3 mb-4">
@@ -18,7 +25,9 @@ export default function Component() {
           <p className="text-gray-500 text-sm">@jakobbbtsh</p>
         </div>
       </div>
-      <button className="absolute top-4 right-4 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white text-sm font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+      <button onClick={handleProfileClick}
+      className="absolute top-4 right-4 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white text-sm font-semibold py-2 px-4 rounded-full transition-colors duration-300">
+          
         Voir profil
       </button>
       <div className="flex justify-between bg-gray-100 rounded-lg p-3">
