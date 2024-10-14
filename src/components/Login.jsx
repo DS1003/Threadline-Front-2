@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Scissors, Mail, Lock, Facebook, Instagram } from 'lucide-react';
+import { Scissors, Mail, Lock, Eye, EyeOff, Facebook, Instagram } from 'lucide-react';
 import apiService from '../services/ApiService';
 import Loading from './animations/Loading';
 
@@ -10,18 +10,49 @@ const Login = () => {
     password: ''
   });
 
-  const [error, setError] = useState(''); // État pour stocker les erreurs
+  const [errors, setErrors] = useState({
+    email: '',
+    password: '',
+    general: ''
+  });
+
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors({ ...errors, [name]: '' });
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = { email: '', password: '', general: '' };
+
+    if (!formData.email) {
+      newErrors.email = 'L\'adresse email est requise';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'L\'adresse email est invalide';
+      isValid = false;
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'Le mot de passe est requis';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) return;
+
     setIsLoading(true);
-    setError(''); // Réinitialiser l'erreur avant une nouvelle tentative
+    setErrors({ email: '', password: '', general: '' });
 
     try {
       const response = await apiService.request('post', '/users/login', formData);
@@ -29,10 +60,14 @@ const Login = () => {
       navigate('/feed');
     } catch (err) {
       console.error(err);
-      setError('Erreur de connexion. Veuillez vérifier vos informations et réessayer.'); // Afficher l'erreur
+      setErrors({ ...errors, general: 'Erreur de connexion. Veuillez vérifier vos informations et réessayer.' });
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
@@ -64,32 +99,39 @@ const Login = () => {
                   value={formData.email}
                   onChange={handleChange} 
                   placeholder="example@gmail.com"
-                  className="pl-10 w-full px-4 py-2 border border-[#EAB0B7] rounded-md focus:ring-[#CC8C87] focus:border-[#CC8C87] transition-all duration-300 ease-in-out" 
-                  required
+                  className={`pl-10 w-full px-4 py-2 border rounded-md focus:ring-[#CC8C87] focus:border-[#CC8C87] transition-all duration-300 ease-in-out ${errors.email ? 'border-red-500' : 'border-[#EAB0B7]'}`}
                 />
               </div>
+              {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Mot de Passe</label>
-              <div className="relative mb-5">
+              <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••" 
-                  className="pl-10 w-full px-4 py-2 border border-[#EAB0B7] rounded-md focus:ring-[#CC8C87] focus:border-[#CC8C87] transition-all duration-300 ease-in-out" 
-                  required
+                  className={`pl-10 pr-10 w-full px-4 py-2 border rounded-md focus:ring-[#CC8C87] focus:border-[#CC8C87] transition-all duration-300 ease-in-out ${errors.password ? 'border-red-500' : 'border-[#EAB0B7]'}`}
                 />
+                <button
+                  type="button"
+                  onClick={togglePasswordVisibility}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87] focus:outline-none"
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
-              <Link to="/forgot-password" className="text-sm text-[#CC8C87] hover:text-[#EAB0B7] transition-colors duration-300 ease-in-out">Mot de passe oublié ?</Link>
+              {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
+              <Link to="/forgot-password" className="block mt-2 text-sm text-[#CC8C87] hover:text-[#EAB0B7] transition-colors duration-300 ease-in-out">Mot de passe oublié ?</Link>
             </div>
 
-            {/* Message d'erreur */}
-            {error && (
-              <div className="text-red-600 text-sm text-center mb-4">
-                {error}
+            {/* Message d'erreur général */}
+            {errors.general && (
+              <div className="text-red-600 text-sm text-center">
+                {errors.general}
               </div>
             )}
 
