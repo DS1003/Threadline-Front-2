@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Edit3, Image, X } from 'lucide-react';
+import ApiService from '../services/ApiService';
 
 export default function CreatePostCard() {
   const [postContent, setPostContent] = useState('');
@@ -29,15 +30,43 @@ export default function CreatePostCard() {
     }
   };
 
+  const createPost = async () => {
+
+    const token = localStorage.getItem('token'); // Récupération du token
+    if (!token) {
+      alert('Token non trouvé, veuillez vous reconnecter.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('content', postContent);
+    formData.append('tags', JSON.stringify(tags));
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+
+    try {
+
+      const response = await ApiService.request('POST', '/post/create', formData, token);
+      console.log('Post créé avec succès:', response);
+      // Réinitialiser les champs du formulaire
+      setPostContent('');
+      setTags([]);
+      setSelectedFile(null);
+    } catch (error) {
+      console.error('Erreur lors de la création du post:', error);
+      alert('Une erreur est survenue lors de la création du post.');
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('Post Content:', postContent);
     console.log('Tags:', tags);
     console.log('Selected File:', selectedFile);
-    // Here you would typically send the post data to your backend
-    setPostContent('');
-    setTags([]);
-    setSelectedFile(null);
+
+    createPost(); 
+  
   };
 
   return (
