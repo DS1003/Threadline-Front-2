@@ -106,9 +106,7 @@ const Navbar = () => {
                   />
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
                 </button>
-                <button className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FDF1F2] hover:bg-[#EAB0B7] transition-colors duration-200">
-                  <Grid className="w-5 h-5 text-[#242424]" />
-                </button>
+                
 
                 {/* Profile Dropdown */}
                 {isProfileMenuOpen && (
