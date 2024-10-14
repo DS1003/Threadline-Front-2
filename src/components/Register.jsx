@@ -121,9 +121,9 @@ const Register = () => {
           <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {renderInput('firstname', 'Prénom', <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />)}
             {renderInput('lastname', 'Nom', <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />)}
-            {renderInput('email', 'Email', <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />, 'email')}
             {renderInput('password', 'Mot de passe', <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />, 'password')}
             {renderInput('confirm_password', 'Confirmer le mot de passe', <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />, 'password')}
+            {renderInput('email', 'Email', <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />, 'email')}
             {renderInput('phoneNumber', 'Numéro de téléphone', <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />, 'tel')}
             {renderInput('address', 'Adresse', <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />)}
             
