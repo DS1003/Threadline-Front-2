@@ -9,11 +9,11 @@ const PageLoader = () => {
     useEffect(() => {
         const progressInterval = setInterval(() => {
             setProgress((prev) => (prev + 1) % 101);
-        }, 50);
+        }, 100);
 
         const colorInterval = setInterval(() => {
             setCurrentColor((prev) => (prev + 1) % colors.length);
-        }, 1000);
+        }, 2000);
 
         return () => {
             clearInterval(progressInterval);

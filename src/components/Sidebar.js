@@ -21,7 +21,7 @@ const Sidebar = () => {
             <item.icon size={20} className="mr-3" />
             <span>{item.label}</span>
             {item.notificationCount && (
-              <span className="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-1">{item.notificationCount}</span>
+              <span className="ml-auto bg-[#CC8C87] text-white text-xs rounded-full px-2 py-1">{item.notificationCount}</span>
             )}
           </div>
         ))}

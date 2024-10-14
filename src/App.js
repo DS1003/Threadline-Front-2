@@ -5,7 +5,6 @@ import AppRoutes from './routes'; // Import the routes
 function App() {
   return (
     <div>
-      
       <ErrorBoundary>
         <AppRoutes /> {/* Use the centralized routes */}
       </ErrorBoundary>

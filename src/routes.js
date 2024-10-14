@@ -1,17 +1,15 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import About from './components/About';
-import Login from './components/Login';
 import Register from './components/Register';
-import MainFeed from './components/MAinFeed';
 import ProfilePage from './components/ui/ProfilePage';
 import PageLoader from './components/PageLoader';
 
-
-
-// Lazy load the Dashboard component en ajoutant le page loader lors du chargement 
+// Lazy loading the Dashboard & MainFeed component
 const Dashboard = lazy(() => import('./components/Dashboard'));
-/* const MainFead = lazy(() => import('./components/MAinFeed')); */
+const MainFeed = lazy(() => import('./components/MAinFeed'));
+const Login = lazy(() => import('./components/Login'));
+
 
 const AppRoutes = () => {
   
