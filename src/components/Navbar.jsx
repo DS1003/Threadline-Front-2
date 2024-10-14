@@ -70,7 +70,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Search */}
           <div className="flex items-center flex-1">
-            <NavLink to="/" className="flex-shrink-0 mr-10">
+            <NavLink to="/feed" className="flex-shrink-0 mr-10">
               <span className="titreSite text-4xl font-bold text-[#CC8C87]">Threadline</span>
             </NavLink>
             <div className="relative hidden sm:block max-w-xs w-full">
