@@ -8,9 +8,9 @@ import { RefreshCw, Gift, Wallet, CreditCard, Calendar, Clock } from 'lucide-rea
 
 const PaymentMethodBadge = ({ method }) => {
   const logos = {
-    wave: "/api/placeholder/100/40",
-    orange: "/api/placeholder/100/40",
-    free: "/api/placeholder/100/40"
+    wave: 'https://goamobile.com/logosent/wave@221@-P-2021-06-30_00-18-27wave_logo_2.png',
+    orange: 'https://play-lh.googleusercontent.com/T4ZLP7nx1kM6oXacVqAlCqQ5d11xc1NPdC9i3iofouWGIuXXo9QW0FsQJGA01AEblDRo=w240-h480-rw',
+    free: 'https://paydunya.com/refont/images/icon_pydu/partners/free.png'
   };
 
   const colors = {
@@ -185,6 +185,7 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                       Méthode de paiement
                     </Label>
                     <RadioGroup onValueChange={setPaymentMethod} className="grid grid-cols-3 gap-4">
+
                       {['wave', 'orange', 'free'].map((method) => (
                         <div key={method}>
                           <RadioGroupItem value={method} id={method} className="peer sr-only" />
@@ -192,11 +193,12 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                             htmlFor={method}
                             className="flex flex-col items-center justify-between rounded-xl border-2 border-gray-200 bg-white p-4 hover:bg-gray-50 hover:border-indigo-500 peer-data-[state=checked]:border-indigo-600 peer-data-[state=checked]:bg-indigo-50 transition duration-200 ease-in-out cursor-pointer"
                           >
-                            <img src={`/api/placeholder/60/30`} alt={`${method} logo`} className="w-12 h-6 object-contain mb-2" />
+                            <img src="logos{{method}" alt={`${method} logo`} className="w-12 h-6 object-contain mb-2" />
                             {method.charAt(0).toUpperCase() + method.slice(1)}
                           </Label>
                         </div>
                       ))}
+
                     </RadioGroup>
                   </div>
                 </div>
