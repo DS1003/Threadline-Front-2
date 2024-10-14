@@ -1,10 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Camera, Edit } from 'lucide-react';
+import apiService from '../../services/ApiService';
 
-const ProfileHeader = ({ user }) => {
+const ProfileHeader = () => {
+  const [user, setUser] = useState({
+    firstname: '',
+    lastname: '',
+    photoUrl: ''
+  });
+
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await apiService.request('get', 'users/get-one', null, token);
+        console.log("Dans la response du header");
+        const  user  = response.user;
+        console.log(user);
+
+        setUser({
+          firstname: user.firstname,
+          lastname: user.lastname,
+          photoUrl: user.photoUrl
+        });
+      } catch (error) {
+        console.error('Failed to fetch user profile:', error);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
+
   return (
     <div className="relative">
-      <div className="h-96  overflow-hidden">
+      <div className="h-96 overflow-hidden">
         <img
           src="https://res.cloudinary.com/drxouwbms/image/upload/v1728761058/cgkho4rmytr3vizj7efa.png"
           alt="Cover"
@@ -17,8 +47,8 @@ const ProfileHeader = ({ user }) => {
       <div className="absolute bottom-0 left-8 transform translate-y-1/2 flex items-end">
         <div className="relative">
           <img
-            src={user.profilePicture || "https://avatars.githubusercontent.com/u/100100154?v=4"}
-            alt={user.name}
+            src={user.photoUrl}
+            alt={`${user.firstname} ${user.lastname}`}
             className="w-40 h-40 rounded-full border-4 border-white"
           />
           <button className="absolute bottom-2 right-2 bg-white p-2 rounded-full shadow-lg">
@@ -26,8 +56,8 @@ const ProfileHeader = ({ user }) => {
           </button>
         </div>
         <div className="ml-4 mb-4">
-          <h1 className="text-3xl font-bold text-[#CC8C87] shadow-text">{user.name}</h1>
-          <p className="text-gray-400 shadow-text">{user.tagline}</p>
+          <h1 className="text-3xl font-bold text-[#CC8C87] shadow-text">{`${user.firstname} ${user.lastname}`}</h1>
+          <p className="text-gray-400 shadow-text">Mon profil</p>
         </div>
       </div>
       <div className="absolute top-4 right-4">
