@@ -56,7 +56,8 @@ const Login = () => {
 
     try {
       const response = await apiService.request('post', '/users/login', formData);
-      const { token, user } = response.data;
+      console.log(response);
+      const { token, user } = response;
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(user));
       navigate('/feed');
