@@ -1,4 +1,3 @@
-// src/components/ui/Label.jsx
 import React from 'react';
 
 const Label = ({ htmlFor, children, className }) => {
@@ -7,6 +6,4 @@ const Label = ({ htmlFor, children, className }) => {
       {children}
     </label>
   );
-};
-
-export default Label;
+}; export default Label;
