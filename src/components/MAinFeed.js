@@ -65,7 +65,6 @@ const MainFeed= () => {
                     {/* Create post form */}
                     <CreatePostCard />
                     <Post />
-                    <Post />
                     {/* Add more posts as needed */}
                 </div>
             </div>
