@@ -123,16 +123,16 @@ export default function PostCard() {
 
   const handleDeletePost = async (postId) => {
     try {
-      const token = localStorage.getItem("token");
+      const user = JSON.parse(localStorage.getItem('user'));
       const response = await apiService.request(
         "DELETE",
         `/posts/delete/${postId}`,
         null,
-        token
+        user.token
       );
   
       // Si la suppression est réussie
-      if (response && response.status === 200) {
+      if (response) {
         // Supprimer le post du DOM uniquement après la réussite de l'opération
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
   

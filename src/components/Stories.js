@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash,Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../services/ApiService';
-
+ // Assuming you are using react-feather for icons
 const user = JSON.parse(localStorage.getItem('user'));
       
 if (!user || !user.token) {
@@ -34,6 +34,7 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
   </div>
 );
 const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
+  // Define the state for stories
   const [content, setContent] = useState('');
   const [description, setDescription] = useState('');
   const [mediaFile, setMediaFile] = useState(null);
@@ -81,6 +82,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
       reader.readAsDataURL(file);
     }
   };
+ 
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50">
@@ -157,6 +159,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   );
 };
 const StoryViewModal = ({ isOpen, onClose, story }) => {
+  const [stories, setStories] = useState([]);
   const [liked, setLiked] = useState(false);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
@@ -172,13 +175,35 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
       setComment('');
     }
   };
+  const handleDelete = async (storiesId) => {
+    const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette story ?");
+    if (!confirmDelete) return;
+  
+    try {
+      const user = JSON.parse(localStorage.getItem('user'));
+      const response = await apiService.request(
+        "POST",
+        `/stories/delete/${storiesId}`,
+        null,
+        user.token);
+        if (response){
 
+          alert("Story supprimée avec succès !");
+        }
+      onClose(); // Close the modal after deletion
+      setStories((prevStories) => prevStories.filter((storiesId) =>  storiesId!== story.id)); // Update the state
+    } catch (error) {
+      console.error("Erreur lors de la suppression de la story :", error);
+      alert("Impossible de supprimer la story. Veuillez réessayer.");
+    }
+  };
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div className="flex justify-between items-center p-4 bg-gray-50">
           <div className="flex items-center">
-            <img src={story.content} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <img src={user.photoUrl} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
             <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -214,6 +239,11 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
           </div>
         </div>
         <div className="p-4">
+        <button onClick={() => handleDelete(story.id)} className="flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300">
+  <Trash size={24} />
+  <span className="ml-2 text-sm">Supprimer</span>
+</button>
+
           <h3 className="font-semibold mb-2 text-gray-700">Commentaires</h3>
           <div className="max-h-32 overflow-y-auto mb-4 space-y-2">
             {comments.map((comment, index) => (
