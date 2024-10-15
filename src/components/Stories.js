@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import apiService from '../services/ApiService';
 
-// ... (StoryCircle component remains unchanged)
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
   <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
@@ -27,25 +27,51 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
     </button>
   </div>
 );
-
 const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   const [content, setContent] = useState('');
+  const [description, setDescription] = useState('');
+  const [mediaFile, setMediaFile] = useState(null);
   const [mediaPreview, setMediaPreview] = useState(null);
+  const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddStory({ content, media: mediaPreview });
-    setContent('');
-    setMediaPreview(null);
-    onClose();
+    const formData = new FormData();
+    if (mediaFile) {
+      formData.append('content', mediaFile);
+    } else {
+      formData.append('content', content);
+    }
+    formData.append('description', description);
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+      
+    const response = await apiService.request('post', '/stories/new', formData, token);
+    console.log("Fetched stories:", response);
+      onAddStory(response.story);
+      setContent('');
+      setDescription('');
+      setMediaFile(null);
+      setMediaPreview(null);
+      setError(null);
+      onClose();
+    } catch (error) {
+      console.error('Error adding story:', error);
+      setError(error.message || 'Failed to add story. Please try again.');
+    }
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      setMediaFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setMediaPreview(reader.result);
@@ -64,11 +90,23 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
           </button>
         </div>
         <form onSubmit={handleSubmit} className="p-6">
+          {/* Affichage de l'erreur si elle existe */}
+          {error && (
+            <div className="mb-4 p-2 text-red-700 bg-red-100 rounded-lg">
+              <p>{error}</p>
+            </div>
+          )}
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Que voulez-vous partager ?"
             className="w-full h-32 p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          <input
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Description (optionnel)"
+            className="w-full p-3 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
           <div className="mb-4">
             <input
@@ -98,7 +136,10 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
                 </video>
               )}
               <button
-                onClick={() => setMediaPreview(null)}
+                onClick={() => {
+                  setMediaPreview(null);
+                  setMediaFile(null);
+                }}
                 className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
               >
                 <X size={20} className="text-gray-600" />
@@ -113,7 +154,6 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
     </div>
   );
 };
-
 const StoryViewModal = ({ isOpen, onClose, story }) => {
   const [liked, setLiked] = useState(false);
   const [comment, setComment] = useState('');
@@ -136,7 +176,7 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
       <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div className="flex justify-between items-center p-4 bg-gray-50">
           <div className="flex items-center">
-            <img src={story.image} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <img src={story.content} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
             <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -144,19 +184,20 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
           </button>
         </div>
         <div className="relative">
-          {story.media ? (
-            story.media.startsWith('data:image') ? (
-              <img src={story.media} alt="Story" className="w-full h-[calc(100vh-250px)] object-cover" />
-            ) : (
-              <video src={story.media} controls className="w-full h-[calc(100vh-250px)] object-cover">
-                Votre navigateur ne supporte pas la lecture de vidéos.
-              </video>
-            )
-          ) : (
-            <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
-              <p className="text-3xl font-bold text-white text-center px-6">{story.content}</p>
-            </div>
-          )}
+        {story.content ? (
+  /\.(jpg|jpeg|png|gif)$/i.test(story.content) ? (
+    <img src={story.content} alt="Story" className="w-full h-[calc(100vh-250px)] object-cover" />
+  ) : /\.(mp4|webm|ogg)$/i.test(story.content) ? (
+    <video src={story.content} controls className="w-full h-[calc(100vh-250px)] object-cover">
+      Votre navigateur ne supporte pas la lecture de vidéos.
+    </video>
+  ) : (
+    <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+      <p className="text-3xl font-bold text-white text-center px-6">{story.content}</p>
+    </div>
+  )
+) : null}
+
           <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
             <div className="flex justify-between items-center">
               <button onClick={handleLike} className={`flex items-center ${liked ? 'text-red-500' : 'text-white'}`}>
@@ -197,53 +238,67 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
   );
 };
 
-// ... (The rest of the Stories component remains unchanged)
+
+
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [selectedStory, setSelectedStory] = useState(null);
-  const [stories, setStories] = useState([
-    { id: 1, user: "Vous", image: "https://img.freepik.com/photos-gratuite/mannequin-ruban-mesurer_93675-130756.jpg?t=st=1728783485~exp=1728787085~hmac=a46502455c05477cbefe8a43004002abb3a554bce8fe195afbbacaa7ff5e123d&w=740", isUser: true },
-    { id: 2, user: "Marie L.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 3, user: "Thomas R.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 4, user: "Sophie K.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 5, user: "Emma J.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 6, user: "Luc P.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 7, user: "Julie M.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-    { id: 8, user: "Marc D.", image: "https://avatars.githubusercontent.com/u/100100154?v=4" },
-  ]);
-
+  const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
+  const [error, setError] = useState(null);
   const storiesPerPage = 5;
-  const totalPages = Math.ceil(stories.length / storiesPerPage);
-
   const carouselRef = useRef(null);
 
-  const handleAddStory = ({ content, media }) => {
-    const newStory = {
-      id: stories.length + 1,
-      user: "Vous",
-      image: media || "https://avatars.githubusercontent.com/u/100100154?v=4",
-      content: content,
-      media: media,
-      isUser: true,
-    };
-    setStories([newStory, ...stories.filter(story => !story.isUser)]);
-  };
+  useEffect(() => {
+    fetchStories();
+  }, []);
 
+  const fetchStories = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No authentication token found. Please log in.');
+      }
+  
+      console.log('Token:', token); // Vérifiez si le token est récupéré correctement
+  
+      const response = await apiService.request('post', '/stories/all', null, token);
+      console.log('Response:', response); // Affiche la réponse complète pour inspection
+      const stories = response.stories; // correction ici
+      
+      // Assurez-vous que `response.stories` existe avant de le définir
+      if (stories) {
+        setStories(stories);
+        setError(null);
+      } else {
+        console.error('Story data not found in response:', stories);
+        setError('No story data found in response.');
+      }
+    } catch (error) {
+      console.error('Error fetching stories:', error);
+      setError(error.message || 'Failed to fetch stories. Please try again.');
+    }
+};
+
+  
+  const handleAddStory = (newStory) => {
+    setStories([newStory, ...stories]);
+  };
+  
   const handleViewStory = (story) => {
     setSelectedStory(story);
     setIsViewModalOpen(true);
   };
-
+  
   const nextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, totalPages - 1));
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(stories.length / storiesPerPage) - 1));
   };
-
+  
   const prevPage = () => {
     setCurrentPage((prevPage) => Math.max(prevPage - 1, 0));
   };
-
+  
   useEffect(() => {
     if (carouselRef.current) {
       carouselRef.current.scrollTo({
@@ -252,7 +307,9 @@ const Stories = () => {
       });
     }
   }, [currentPage]);
-
+  
+  const totalPages = Math.ceil(stories.length / storiesPerPage);
+  
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6 relative">
       <div className="flex items-center justify-between mb-4">
@@ -274,15 +331,29 @@ const Stories = () => {
           </button>
         </div>
       </div>
+      {error && (
+        <div className="text-red-500 bg-red-100 p-4 rounded mb-4">
+          <strong>Error:</strong> {error}
+        </div>
+      )}
       <div
         ref={carouselRef}
         className="flex space-x-4 overflow-x-hidden scroll-smooth"
       >
+        <StoryCircle
+          user="Vous"
+          image={stories.content}
+          isUser={true}
+          onAddStory={() => setIsAddModalOpen(true)}
+          onViewStory={() => {}}
+        />
         {stories.map((story) => (
           <StoryCircle
             key={story.id}
-            {...story}
-            onAddStory={() => setIsAddModalOpen(true)}
+            user={story.author ? story.author.id : 'Utilisateur'}
+            image={story.content}
+            isUser={false}
+            onAddStory={() => {}}
             onViewStory={() => handleViewStory(story)}
           />
         ))}
@@ -310,9 +381,10 @@ const Stories = () => {
       />
     </div>
   );
-};
-
-export default Stories;
+  };
+  
+  export default Stories;
+  
 
 // Styles pour la barre de défilement personnalisée
 const styles = `
