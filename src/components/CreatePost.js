@@ -36,7 +36,6 @@ export default function CreatePostCard(props) {
   };
 
   const createPost = async () => {
-    
     const formData = new FormData();
     formData.append('description', postContent);
     formData.append('tags', JSON.stringify(tags));
