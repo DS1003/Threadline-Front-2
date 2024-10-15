@@ -2,6 +2,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../services/ApiService';
 
+const user = JSON.parse(localStorage.getItem('user'));
+      
+if (!user || !user.token) {
+  throw new Error('No authentication token found. Please log in.');
+}
+
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
   <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
@@ -48,12 +54,8 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
     formData.append('description', description);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found. Please log in.');
-      }
       
-    const response = await apiService.request('post', '/stories/new', formData, token);
+    const response = await apiService.request('post', '/stories/new', formData, user.token);
     console.log("Fetched stories:", response);
       onAddStory(response.story);
       setContent('');
@@ -255,15 +257,8 @@ const Stories = () => {
   }, []);
 
   const fetchStories = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('No authentication token found. Please log in.');
-      }
-  
-      console.log('Token:', token); // Vérifiez si le token est récupéré correctement
-  
-      const response = await apiService.request('post', '/stories/all', null, token);
+    try { 
+      const response = await apiService.request('post', '/stories/all', null, user.token);
       console.log('Response:', response); // Affiche la réponse complète pour inspection
       const stories = response.stories; // correction ici
       

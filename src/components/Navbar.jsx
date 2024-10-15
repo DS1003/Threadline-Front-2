@@ -20,7 +20,7 @@ const Navbar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const isAuthenticated = localStorage.getItem('token');
+  const isAuthenticated = JSON.stringify(localStorage.getItem('user'));
   const notificationRef = useRef(null);
   
   const user = {

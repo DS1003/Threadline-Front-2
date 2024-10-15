@@ -45,15 +45,21 @@ export default function PostCard() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
 
+  const user = JSON.parse(localStorage.getItem('user'));
+      
+  if (!user || !user.token) {
+    throw new Error('No authentication token found. Please log in.');
+  }
+
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        const token = localStorage.getItem("token");
+        
         const response = await apiService.request(
           "GET",
           "/posts/getAllPost",
           null,
-          token
+          user.token
         );
 
         
