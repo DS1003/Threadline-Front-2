@@ -5,7 +5,9 @@ import Swal from 'sweetalert2';
 
 
 
-export default function CreatePostCard() {
+export default function CreatePostCard(props) {
+  const {user} = props;
+  console.log(user);
   const [postContent, setPostContent] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
@@ -34,14 +36,7 @@ export default function CreatePostCard() {
   };
 
   const createPost = async () => {
-
-    const token = localStorage.getItem('token');
-    console.log('recup token post:', token); 
-    if (!token) {
-      alert('Token non trouvé, veuillez vous reconnecter.');
-      return;
-    }
-
+    
     const formData = new FormData();
     formData.append('description', postContent);
     formData.append('tags', JSON.stringify(tags));
@@ -51,7 +46,7 @@ export default function CreatePostCard() {
 
     try {
       console.log(formData);
-      const response = await ApiService.request('POST', '/posts/create', formData, token);
+      const response = await ApiService.request('POST', '/posts/create', formData, user.token);
       console.log('Post créé avec succès:', response);
 
       Swal.fire({
@@ -90,7 +85,7 @@ export default function CreatePostCard() {
       <form onSubmit={handleSubmit}>
         <div className="flex items-start mb-4">
           <img
-            src="https://avatars.githubusercontent.com/u/100100154?v=4"
+            src={user.photoUrl}
             alt="User avatar"
             className="w-10 h-10 rounded-full mr-3"
           />

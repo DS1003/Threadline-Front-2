@@ -14,19 +14,19 @@ import {
   ChevronDown
 } from 'lucide-react';
 
-const Navbar = () => {
+const Navbar = (props) => {
+  const { user } = props;
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const isAuthenticated = JSON.stringify(localStorage.getItem('user'));
+  let isAuthenticated = false;
   const notificationRef = useRef(null);
-  
-  const user = {
-    name: "John Doe",
-    avatar: "https://avatars.githubusercontent.com/u/100100154?v=4"
-  };
+
+  if(user){
+    isAuthenticated = true
+  }
 
   const notifications = [
     { id: 1, content: "Nouveau message de Alice", time: "Il y a 5 minutes", type: "message" },
@@ -55,7 +55,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     setIsProfileMenuOpen(false);
     navigate('/login');
   };
@@ -135,8 +135,8 @@ const Navbar = () => {
                   className="flex items-center justify-center h-10 rounded-full hover:bg-[#FDF1F2] transition-colors duration-200 mr-2 px-2"
                 >
                   <img 
-                    src={user.avatar}
-                    alt={user.name} 
+                    src={user.photoUrl}
+                    alt="" 
                     className="w-8 h-8 rounded-full object-cover mr-2"
                   />
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
@@ -148,12 +148,12 @@ const Navbar = () => {
                     <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
                       <div className="flex items-center">
                         <img 
-                          src={user.avatar}
-                          alt={user.name} 
+                          src={user.photoUrl}
+                          alt=""
                           className="w-14 h-14 rounded-full object-cover mr-3 border-2 border-white"
                         />
                         <div>
-                          <p className="font-semibold text-white">{user.name}</p>
+                          <p className="font-semibold text-white">{user.firstname} {user.lastname}</p>
                           <p className="text-sm text-white opacity-80">Voir votre profil</p>
                         </div>
                       </div>
@@ -241,11 +241,11 @@ const Navbar = () => {
               {isAuthenticated && (
                 <div className="flex items-center px-3 py-2 border-b border-[#EAB0B7] mb-2">
                   <img 
-                    src={user.avatar}
-                    alt={user.name} 
+                    src={user.photoUrl}
+                    alt=""
                     className="w-10 h-10 rounded-full mr-3 object-cover"
                   />
-                  <span className="font-semibold text-[#242424]">{user.name}</span>
+                  <span className="font-semibold text-[#242424]">{user.firstname}</span>
                 </div>
               )}
               <div className="px-3 py-2">

@@ -3,10 +3,6 @@ import { Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft
 import apiService from '../services/ApiService';
 
 const user = JSON.parse(localStorage.getItem('user'));
-      
-if (!user || !user.token) {
-  throw new Error('No authentication token found. Please log in.');
-}
 
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
   <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
