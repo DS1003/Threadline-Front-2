@@ -67,18 +67,18 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
   const tokenRate = 0.1;
 
   return (
-    <div className="overflow-hidden bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-8 text-white shadow-2xl mb-4 w-full max-w-md mx-auto">
+    <div className="overflow-hidden bg-gradient-to-br from-[#CC8C87] to-[#ffd9d9] rounded-3xl p-8 text-white shadow-2xl mb-4 w-full max-w-md mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
           <h2 className="text-6xl font-bold mb-2">{balance}</h2>
-          <p className="text-lg font-semibold text-indigo-200">JETONS</p>
+          <p className="text-lg font-semibold text-[#4A4A4A]">JETONS</p>
         </div>
         <div className="bg-white bg-opacity-20 p-4 rounded-full">
-          <Gift size={40} className="text-indigo-100" />
+          <Gift size={40} className="text-[#4A4A4A]" />
         </div>
       </div>
       <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center space-x-2 text-indigo-200">
+        <div className="flex items-center space-x-2 text-[#4A4A4A]">
           <Calendar size={20} />
           <p className="text-sm">Dernier achat : {formatDate(lastPurchaseDate)}</p>
         </div>
@@ -95,14 +95,14 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
       <div className="grid grid-cols-2 gap-4">
         <Button
           onClick={() => setIsHistoryOpen(true)}
-          className="bg-white bg-opacity-20 hover:bg-opacity-30 text-white font-semibold py-3 rounded-xl transition duration-200 ease-in-out transform hover:scale-105"
+          className="bg-[#4A4A4A] bg-opacity-50 hover:bg-opacity-20 text-white font-semibold py-3 rounded-xl transition duration-200 ease-in-out transform hover:scale-105"
         >
           <Wallet size={20} className="mr-2" />
           Historique
         </Button>
         <Button
           onClick={handlePurchaseStart}
-          className="bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-xl transition duration-200 ease-in-out transform hover:scale-105"
+          className="bg-[#ce7872]  hover:bg-[#CC8C87]  text-white font-semibold py-3 rounded-xl transition duration-200 ease-in-out transform hover:scale-105"
         >
           <CreditCard size={20} className="mr-2" />
           Acheter
@@ -111,9 +111,9 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
 
       <Dialog open={isHistoryOpen} onOpenChange={setIsHistoryOpen}>
         <DialogContent className="sm:max-w-[425px] bg-white rounded-3xl p-0 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+          <div className="bg-gradient-to-r from-[#CC8C87] to-[#ffd9d9] p-6">
             <DialogTitle className="text-3xl font-bold mb-2 text-white">Historique d'achat</DialogTitle>
-            <DialogDescription className="text-indigo-200">
+            <DialogDescription className="text-[#4A4A4A]">
               Vos transactions récentes
             </DialogDescription>
           </div>
@@ -123,7 +123,7 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                 <li key={index} className="py-4 flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <div className="bg-indigo-100 p-3 rounded-full">
-                      <CreditCard size={24} className="text-indigo-600" />
+                      <CreditCard size={24} className="text-[#4A4A4A]" />
                     </div>
                     <div>
                       <p className="text-sm font-medium text-gray-900">+{purchase.amount} jetons</p>
@@ -141,7 +141,7 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
             </ul>
           </div>
           <div className="bg-gray-50 px-6 py-4">
-            <Button onClick={() => setIsHistoryOpen(false)} className="w-full bg-indigo-600 text-white hover:bg-indigo-700 font-semibold py-2 px-4 rounded-xl transition duration-200 ease-in-out">
+            <Button onClick={() => setIsHistoryOpen(false)} className="w-full bg-[#CC8C87] text-white hover:bg-[#cc8c8791] font-semibold py-2 px-4 rounded-xl transition duration-200 ease-in-out">
               Fermer
             </Button>
           </div>
@@ -150,11 +150,11 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
 
       <Dialog open={isPurchaseOpen} onOpenChange={setPurchaseOpen}>
         <DialogContent className="sm:max-w-[425px] bg-white rounded-3xl p-0 overflow-hidden">
-          <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-6">
+          <div className="bg-gradient-to-r from-[#CC8C87] to-[#ffd9d9] p-6">
             <DialogTitle className="text-3xl font-bold mb-2 text-white">
               {purchaseStep === 1 ? "Achat de jetons" : "Vérification"}
             </DialogTitle>
-            <DialogDescription className="text-indigo-200">
+            <DialogDescription className="text-[#4A4A4A]">
               {purchaseStep === 1 ? "Choisissez le montant et la méthode de paiement" : "Entrez le code de vérification"}
             </DialogDescription>
           </div>
@@ -171,12 +171,12 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                       type="number"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
-                      className="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                      className="w-full rounded-xl border-gray-300 focus:border-[#CC8C87] focus:ring-[#CC8C87]"
                       placeholder="Entrez le montant"
                     />
                   </div>
                   {amount && (
-                    <p className="text-sm text-indigo-600 font-semibold">
+                    <p className="text-sm text-[#CC8C87] font-semibold">
                       Vous recevrez {Math.floor(parseInt(amount) / tokenRate)} jetons
                     </p>
                   )}
@@ -191,7 +191,7 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                           <RadioGroupItem value={method} id={method} className="peer sr-only" />
                           <Label
                             htmlFor={method}
-                            className="flex flex-col items-center justify-between rounded-xl border-2 border-gray-200 bg-white p-4 hover:bg-gray-50 hover:border-indigo-500 peer-data-[state=checked]:border-indigo-600 peer-data-[state=checked]:bg-indigo-50 transition duration-200 ease-in-out cursor-pointer"
+                            className="flex flex-col items-center justify-between rounded-xl border-2 border-gray-200 bg-white p-4 hover:bg-gray-50 hover:border-[#CC8C87] peer-data-[state=checked]:border-[#CC8C87] peer-data-[state=checked]:bg-[#cc8c87c0] transition duration-200 ease-in-out cursor-pointer"
                           >
                             <img src="logos{{method}" alt={`${method} logo`} className="w-12 h-6 object-contain mb-2" />
                             {method.charAt(0).toUpperCase() + method.slice(1)}
@@ -204,7 +204,7 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                 </div>
                 <DialogFooter className="mt-6">
                   <Button onClick={() => setPurchaseStep(2)} disabled={!amount || !paymentMethod}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-xl transition duration-200 ease-in-out">
+                    className="w-full bg-[#CC8C87] hover:bg-[#cc8c87b7] text-white font-semibold py-2 rounded-xl transition duration-200 ease-in-out">
                     Suivant
                   </Button>
                 </DialogFooter>
@@ -220,14 +220,14 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
                       id="code"
                       value={verificationCode}
                       onChange={(e) => setVerificationCode(e.target.value)}
-                      className="w-full rounded-xl border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                      className="w-full rounded-xl border-gray-300 focus:border-[#CC8C87] focus:ring-[#CC8C87]"
                       placeholder="Entrez le code"
                     />
                   </div>
                 </div>
                 <DialogFooter className="mt-6">
                   <Button onClick={handlePurchaseSubmit} disabled={!verificationCode}
-                    className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 rounded-xl transition duration-200 ease-in-out">
+                    className="w-full bg-[#CC8C87] hover:bg-[#cc8c87b7] text-white font-semibold py-2 rounded-xl transition duration-200 ease-in-out">
                     Valider l'achat
                   </Button>
                 </DialogFooter>

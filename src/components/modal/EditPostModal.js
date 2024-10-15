@@ -1,15 +1,13 @@
 import React, { useState, useRef } from 'react';
 import { Edit3, Image, X } from 'lucide-react';
-import ApiService from '../services/ApiService';
+import ApiService from '../../services/ApiService';
 import Swal from 'sweetalert2';
 
-
-
-export default function CreatePostCard() {
-  const [postContent, setPostContent] = useState('');
-  const [tags, setTags] = useState([]);
+export default function EditPostModal({ post, onClose, onUpdate }) {
+  const [postContent, setPostContent] = useState(post.content || '');
+  const [tags, setTags] = useState(post.tags || []);
   const [currentTag, setCurrentTag] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null); // Nouveau fichier
   const fileInputRef = useRef(null);
 
   const handleAddTag = (e) => {
@@ -33,10 +31,8 @@ export default function CreatePostCard() {
     }
   };
 
-  const createPost = async () => {
-
+  const updatePost = async () => {
     const token = localStorage.getItem('token');
-    console.log('recup token post:', token); 
     if (!token) {
       alert('Token non trouvé, veuillez vous reconnecter.');
       return;
@@ -50,42 +46,35 @@ export default function CreatePostCard() {
     }
 
     try {
-      console.log(formData);
-      const response = await ApiService.request('POST', '/posts/create', formData, token);
-      console.log('Post créé avec succès:', response);
+      const response = await ApiService.request('PUT', `/posts/update/${post.id}`, formData, token);
+      console.log('Post modifié avec succès:', response);
 
       Swal.fire({
         title: 'Succès!',
-        text: 'Post créé avec succès',
+        text: 'Post modifié avec succès',
         icon: 'success',
         confirmButtonText: 'Ok',
       });
 
-      
-      setPostContent('');
-      setTags([]);
-      setSelectedFile(null);
+      // Appelle la fonction pour mettre à jour la liste des posts dans le composant parent
+      onUpdate(response.post);
+      onClose(); // Fermer la modale
     } catch (error) {
-      console.error('Erreur lors de la création du post:', error);
-      alert('Une erreur est survenue lors de la création du post.');
+      console.error('Erreur lors de la modification du post:', error);
+      alert('Une erreur est survenue lors de la modification du post.');
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Post Content:', postContent);
-    console.log('Tags:', tags);
-    console.log('Selected File:', selectedFile);
-
-    createPost(); 
-  
+    updatePost();
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 max-w-2xl">
       <div className="flex items-center mb-4">
         <Edit3 className="w-5 h-5 text-[#CC8C87] mr-2" />
-        <span className="text-gray-600 font-medium">Create Post</span>
+        <span className="text-gray-600 font-medium">Modifier le Post</span>
       </div>
       <form onSubmit={handleSubmit}>
         <div className="flex items-start mb-4">
@@ -96,7 +85,7 @@ export default function CreatePostCard() {
           />
           <textarea
             className="flex-grow p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
-            placeholder="What's on your mind?"
+            placeholder="Modifier votre post"
             rows={3}
             value={postContent}
             onChange={(e) => setPostContent(e.target.value)}
@@ -120,7 +109,7 @@ export default function CreatePostCard() {
           <div className="flex">
             <input
               type="text"
-              placeholder="Add a tag"
+              placeholder="Ajouter un tag"
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
               className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
@@ -130,7 +119,7 @@ export default function CreatePostCard() {
               onClick={handleAddTag}
               className="bg-[#CC8C87] text-white px-4 py-2 rounded-r-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
             >
-              Add Tag
+              Ajouter Tag
             </button>
           </div>
         </div>
@@ -142,7 +131,7 @@ export default function CreatePostCard() {
               className="flex items-center text-gray-600 hover:text-gray-800"
             >
               <Image className="w-5 h-5 text-green-500 mr-1" />
-              <span className="text-sm">Photo/Video</span>
+              <span className="text-sm">Modifier Photo/Video</span>
             </button>
             <input
               ref={fileInputRef}
@@ -154,7 +143,7 @@ export default function CreatePostCard() {
           </div>
           {selectedFile && (
             <div className="text-sm text-gray-600">
-              File selected: {selectedFile.name}
+              Fichier sélectionné: {selectedFile.name}
             </div>
           )}
         </div>
@@ -162,7 +151,7 @@ export default function CreatePostCard() {
           type="submit"
           className="mt-4 w-full bg-[#CC8C87] text-white px-4 py-2 rounded-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
-          Post
+          Mettre à jour
         </button>
       </form>
     </div>
