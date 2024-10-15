@@ -13,7 +13,7 @@ function withAuth(Component) {
     const validateToken = async () => {
       if (user && user.token) {
         try {
-          const response = await apiService.request('POST', '/users/verify-token', { token: user.token });
+          const response = await apiService.request('POST', '/users/verify', { token: user.token });
           console.log(response);
           setIsValidToken(true);
         } catch (error) {
