@@ -1,11 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import apiService from '../services/ApiService';
 
 function withAuth(Component) {
   return function AuthenticatedComponent(props) {
-    const token = localStorage.getItem('token');
-    console.log("Token:", token);
 
-    if (!token) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const [isValidToken, setIsValidToken] = useState(false);
+
+    useEffect(() => {
+      validateToken();
+    }, [])
+    const validateToken = async () => {
+      if (user && user.token) {
+        try {
+          const response = await apiService.request('POST', '/users/verify-token', { token: user.token });
+          console.log(response);
+          setIsValidToken(true);
+        } catch (error) {
+          console.error('Token validation failed:', error);
+          setIsValidToken(false);
+        }
+      } else {
+        setIsValidToken(false);
+      }
+    }
+
+    if (!isValidToken) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="max-w-md w-full">
@@ -63,7 +83,7 @@ function withAuth(Component) {
       );
     }
 
-    return <Component {...props} />;
+    return <Component user={user} />;
   };
 }
 

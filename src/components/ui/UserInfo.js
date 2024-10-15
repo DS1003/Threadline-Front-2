@@ -8,9 +8,9 @@ const UserInfo = ({ user }) => {
       <div className="space-y-4">
         {[
           { Icon: MapPin, label: 'Adresse', value: user.address },
-          { Icon: Phone, label: 'Téléphone', value: user.phone },
+          { Icon: Phone, label: 'Téléphone', value: user.phoneNumber },
           { Icon: Mail, label: 'Email', value: user.email },
-          { Icon: User, label: 'Genre', value: user.gender },
+          { Icon: User, label: 'Genre', value: user.gender === 'MALE' ? 'Homme' : 'Femme' },
         ].map(({ Icon, label, value }) => (
           <div key={label} className="flex items-center p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:scale-102">
             <div className="bg-[#CC8C87] p-3 rounded-full mr-4">

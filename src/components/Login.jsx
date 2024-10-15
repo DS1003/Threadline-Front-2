@@ -56,14 +56,11 @@ const Login = () => {
 
     try {
       const response = await apiService.request('post', '/users/login', formData);
-      console.log(response);
-      const { token, user } = response;
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("user", JSON.stringify(user));
+      console.log(response.data);
+      localStorage.setItem("user", JSON.stringify(response.data));
       navigate('/feed');
     } catch (err) {
-      console.error(err);
-      setErrors({ ...errors, general: 'Erreur de connexion. Veuillez vérifier vos informations et réessayer.' });
+      setErrors({ ...errors, general: err.message });
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +94,7 @@ const Login = () => {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" size={18} />
                 <input 
-                  type="email" 
+                  type="text" 
                   name="email"
                   value={formData.email}
                   onChange={handleChange} 
