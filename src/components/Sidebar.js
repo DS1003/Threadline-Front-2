@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Users, Calendar, Video, Image, ShoppingBag, File } from 'lucide-react';
+import { Home, Users, Calendar, Video, User, Image, ShoppingBag, File } from 'lucide-react';
 
 const Sidebar = () => {
   const menuItems = [
@@ -7,13 +7,12 @@ const Sidebar = () => {
     { icon: Users, label: 'Friends' },
     { icon: Calendar, label: 'Event', notificationCount: 4 },
     { icon: Video, label: 'Watch Videos' },
-    { icon: Image, label: 'Photos' },
-    { icon: ShoppingBag, label: 'Marketplace' },
-    { icon: File, label: 'Files', notificationCount: 7 },
+    { icon: User, label: 'Vendeurs' },
+    { icon: ShoppingBag, label: 'Articles' },
   ];
 
   return (
-    <aside className=" bg-white p-4 max-w-lg">
+    <aside className=" bg-white rounded-lg p-4 max-w-lg">
         
       <nav>
         {menuItems.map((item, index) => (
