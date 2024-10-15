@@ -265,11 +265,19 @@ export default function PostCard() {
               )
 
               ) }
-              <img
-                src={post.content} // Image du post
-                alt="user-image"
-                className="w-full h-90 object-cover rounded-lg"
-              />
+              {post.content ? (
+              /\.(jpg|jpeg|png|gif)$/i.test(post.content) ? (
+                <img src={post.content} alt="Story" className="w-full h-90 object-cover rounded-lg" />
+              ) : /\.(mp4|webm|ogg)$/i.test(post.content) ? (
+                <video src={post.content} controls className="w-full h-90 object-cover rounded-lg">
+                  Votre navigateur ne supporte pas la lecture de vidéos.
+                </video>
+              ) : (
+                <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+                  <p className="text-3xl font-bold text-white text-center px-6">{post.content}</p>
+                </div>
+              )
+            ) : null}
             </div>
             <div className="flex items-center justify-between">
               <div className="flex space-x-4">
