@@ -8,6 +8,7 @@ import {
   MoreVertical,
   Trash2,
   Edit,
+
 } from "lucide-react";
 import {
   AlertDialog,
@@ -27,6 +28,7 @@ import EditPostModal from "../../components/modal/EditPostModal";
 import { format } from 'date-fns';
 
 import Swal from 'sweetalert2';
+import Loader from './Loader';
 
 
 export default function PostCard() {
@@ -172,7 +174,7 @@ export default function PostCard() {
 
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
 
   if (error) {
