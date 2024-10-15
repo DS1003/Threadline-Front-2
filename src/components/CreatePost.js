@@ -35,9 +35,9 @@ export default function CreatePostCard() {
 
   const createPost = async () => {
 
-    const token = localStorage.getItem('token');
-    console.log('recup token post:', token); 
-    if (!token) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    console.log('recup token post:', user.token); 
+    if (!user.token) {
       alert('Token non trouvé, veuillez vous reconnecter.');
       return;
     }
@@ -51,7 +51,7 @@ export default function CreatePostCard() {
 
     try {
       console.log(formData);
-      const response = await ApiService.request('POST', '/posts/create', formData, token);
+      const response = await ApiService.request('POST', '/posts/create', formData, user.token);
       console.log('Post créé avec succès:', response);
 
       Swal.fire({
