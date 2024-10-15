@@ -8,18 +8,20 @@ import UpdateRoleUser from './UpdateRoleUser';
 
 const ProfilePage = () => {
   const [userRole, setUserRole] = useState(''); // État pour stocker le rôle de l'utilisateur
-  
-
-  const user = {
+  const connecteUser = JSON.parse(localStorage.getItem('user'));  
+  const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
+  const user = {...connecteUser, coverPhoto};
+  console.log(user)
+  /*const user = {
     name: 'Jane Doe',
     tagline: 'Photographer | Traveler | Coffee Lover',
-    coverPhoto: 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666',
+    coverPhoto: 
     profilePicture: 'https://avatars.githubusercontent.com/u/100100154?v=4',
     location: 'New York, NY',
     work: 'Freelance Photographer',
     education: 'Bachelor of Fine Arts, NYU',
     relationshipStatus: 'Single',
-  };
+  };*/
 
   const handleRoleUpdate = (newRole) => {
     setUserRole(newRole);
@@ -89,10 +91,10 @@ const ProfilePage = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
             <UserInfo user={user} />
-            {/* Vérifier le rôle avant d'afficher le bouton de mise à jour */}
-            {userRole !== 'TAILOR' && userRole !== 'SELLER' && (
-  <UpdateRoleUser onRoleUpdate={handleRoleUpdate} />
-)}
+            
+            {user.roles && !user.roles.some(role => role.name === 'TAILOR' || role.name === 'SELLER') && (
+                <UpdateRoleUser onRoleUpdate={handleRoleUpdate} />
+            )}
 
             <UserMeasurements measurements={measurements} />
             <InstagramStyleFavorites posts={posts} />

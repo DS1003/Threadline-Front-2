@@ -10,7 +10,7 @@ import Balanced from './Balanced';
 import Navbar from './Navbar';
 import withAuth from '../hoc/withAuth';
 
-const MainFeed= () => {
+const MainFeed= (props) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -44,7 +44,7 @@ const MainFeed= () => {
 
             {/* Left sidebar - fixed */}
             <div className="custom-scrollbar overflow-hidden w-1/4 p-8 fixed left-[10%] top-14 bottom-0">
-                <ProfileInfo />
+                <ProfileInfo user={props.user} />
                 <Balanced 
                     balance={balance} 
                     lastPurchaseDate="2024-05-24"

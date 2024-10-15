@@ -2,27 +2,29 @@ import React from 'react'
 import { VerifiedIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom';
 
-export default function Component() {
+export default function Component(props) {
   const navigate = useNavigate();
 
+  const {user} = props;
+
   const handleProfileClick = () => {
-    navigate('/profile'); // Remplacez '/profile' par l'URL de destination souhaitée
+    navigate('/profile');
   };
   
   return (
     <div className="w-full  h-fit max-w-lg mb-3  bg-white rounded-lg shadow-sm p-4 relative">
       <div className="flex items-center gap-3 mb-4">
         <img
-          src="https://avatars.githubusercontent.com/u/100100154?v=4"
+          src={user.photoUrl}
           alt="Profilepicture"
           className="w-12 h-12 rounded-full"
         />
         <div>
           <div className="flex items-center gap-1">
-            <h2 className="text-lg font-bold">Jakob Botosh</h2>
+            <h2 className="text-lg font-bold">{user.firstname} {user.lastname}</h2>
             <VerifiedIcon className="w-5 h-5 text-[#CC8C87]" />
           </div>
-          <p className="text-gray-500 text-sm">@jakobbbtsh</p>
+          <p className="text-gray-500 text-sm">{user.email}</p>
         </div>
       </div>
       <button onClick={handleProfileClick}

@@ -35,10 +35,10 @@ const Register = () => {
   };
 
   const handleFileChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      setFormData(prevState => ({ ...prevState, photo: file }));
-      setLoadImage(URL.createObjectURL(file));
+    const photo = e.target.files[0];
+    if (photo && (photo.type.startsWith('image/'))) {
+      setFormData(prevState => ({ ...prevState, photo: photo }));
+      setLoadImage(URL.createObjectURL(photo));
     }
   };
 
@@ -65,7 +65,15 @@ const Register = () => {
     setIsLoading(true);
     setGeneralError('');
     try {
-      const response = await apiService.request('post', '/users/register', formData);
+      const data = new FormData();
+      Object.keys(formData).forEach((key) => {
+          data.append(key, formData[key]);
+      }); 
+      const response = await apiService.request('post', '/users/register', data, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       console.log(response);
       toast.success('Inscription réussie ! Redirection vers la page de connexion...');
       setTimeout(() => navigate('/login'), 3000);

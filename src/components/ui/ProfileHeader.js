@@ -1,36 +1,7 @@
-import React, { useEffect, useState } from 'react';
 import { Camera, Edit } from 'lucide-react';
-import apiService from '../../services/ApiService';
 
-const ProfileHeader = () => {
-  const [user, setUser] = useState({
-    firstname: '',
-    lastname: '',
-    photoUrl: ''
-  });
-
-  const token = localStorage.getItem('token');
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await apiService.request('get', 'users/get-one', null, token);
-        console.log("Dans la response du header");
-        const  user  = response.user;
-        console.log(user);
-
-        setUser({
-          firstname: user.firstname,
-          lastname: user.lastname,
-          photoUrl: user.photoUrl
-        });
-      } catch (error) {
-        console.error('Failed to fetch user profile:', error);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
+const ProfileHeader = (props) => {
+  const { user } = props;
 
   return (
     <div className="relative">
