@@ -117,7 +117,7 @@ const Register = () => {
             <p className="text-xl">Le réseau social des créateurs de mode</p>
           </div>
           <div className="w-full flex justify-center">
-            <Scissors className="text-white" size={120} />
+            <img src="https://res.cloudinary.com/drxouwbms/image/upload/v1729028749/ThreadLogo_vejh4o.png" className="text-white" size={120} />
           </div>
           <p className="text-white text-sm">Tissez votre réseau, créez votre style</p>
         </div>

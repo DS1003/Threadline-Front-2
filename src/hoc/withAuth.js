@@ -5,16 +5,17 @@ function withAuth(Component) {
   return function AuthenticatedComponent(props) {
 
     const user = JSON.parse(localStorage.getItem('user'));
-    const [isValidToken, setIsValidToken] = useState(false);
+    const [isValidToken, setIsValidToken] = useState(true);
 
     useEffect(() => {
       validateToken();
-    }, [])
+    }, []);
+
     const validateToken = async () => {
       if (user && user.token) {
         try {
           const response = await apiService.request('POST', '/users/verify', { token: user.token });
-          console.log(response);
+          console.log("La réponse est :", response);
           setIsValidToken(true);
         } catch (error) {
           console.error('Token validation failed:', error);
@@ -25,7 +26,7 @@ function withAuth(Component) {
       }
     }
 
-    if (!isValidToken) {
+    if (isValidToken === false) {
       return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
           <div className="max-w-md w-full">

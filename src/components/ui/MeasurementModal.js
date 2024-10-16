@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import apiService from '../../services/ApiService'; // Importez le service API
 
-const MeasurementModal = ({ isOpen, onClose, onAdd, measurement }) => {
-  const user = JSON.parse(localStorage.getItem('user'));
+const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
   
   const [newMeasurement, setNewMeasurement] = useState({
     waist: '',

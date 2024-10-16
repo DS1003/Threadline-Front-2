@@ -10,6 +10,7 @@ import Balanced from './Balanced';
 import Navbar from './Navbar';
 import withAuth from '../hoc/withAuth';
 
+
 const MainFeed= (props) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -40,7 +41,7 @@ const MainFeed= (props) => {
 
     return (
         <div className="flex h-screen overflow-hidden">
-            <Navbar />
+            <Navbar user={props.user}/>
 
             {/* Left sidebar - fixed */}
             <div className="custom-scrollbar overflow-hidden w-1/4 p-8 fixed left-[10%] top-14 bottom-0">
@@ -63,7 +64,7 @@ const MainFeed= (props) => {
                         <StoryCircles />
                     </div>
                     {/* Create post form */}
-                    <CreatePostCard />
+                    <CreatePostCard user={props.user} />
                     <Post />
                     {/* Add more posts as needed */}
                 </div>

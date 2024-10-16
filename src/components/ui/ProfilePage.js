@@ -8,31 +8,35 @@ import UserMeasurements from './UserMeasurements';
 import UpdateRoleUser from './UpdateRoleUser';
 
 const ProfilePage = () => {
-  const [userRole, setUserRole] = useState(''); // État pour stocker le rôle de l'utilisateur
-  const [measurements, setMeasurements] = useState([]); // État pour stocker les ensembles de mesures
-  const connecteUser = JSON.parse(localStorage.getItem('user'));
-  const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
-  const user = { ...connecteUser, coverPhoto };
+  const [measurements, setMeasurements] = useState([]);
+  const [user, setUser] = useState(null); // État pour stocker l'utilisateur connecté
 
-  const handleRoleUpdate = (newRole) => {
-    setUserRole(newRole);
-    localStorage.setItem('userRole', newRole); // Mettre à jour le localStorage
-  };
-
-  // Récupérer le rôle de l'utilisateur depuis localStorage ou une autre source au chargement du composant
   useEffect(() => {
-    const savedRole = localStorage.getItem('userRole'); // Récupérer le rôle depuis localStorage
-    if (savedRole) {
-      setUserRole(savedRole); // Mettre à jour l'état avec le rôle récupéré
+    // Récupérer les informations de l'utilisateur depuis localStorage
+    const userFromStorage = localStorage.getItem('user');
+    if (userFromStorage) {
+      try {
+        const parsedUser = JSON.parse(userFromStorage);
+        setUser(parsedUser); // Mettre à jour l'état avec les informations utilisateur
+        //setUserRole(parsedUser.roles.map(role => role.name)); // Récupérer le rôle
+      } catch (error) {
+        console.error("Erreur lors du parsing de l'utilisateur depuis le localStorage", error);
+      }
     }
   }, []);
+ 
+
+  const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
+ 
+  // Vérification des rôles pour décider d'afficher ou non le composant UpdateRoleUser
+  const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
 
   const posts = [
     {
       id: 1,
       author: {
-        name: user.name,
-        profilePicture: user.profilePicture,
+        name: 'kaba',
+        profilePicture: 'https://source.unsplash.com/random/800x600',
       },
       date: 'June 1, 2023',
       content: 'Just finished a great photoshoot in Central Park!',
@@ -43,8 +47,8 @@ const ProfilePage = () => {
     {
       id: 2,
       author: {
-        name: user.name,
-        profilePicture: user.profilePicture,
+        name: 'diallo',
+        profilePicture: 'https://source.unsplash.com/random/800x600',
       },
       date: 'May 28, 2023',
       content: 'Exploring the streets of NYC. So much inspiration everywhere!',
@@ -73,23 +77,24 @@ const ProfilePage = () => {
   // Fonction pour supprimer un ensemble de mesures
   const handleDeleteMeasurement = (index) => {
     setMeasurements((prevMeasurements) => prevMeasurements.filter((_, i) => i !== index));
-  };
+  }
+
 
   return (
     <div className="bg-gray-100 min-h-screen">
-      <ProfileHeader user={user} />
+      <ProfileHeader user={{ ...user, coverPhoto }} />
       <div className="container mt-14 mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-1">
             <UserInfo user={user} />
-
-            {user.roles && !user.roles.some(role => role.name === 'TAILOR' || role.name === 'SELLER') && (
-              <UpdateRoleUser onRoleUpdate={handleRoleUpdate} />
+            
+            {!isTailorOrSeller && (
+              <UpdateRoleUser user={user} setUser={setUser} />
             )}
 
             {/* Passer les fonctions d'ajout et de suppression à UserMeasurements */}
             <UserMeasurements 
-              measurements={measurements} 
+              user={user}
               onAddMeasurement={addMeasurement} 
               onDeleteMeasurement={handleDeleteMeasurement} // Passer la fonction de suppression
             />

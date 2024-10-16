@@ -1,11 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Ruler } from 'lucide-react';
 import { FaPlus } from 'react-icons/fa';
 import MeasurementModal from './MeasurementModal';
+import ConfirmationModal from './ConfirmationModal'; // Import the ConfirmationModal
+import apiService from '../../services/ApiService';
 
-const UserMeasurements = ({ measurements, onAddMeasurement, onDeleteMeasurement }) => {
+const UserMeasurements = ({ user, onAddMeasurement, onDeleteMeasurement }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // State for confirmation modal
   const [currentMeasurement, setCurrentMeasurement] = useState(null);
+  const [measurements, setMeasurestments] = useState([]);
+  const [measurementToDelete, setMeasurementToDelete] = useState(null); // Store the measurement ID to delete
+
+  useEffect(() => {
+    const fetchMeasurements = async () => {
+      try {
+        const response = await apiService.request('GET', '/measurements/all', null, user?.token);
+        setMeasurestments(response.data);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des mesures:', error);
+      }
+    };
+    if (user?.token) {
+      fetchMeasurements();
+    }
+  }, [user]);
 
   const openModal = (measurement = null) => {
     setCurrentMeasurement(measurement);
@@ -22,8 +41,28 @@ const UserMeasurements = ({ measurements, onAddMeasurement, onDeleteMeasurement 
     closeModal();
   };
 
-  const handleDeleteMeasurement = (index) => {
-    onDeleteMeasurement(index); // Appeler la fonction de suppression à partir du parent
+  // Open the confirmation modal
+  const handleDeleteClick = (id) => {
+    setMeasurementToDelete(id);
+    setIsConfirmationOpen(true);
+  };
+
+  // Confirm delete measurement
+  const confirmDeleteMeasurement = async () => {
+    if (measurementToDelete) {
+      try {
+        const response = await apiService.request('DELETE', `/measurements/delete/${measurementToDelete}`, null, user?.token);
+        if (response.status === 200) {
+          setMeasurestments((prev) => prev.filter((m) => m.id !== measurementToDelete));
+          onDeleteMeasurement(measurementToDelete); // Optionally pass this up to the parent
+        }
+      } catch (error) {
+        console.error('Erreur lors de la suppression des mesures:', error);
+      } finally {
+        setIsConfirmationOpen(false);
+        setMeasurementToDelete(null); // Reset the ID
+      }
+    }
   };
 
   return (
@@ -33,25 +72,25 @@ const UserMeasurements = ({ measurements, onAddMeasurement, onDeleteMeasurement 
         Mesures
       </h2>
       <div className="grid grid-cols-1 gap-6">
-        {measurements.map((measurement, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg hover:scale-105">
-            <h3 className="text-lg font-semibold text-[#CC8C87]">Mesure {measurement.clientName}</h3>
-            <p className="text-sm">Poitrine: {measurement.chest} cm</p>
-            <p className="text-sm">Taille: {measurement.waist} cm</p>
-            <p className="text-sm">Hanches: {measurement.hips} cm</p>
-            <p className="text-sm">Épaules: {measurement.shoulder} cm</p>
-            <p className="text-sm">Buste: {measurement.bust} cm</p>
-            <p className="text-sm">Entrejambe: {measurement.inseam} cm</p>
-            <p className="text-sm">Cuisse: {measurement.thigh} cm</p>
+        {measurements.map((m) => (
+          <div key={m.id} className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg hover:scale-105">
+            <h3 className="text-lg font-semibold text-[#CC8C87]">Mesure</h3>
+            <p className="text-sm">Poitrine: {m.chest} cm</p>
+            <p className="text-sm">Taille: {m.waist} cm</p>
+            <p className="text-sm">Hanches: {m.hips} cm</p>
+            <p className="text-sm">Épaules: {m.shoulder} cm</p>
+            <p className="text-sm">Buste: {m.bust} cm</p>
+            <p className="text-sm">Entrejambe: {m.inseam} cm</p>
+            <p className="text-sm">Cuisse: {m.thigh} cm</p>
             <div className="flex justify-between mt-4">
               <button
-                onClick={() => openModal(measurement)}
+                onClick={() => openModal(m)}
                 className="bg-[#CC8C87] text-white rounded-full py-2 px-4 hover:bg-[#a96d69] transition duration-300"
               >
                 Modifier
               </button>
               <button
-                onClick={() => handleDeleteMeasurement(index)}
+                onClick={() => handleDeleteClick(m.id)} // Pass the measurement id to delete
                 className="bg-red-500 text-white rounded-full py-2 px-4 hover:bg-red-700 transition duration-300"
               >
                 Supprimer
@@ -76,6 +115,14 @@ const UserMeasurements = ({ measurements, onAddMeasurement, onDeleteMeasurement 
         onClose={closeModal}
         onAdd={handleAddMeasurement}
         measurement={currentMeasurement}
+        user={user}
+      />
+
+      <ConfirmationModal
+        isOpen={isConfirmationOpen}
+        onClose={() => setIsConfirmationOpen(false)} // Close the confirmation modal
+        onConfirm={confirmDeleteMeasurement} // Confirm deletion
+        message="Êtes-vous sûr de vouloir supprimer cette mesure ?" // Confirmation message
       />
     </div>
   );
