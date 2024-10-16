@@ -417,7 +417,7 @@ export default function PostCard() {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           onClick={closeImageModal}
         >
-          <div className="relative ">
+          <div className="relative "> 
             <img
               src={selectedImage}
               alt="Agrandie"
