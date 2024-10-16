@@ -37,6 +37,8 @@ export default function CommentModal({ postId, onClose, post }) {
                     content: comment,
                     postId: postId,
                 }, user.token);
+
+
                 // Ajouter le nouveau commentaire à l'état des commentaires
                 setComments((prevComments) => [...prevComments, response.comment]);
                 setComment('');
@@ -73,13 +75,24 @@ export default function CommentModal({ postId, onClose, post }) {
                             <span></span>
                         </div>
 
-                        {comments.map((comment) => (
-                            <div key={comment.id} className="mb-4">
-                                <span className="font-semibold mr-2"></span>
-                                <span>{comment.content}</span>
-                                <p className="text-xs text-gray-500 mt-1">{new Date(comment.createdAt).toLocaleString()}</p>
-                            </div>
-                        ))}
+                        {/* {comments.map((comment) => (
+    <div key={comment.id} className="mb-4">
+        <span className="font-semibold mr-2">{comment.author.firstName} {comment.author.lastName}</span>
+        <span>{comment.content}</span>
+        <p className="text-xs text-gray-500 mt-1">{new Date(comment.createdAt).toLocaleString()}</p>
+    </div>
+))} */}
+              {comments.map((comment) => (
+                  <div key={comment.id} className="mb-4">
+                      <span className="font-semibold mr-2">
+                          {comment.author?.firstName} {comment.author?.lastName} {/* Utilisation de l'opérateur de coalescence pour éviter l'erreur */}
+                      </span>
+                      <span>{comment.content}</span>
+                      <p className="text-xs text-gray-500 mt-1">{new Date(comment.createdAt).toLocaleString()}</p>
+                  </div>
+              ))}
+
+
                     </div>
 
                     {/* Interaction buttons */}
@@ -112,7 +125,7 @@ export default function CommentModal({ postId, onClose, post }) {
                             disabled={!comment.trim()} 
                             className={`px-4 py-2 rounded-full font-semibold ${comment.trim() ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-500'}`}
                         >
-                            Post
+                            envoyer
                         </button>
                     </form>
                 </div>
