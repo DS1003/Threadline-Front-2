@@ -9,7 +9,7 @@ const Dashboard = lazy(() => import('./components/Dashboard'));
 const MainFeed = lazy(() => import('./components/MAinFeed'));
 const Login = lazy(() => import('./components/Login'));
 const ProfilePage = lazy(() => import('./components/ui/ProfilePage'));
-
+const MessagingPage = lazy(() => import('./components/Messaging'));
 
 const AppRoutes = () => {
   
@@ -24,6 +24,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/messages" element={<MessagingPage />} />
       </Routes>
     </Suspense>
   );

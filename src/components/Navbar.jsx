@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { 
+import {
   Layout,
   Users,
   Bell,
@@ -13,6 +13,7 @@ import {
   Search,
   ChevronDown
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Navbar = (props) => {
   const { user } = props;
@@ -24,7 +25,7 @@ const Navbar = (props) => {
   let isAuthenticated = false;
   const notificationRef = useRef(null);
 
-  if(user){
+  if (user) {
     isAuthenticated = true
   }
 
@@ -61,21 +62,32 @@ const Navbar = (props) => {
   };
 
   const NavItem = ({ to, icon: Icon, children, notificationCount, onClick }) => (
-    <button
+    <motion.button
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`flex items-center justify-center w-14 h-14 rounded-xl transition-colors duration-200 relative ${
-        isNotificationsOpen && Icon === Bell
+      className={`flex items-center justify-center w-14 h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
           ? 'text-[#CC8C87] bg-[#FDF1F2]'
           : 'text-[#242424] hover:bg-[#FDF1F2]'
-      }`}
+        }`}
     >
-      <Icon className="w-6 h-6" />
-      {notificationCount > 0 && (
-        <span className="absolute top-1 right-1 bg-[#CC8C87] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-          {notificationCount}
-        </span>
+      {to ? (
+        <NavLink to={to} className="flex items-center justify-center w-full h-full">
+          <Icon className="w-6 h-6" />
+        </NavLink>
+      ) : (
+        <Icon className="w-6 h-6" />
       )}
-    </button>
+      {notificationCount > 0 && (
+        <motion.span
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="absolute top-1 right-1 bg-[#CC8C87] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+        >
+          {notificationCount}
+        </motion.span>
+      )}
+    </motion.button>
   );
 
   const getNotificationIcon = (type) => {
@@ -94,21 +106,25 @@ const Navbar = (props) => {
   };
 
   return (
-    <nav className={`fixed w-full z-50 transition-all duration-300 ${
-      scrolled ? 'bg-white shadow-md' : 'bg-white'
-    }`}>
+    <motion.nav
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100 }}
+      className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'
+        }`}
+    >
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo and Search */}
           <div className="flex items-center flex-1">
             <NavLink to="/feed" className="flex-shrink-0 mr-10">
-              <span className="titreSite text-4xl font-bold text-[#CC8C87]">Threadline</span>
+              <span className="titreSite text-4xl font-bold bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
             </NavLink>
             <div className="relative hidden sm:block max-w-xs w-full">
               <input
                 type="text"
                 placeholder="Rechercher sur Theardline"
-                className="w-full px-4 py-2 rounded-full bg-[#f4f4f4] text-[#242424] border-none placeholder-[#77696A] focus:outline-none focus:ring-2 focus:ring-[#EAB0B7]"
+                className="w-full px-4 py-2 rounded-full bg-[#f4f4f4] text-[#242424] border-none placeholder-[#77696A] focus:outline-none focus:ring-2 focus:ring-[#EAB0B7] transition-all duration-300"
               />
               <Search className="absolute right-3 top-2.5 w-5 h-5 text-[#77696A]" />
             </div>
@@ -116,12 +132,12 @@ const Navbar = (props) => {
 
           {/* Main Navigation */}
           <div className="flex items-center justify-center flex-1 space-x-2">
-            <NavItem to="/" icon={Layout} />
+            <NavItem to="/feed" icon={Layout} />
             <NavItem to="/network" icon={Users} />
             <NavItem to="/messages" icon={Mail} notificationCount={3} />
-            <NavItem 
-              icon={Bell} 
-              notificationCount={5} 
+            <NavItem
+              icon={Bell}
+              notificationCount={5}
               onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
             />
           </div>
@@ -130,24 +146,32 @@ const Navbar = (props) => {
           <div className="flex items-center justify-end flex-1">
             {isAuthenticated ? (
               <>
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center justify-center h-10 rounded-full hover:bg-[#FDF1F2] transition-colors duration-200 mr-2 px-2"
                 >
-                  <img 
+                  <img
                     src={user.photoUrl}
-                    alt="" 
-                    className="w-8 h-8 rounded-full object-cover mr-2"
+                    alt=""
+                    className="w-8 h-8 rounded-full object-cover mr-2 border-2 border-[#EAB0B7]"
                   />
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
-                </button>
-                
-                       {/* Profile Dropdown */}
-                       {isProfileMenuOpen && (
-                  <div className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden transition-all duration-300 ease-in-out">
+                </motion.button>
+
+                {/* Profile Dropdown */}
+                {isProfileMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
+                  >
                     <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
                       <div className="flex items-center">
-                        <img 
+                        <img
                           src={user.photoUrl}
                           alt=""
                           className="w-14 h-14 rounded-full object-cover mr-3 border-2 border-white"
@@ -177,22 +201,28 @@ const Navbar = (props) => {
                       </div>
                       <span>Déconnexion</span>
                     </button>
-                  </div>
+                  </motion.div>
                 )}
               </>
             ) : (
-              <NavLink
-                to="/login"
-                className="flex items-center px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7] transition-all duration-300"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                Connexion
-              </NavLink>
+                <NavLink
+                  to="/login"
+                  className="flex items-center px-4 py-2 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-white rounded-md hover:from-[#EAB0B7] hover:to-[#CC8C87] transition-all duration-300"
+                >
+                  Connexion
+                </NavLink>
+              </motion.div>
             )}
           </div>
 
-
           {/* Mobile menu button */}
-          <button
+          <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden ml-2 p-2 rounded-full text-[#242424] hover:bg-[#FDF1F2] transition-colors duration-200"
           >
@@ -201,18 +231,29 @@ const Navbar = (props) => {
             ) : (
               <Menu className="w-6 h-6" />
             )}
-          </button>
+          </motion.button>
         </div>
 
-         {/* Notifications Dropdown */}
-         {isNotificationsOpen && (
-          <div ref={notificationRef} className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden transition-all duration-300 ease-in-out">
+        {/* Notifications Dropdown */}
+        {isNotificationsOpen && (
+          <motion.div
+            ref={notificationRef}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.2 }}
+            className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
+          >
             <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
               <h3 className="font-semibold text-lg text-white">Notifications</h3>
             </div>
             <div className="max-h-96 overflow-y-auto">
               {notifications.map((notification) => (
-                <div key={notification.id} className="px-4 py-3 border-b border-[#EAB0B7] hover:bg-[#FDF1F2] transition-all duration-200">
+                <motion.div
+                  key={notification.id}
+                  whileHover={{ backgroundColor: "#FDF1F2" }}
+                  className="px-4 py-3 border-b border-[#EAB0B7] transition-all duration-200"
+                >
                   <div className="flex items-start">
                     <div className="flex-shrink-0 mr-3">
                       {getNotificationIcon(notification.type)}
@@ -222,7 +263,7 @@ const Navbar = (props) => {
                       <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
             <div className="px-4 py-3 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
@@ -230,20 +271,25 @@ const Navbar = (props) => {
                 Voir toutes les notifications
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t border-[#EAB0B7] py-4">
-            {/* ... (le contenu du menu mobile reste inchangé) ... */}
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+            className="md:hidden bg-white border-t border-[#EAB0B7] py-4"
+          >
             <div className="space-y-2 px-2">
               {isAuthenticated && (
                 <div className="flex items-center px-3 py-2 border-b border-[#EAB0B7] mb-2">
-                  <img 
+                  <img
                     src={user.photoUrl}
                     alt=""
-                    className="w-10 h-10 rounded-full mr-3 object-cover"
+                    className="w-10 h-10 rounded-full mr-3 object-cover border-2 border-[#EAB0B7]"
                   />
                   <span className="font-semibold text-[#242424]">{user.firstname}</span>
                 </div>
@@ -251,63 +297,72 @@ const Navbar = (props) => {
               <div className="px-3 py-2">
                 <input
                   type="text"
-                  placeholder="Rechercher sur Theardline"
-                  className="w-full px-4 py-2 rounded-full bg-[#FDF1F2] text-[#242424] placeholder-[#77696A] focus:outline-none focus:ring-2 focus:ring-[#EAB0B7]"
+                  placeholder="Rechercher sur Threadline"
+                  className="w-full px-4 py-2 rounded-full bg-[#FDF1F2] text-[#242424] placeholder-[#77696A] focus:outline-none focus:ring-2 focus:ring-[#EAB0B7] transition-all duration-300"
                 />
               </div>
-              <NavLink to="/" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
-                <Layout className="w-5 h-5 mr-3" />
-                Accueil
-              </NavLink>
-              <NavLink to="/network" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
-                <Users className="w-5 h-5 mr-3" />
-                Mon réseau
-              </NavLink>
-              <NavLink to="/create" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
-                <PlusCircle className="w-5 h-5 mr-3" />
-                Créer
-              </NavLink>
-              <NavLink to="/messages" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
-                <Mail className="w-5 h-5 mr-3" />
-                Messages
-              </NavLink>
-              <NavLink to="/notifications" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md">
-                <Bell className="w-5 h-5 mr-3" />
-                Notifications
-              </NavLink>
-              
+              <motion.div className="space-y-2">
+                <NavLink to="/" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <Layout className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Accueil
+                </NavLink>
+                <NavLink to="/network" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <Users className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Mon réseau
+                </NavLink>
+                <NavLink to="/create" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <PlusCircle className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Créer
+                </NavLink>
+                <NavLink to="/messages" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <Mail className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Messages
+                </NavLink>
+                <NavLink to="/notifications" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <Bell className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Notifications
+                </NavLink>
+              </motion.div>
+
               {isAuthenticated ? (
                 <>
                   <NavLink
                     to="/settings"
-                    className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md"
+                    className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200"
                     onClick={() => setIsMenuOpen(false)}
                   >
-                    <User className="w-5 h-5 mr-3" />
+                    <User className="w-5 h-5 mr-3 text-[#CC8C87]" />
                     Paramètres
                   </NavLink>
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     onClick={handleLogout}
-                    className="w-full flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md"
+                    className="w-full flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200"
                   >
-                    <LogOut className="w-5 h-5 mr-3" />
+                    <LogOut className="w-5 h-5 mr-3 text-[#CC8C87]" />
                     Déconnexion
-                  </button>
+                  </motion.button>
                 </>
               ) : (
-                <NavLink
-                  to="/login"
-                  className="flex items-center px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7]"
-                  onClick={() => setIsMenuOpen(false)}
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  Connexion
-                </NavLink>
+                  <NavLink
+                    to="/login"
+                    className="flex items-center justify-center px-4 py-2 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-white rounded-md hover:from-[#EAB0B7] hover:to-[#CC8C87] transition-all duration-300"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Connexion
+                  </NavLink>
+                </motion.div>
               )}
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
-    </nav>
+    </motion.nav>
   );
 };
 
