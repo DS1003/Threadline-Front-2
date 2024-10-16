@@ -7,10 +7,10 @@ const UserInfo = ({ user }) => {
       <h2 className="text-3xl  mb-6 text-[#4A4A4A] border-b-2 border-[#CC8C87] pb-2 text-center">Informations Personnelles</h2>
       <div className="space-y-4">
         {[
-          { Icon: MapPin, label: 'Adresse', value: user.address },
-          { Icon: Phone, label: 'Téléphone', value: user.phoneNumber },
-          { Icon: Mail, label: 'Email', value: user.email },
-          { Icon: User, label: 'Genre', value: user.gender === 'MALE' ? 'Homme' : 'Femme' },
+          { Icon: MapPin, label: 'Adresse', value: user?.address },
+          { Icon: Phone, label: 'Téléphone', value: user?.phoneNumber },
+          { Icon: Mail, label: 'Email', value: user?.email },
+          { Icon: User, label: 'Genre', value: user?.gender === 'MALE' ? 'Homme' : 'Femme' },
         ].map(({ Icon, label, value }) => (
           <div key={label} className="flex items-center p-4 bg-white rounded-lg shadow-md transition-all duration-300 hover:shadow-lg hover:scale-102">
             <div className="bg-[#CC8C87] p-3 rounded-full mr-4">

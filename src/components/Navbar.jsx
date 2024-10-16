@@ -113,12 +113,12 @@ const Navbar = (props) => {
       className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'
         }`}
     >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+      <div className="container  mx-auto px-2">
+        <div className="flex items-center  justify-between h-16">
           {/* Logo and Search */}
-          <div className="flex items-center flex-1">
-            <NavLink to="/feed" className="flex-shrink-0 mr-10">
-              <span className="titreSite text-4xl font-bold bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
+          <div className="flex items-center  flex-1">
+            <NavLink to="/feed" className="flex-shrink-0 ">
+              <span className="titreSite text-4xl   font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
             </NavLink>
             <div className="relative hidden sm:block max-w-xs w-full">
               <input

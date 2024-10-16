@@ -8,7 +8,6 @@ import {
   MoreVertical,
   Trash2,
   Edit,
-
 } from "lucide-react";
 import {
   AlertDialog,
@@ -24,12 +23,11 @@ import {
 import RatingModal from "./RatingModal";
 import CommentModal from "./CommentModal";
 import apiService from "../../services/ApiService";
-import EditPostModal from "../../components/modal/EditPostModal"; 
-import { format } from 'date-fns';
+import EditPostModal from "../../components/modal/EditPostModal";
+import { format } from "date-fns";
 
-import Swal from 'sweetalert2';
-import Loader from './Loader';
-
+import Swal from "sweetalert2";
+import Loader from "./Loader";
 
 export default function PostCard() {
   const [liked, setLiked] = useState(false);
@@ -44,19 +42,22 @@ export default function PostCard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const [reload, setReload] = useState(false); // Variable pour contrôler le rechargement des données
+
   const [showEditModal, setShowEditModal] = useState(false);
   const [currentPost, setCurrentPost] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem('user'));
-      
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const user = JSON.parse(localStorage.getItem("user"));
+
   if (!user || !user.token) {
-    throw new Error('No authentication token found. Please log in.');
+    throw new Error("No authentication token found. Please log in.");
   }
 
   useEffect(() => {
     const fetchPosts = async () => {
       try {
-        
         const response = await apiService.request(
           "GET",
           "/posts/getAllPost",
@@ -64,17 +65,16 @@ export default function PostCard() {
           user.token
         );
 
-        
         if (!response || !response.posts) {
           throw new Error("Aucun post n'a été récupéré");
         }
-        
+
         const data = response.posts.map((post) => ({
           ...post,
           liked: false,
           likeCount: 0,
         }));
-        
+
         setPosts(data);
       } catch (error) {
         setError(error.message);
@@ -84,7 +84,44 @@ export default function PostCard() {
     };
 
     fetchPosts();
-  }, []);
+  }, [reload]);
+
+  // Fonction pour forcer le rechargement des posts
+  const triggerReload = () => {
+    console.log("Dans la fonction trigger reload");
+    console.log(reload);
+    setReload((prevReload) => !prevReload); // Alterne entre true et false pour déclencher l'effet
+  };
+
+  const handleImageClick = async (postId, content) => {
+    setSelectedImage(content);
+
+    try {
+      const response = await apiService.request(
+        "POST",
+        `/views/${postId}`,
+        null,
+        user.token
+      );
+      const updatedPost = response.post;
+      console.log(updatedPost);
+      // Mise à jour de l'état local avec le nouveau nombre de vues
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId ? { ...post, views: updatedPost.views } : post
+        )
+      );
+      triggerReload(); // Recharger les posts après mise à jour
+      console.log(posts);
+    } catch (error) {
+      console.error("Erreur lors de l'incrémentation des vues:", error);
+    }
+  };
+
+  const closeImageModal = () => {
+    setSelectedImage(null); // Ferme la modal
+  };
+
   const handleLike = (postId) => {
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
@@ -125,19 +162,19 @@ export default function PostCard() {
 
   const handleDeletePost = async (postId) => {
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
+      const user = JSON.parse(localStorage.getItem("user"));
       const response = await apiService.request(
         "DELETE",
         `/posts/delete/${postId}`,
         null,
         user.token
       );
-  
+
       // Si la suppression est réussie
       if (response) {
         // Supprimer le post du DOM uniquement après la réussite de l'opération
         setPosts((prevPosts) => prevPosts.filter((post) => post.id !== postId));
-  
+
         Swal.fire({
           icon: "success",
           title: "Succès",
@@ -157,21 +194,19 @@ export default function PostCard() {
       console.error("Erreur lors de la suppression du post:", error);
     }
   };
-  
+
   const handleEditPost = (post) => {
     setCurrentPost(post);
-    console.log(post);
+    // console.log(post);
     setShowEditModal(true);
   };
 
   const handleSavePost = (updatedPost) => {
     setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === updatedPost.id ? updatedPost : post
-      )
+      prevPosts.map((post) => (post.id === updatedPost.id ? updatedPost : post))
     );
+    setShowEditModal(false);
   };
-
 
   if (loading) {
     return <Loader />;
@@ -186,20 +221,24 @@ export default function PostCard() {
       {posts.map((post) => (
         <div
           key={post.id}
-          className="max-w-2xl mt-3 bg-white rounded-lg shadow-md overflow-hidden"
+          className="max-w-2xl mt-3  bg-white rounded-lg shadow-md overflow-hidden"
         >
           <div className="p-4">
             <div className="flex  items-center justify-between mb-4">
-              <div className="flex items-center space-x-2">
-                <img
-                  src={post.author.photoUrl}
-                  className="w-10 h-10 rounded-full"
-                />
-                <div>
-                  <p className="font-semibold">{post.author.firstname}</p>{" "}
-                  <p className="text-sm text-gray-500">{format(new Date(post.publishedAt), 'dd/MM/yyyy HH:mm')}</p>{" "}              
+              {post.author && (
+                <div className="flex items-center space-x-2">
+                  <img
+                    src={post.author.photoUrl}
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div>
+                    <p className="font-semibold">{post.author.firstname}</p>{" "}
+                    <p className="text-sm text-gray-500">
+                      {format(new Date(post.publishedAt), "dd/MM/yyyy HH:mm")}
+                    </p>{" "}
+                  </div>
                 </div>
-              </div>
+              )}
               <div className="relative">
                 <button
                   className="text-gray-500 hover:text-gray-700"
@@ -257,27 +296,37 @@ export default function PostCard() {
                 <span
                   key={t.id}
                   className={`badge bg-gray-200 text-gray-900 px-2 py-1 rounded-full text-sm ${
-                    post.bookmarked? "text-white" : ""
+                    post.bookmarked ? "text-white" : ""
                   } transition-colors duration-200`}
                 >
                   {t.name}
                 </span>
-              )
-
-              ) }
+              ))}
               {post.content ? (
-              /\.(jpg|jpeg|png|gif)$/i.test(post.content) ? (
-                <img src={post.content} alt="Story" className="w-full h-90 object-cover rounded-lg" />
-              ) : /\.(mp4|webm|ogg)$/i.test(post.content) ? (
-                <video src={post.content} controls className="w-full h-90 object-cover rounded-lg">
-                  Votre navigateur ne supporte pas la lecture de vidéos.
-                </video>
-              ) : (
-                <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
-                  <p className="text-3xl font-bold text-white text-center px-6">{post.content}</p>
-                </div>
-              )
-            ) : null}
+                /\.(jpg|jpeg|png|gif)$/i.test(post.content) ? (
+                  <img
+                    src={post.content}
+                    alt="Story"
+                    className="w-full h-[600px] object-cover rounded-lg"
+                    onClick={() => handleImageClick(post.id, post.content)}
+                  />
+                ) : /\.(mp4|webm|ogg)$/i.test(post.content) ? (
+                  <video
+                    src={post.content}
+                    controls
+                    className="w-full h-90 object-cover rounded-lg"
+                  >
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                  </video>
+                ) : (
+                  <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+                    <p className="text-3xl font-bold text-white text-center px-6">
+                      {post.content}
+                    </p>
+                  </div>
+                )
+              ) : null}
+              <p className="text-sm text-gray-500">Vues : {post.views}</p>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex space-x-4">
@@ -355,14 +404,34 @@ export default function PostCard() {
         />
       )}
 
+      {showEditModal && (
+        <EditPostModal
+          post={currentPost}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={handleSavePost}
+        />
+      )}
 
-{showEditModal && (
-  <EditPostModal
-    post={currentPost}
-    onClose={() => setShowEditModal(false)}
-    onSave={handleSavePost}
-  />
-)}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          onClick={closeImageModal}
+        >
+          <div className="relative "> 
+            <img
+              src={selectedImage}
+              alt="Agrandie"
+              className="max-w-full max-h-full h-[900px] rounded-lg"
+            />
+            <button
+              className="absolute top-2 right-2 text-white"
+              onClick={closeImageModal}
+            >
+              ✖
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

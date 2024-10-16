@@ -243,7 +243,7 @@ const MessagingPage = () => {
               initial={{ y: 100 }}
               animate={{ y: 0 }}
               onSubmit={handleSendMessage}
-              className="p-4 border-t border-gray-200 flex items-center"
+              className="p-4 pl-8 border-t border-gray-200 flex items-center"
             >
               <Paperclip className="text-gray-400 mr-2 cursor-pointer" />
               <input

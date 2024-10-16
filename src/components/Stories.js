@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash,Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash,Camera, X, Heart, Share2, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../services/ApiService';
 import UserStories from './UserStories';
  // Assuming you are using react-feather for icons
@@ -155,7 +155,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
               </button>
             </div>
           )}
-          <button type="submit" className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold px-6 py-3 rounded-lg hover:from-purple-600 hover:to-pink-600 transition duration-300">
+          <button type="submit" className="w-full bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-white font-semibold px-6 py-3 rounded-lg hover:scale-105 transition duration-300">
             Publier la story
           </button>
         </form>
@@ -163,6 +163,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
     </div>
   );
 };
+
 const StoryViewModal = ({ isOpen, onClose, story }) => {
   const [stories, setStories] = useState([]);
   const [liked, setLiked] = useState(false);
@@ -273,7 +274,6 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
     </div>
   );
 };
-
 
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
