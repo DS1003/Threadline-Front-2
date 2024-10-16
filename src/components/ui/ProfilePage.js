@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { FaPlus, FaEdit, FaTrash } from 'react-icons/fa';
 import ProfileHeader from './ProfileHeader';
 import UserInfo from './UserInfo';
 import UserPosts from './UserPosts';
@@ -7,6 +8,7 @@ import UserMeasurements from './UserMeasurements';
 import UpdateRoleUser from './UpdateRoleUser';
 
 const ProfilePage = () => {
+  const [measurements, setMeasurements] = useState([]);
   const [user, setUser] = useState(null); // État pour stocker l'utilisateur connecté
 
   useEffect(() => {
@@ -29,7 +31,6 @@ const ProfilePage = () => {
   // Vérification des rôles pour décider d'afficher ou non le composant UpdateRoleUser
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
 
-  
   const posts = [
     {
       id: 1,
@@ -56,14 +57,28 @@ const ProfilePage = () => {
     },
   ];
 
-  const measurements = {
-    height: '5\'8"',
-    weight: '130 lbs',
-    chest: '34"',
-    waist: '28"',
-    hips: '36"',
-    shoeSize: 'US 8',
+  const addMeasurement = (newMeasurement) => {
+    setMeasurements((prevMeasurements) => {
+      const existingMeasurementIndex = prevMeasurements.findIndex(m => m.id === newMeasurement.id);
+  
+      if (existingMeasurementIndex > -1) {
+        // If the measurement exists, update it
+        const updatedMeasurements = [...prevMeasurements];
+        updatedMeasurements[existingMeasurementIndex] = newMeasurement;
+        return updatedMeasurements;
+      } else {
+        // Otherwise, add a new measurement
+        return [...prevMeasurements, newMeasurement];
+      }
+    });
   };
+  
+
+  // Fonction pour supprimer un ensemble de mesures
+  const handleDeleteMeasurement = (index) => {
+    setMeasurements((prevMeasurements) => prevMeasurements.filter((_, i) => i !== index));
+  }
+
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -77,7 +92,13 @@ const ProfilePage = () => {
               <UpdateRoleUser user={user} setUser={setUser} />
             )}
 
-            <UserMeasurements measurements={measurements} />
+            {/* Passer les fonctions d'ajout et de suppression à UserMeasurements */}
+            <UserMeasurements 
+              user={user}
+              onAddMeasurement={addMeasurement} 
+              onDeleteMeasurement={handleDeleteMeasurement} // Passer la fonction de suppression
+            />
+            
             <InstagramStyleFavorites posts={posts} />
           </div>
           <div className="md:col-span-2">
