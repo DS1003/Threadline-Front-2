@@ -19,7 +19,13 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
       {isUser ? (
         <div className="absolute inset-x-2 bottom-2 bg-white bg-opacity-90 rounded-lg py-1 text-center transition-all duration-300 group-hover:bg-opacity-100">
           <Camera className="w-6 h-6 mx-auto text-[#CC8C87]" />
-          <span className="text-xs font-medium text-[#242424]">Créer une story</span>
+          {/* Changed span to button */}
+          <button
+            onClick={onAddStory}
+            className="text-xs font-medium text-[#242424] focus:outline-none"
+          >
+            Créer une story
+          </button>
         </div>
       ) : (
         <div className="absolute inset-x-2 bottom-2 text-center">
@@ -29,6 +35,7 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
     </button>
   </div>
 );
+
 const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   // Define the state for stories
   const [content, setContent] = useState('');
@@ -265,7 +272,6 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
     </div>
   );
 };
-
 
 
 const Stories = () => {
