@@ -24,6 +24,15 @@ const CardContent = ({ children, className }) => {
   );
 };
 
+// Composant CardTitle 
+const CardTitle = ({ children }) => {
+  return <h2 className="card-title">{children}</h2>;
+};
+
+CardTitle.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
 CardContent.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
@@ -50,4 +59,4 @@ Card.displayName = 'Card';
 CardContent.displayName = 'CardContent';
 CardHeader.displayName = 'CardHeader';
 
-export { Card, CardContent, CardHeader };
+export { Card, CardContent, CardHeader, CardTitle };
