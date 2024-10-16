@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Trash,Camera, X, Heart, Share2, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../services/ApiService';
+import UserStories from './UserStories';
  // Assuming you are using react-feather for icons
 const user = JSON.parse(localStorage.getItem('user'));
 
@@ -16,10 +17,17 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
+    
       {isUser ? (
         <div className="absolute inset-x-2 bottom-2 bg-white bg-opacity-90 rounded-lg py-1 text-center transition-all duration-300 group-hover:bg-opacity-100">
           <Camera className="w-6 h-6 mx-auto text-[#CC8C87]" />
-          <span className="text-xs font-medium text-[#242424]">Créer une story</span>
+          {/* Changed span to button */}
+          <button
+            onClick={onAddStory}
+            className="text-xs font-medium text-[#242424] focus:outline-none"
+          >
+            Créer une story
+          </button>
         </div>
       ) : (
         <div className="absolute inset-x-2 bottom-2 text-center">
@@ -239,7 +247,6 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
         <div className="p-4">
         <button onClick={() => handleDelete(story.id)} className="flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300">
   <Trash size={24} />
-  <span className="ml-2 text-sm">Supprimer</span>
 </button>
 
           <h3 className="font-semibold mb-2 text-gray-700">Commentaires</h3>
@@ -275,7 +282,7 @@ const Stories = () => {
   const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(null);
-  const storiesPerPage = 5;
+  const storiesPerPage =2;
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -285,26 +292,24 @@ const Stories = () => {
   const fetchStories = async () => {
     try { 
       const response = await apiService.request('post', '/stories/all', null, user.token);
-      console.log('Response:', response); // Affiche la réponse complète pour inspection
-      const stories = response.stories; // correction ici
-      
-      // Assurez-vous que `response.stories` existe avant de le définir
-      if (stories) {
-        setStories(stories);
+      console.log('Response:', response);
+      const fetchedStories = response.stories;
+  
+      if (fetchedStories) {
+        setStories(fetchedStories.filter(story => story.authorId !== user.id));
         setError(null);
       } else {
-        console.error('Story data not found in response:', stories);
+        console.error('Story data not found in response:', fetchedStories);
         setError('No story data found in response.');
       }
     } catch (error) {
       console.error('Error fetching stories:', error);
       setError(error.message || 'Failed to fetch stories. Please try again.');
     }
-};
+  };
 
-  
   const handleAddStory = (newStory) => {
-    setStories([newStory, ...stories]);
+    setStories(prevStories => [newStory, ...prevStories.filter(story => story.authorId !== user.id)]);
   };
   
   const handleViewStory = (story) => {
@@ -330,6 +335,11 @@ const Stories = () => {
   }, [currentPage]);
   
   const totalPages = Math.ceil(stories.length / storiesPerPage);
+  
+  const displayedStories = stories.slice(
+    currentPage * storiesPerPage,
+    (currentPage + 1) * storiesPerPage
+  );
   
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6 relative">
@@ -363,12 +373,13 @@ const Stories = () => {
       >
         <StoryCircle
           user="Vous"
-          image={stories.content}
+          image={user.photoUrl}
           isUser={true}
           onAddStory={() => setIsAddModalOpen(true)}
           onViewStory={() => {}}
         />
-        {stories.map((story) => (
+        <UserStories />
+        {displayedStories.map((story) => (
           <StoryCircle
             key={story.id}
             user={story.author ? story.author.id : 'Utilisateur'}
@@ -402,10 +413,9 @@ const Stories = () => {
       />
     </div>
   );
-  };
-  
-  export default Stories;
-  
+};
+
+export default Stories;
 
 // Styles pour la barre de défilement personnalisée
 const styles = `
