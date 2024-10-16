@@ -27,6 +27,8 @@ export default function CommentModal({ postId, onClose, post }) {
         fetchComments();
     }, [postId]);
 
+    console.log(comments);
+
     const handleSubmitComment = async (e) => {
         e.preventDefault();
         if (comment.trim()) {
