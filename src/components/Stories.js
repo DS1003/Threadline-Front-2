@@ -5,15 +5,15 @@ import apiService from '../services/ApiService';
 const user = JSON.parse(localStorage.getItem('user'));
 
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
-  <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
+  <div className="flex-shrink-0   w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
       onClick={isUser ? onAddStory : onViewStory}
-      className="w-full h-36 sm:h-44 relative rounded-xl overflow-hidden group"
+      className="w-full  h-36 sm:h-44 relative rounded-xl overflow-hidden group"
     >
       <img
         src={image}
         alt={`${user}'s story`}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+        className="w-full h-full  object-cover transition-transform duration-300 group-hover:scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
       {isUser ? (

@@ -46,7 +46,7 @@ export default function Component(props) {
             {
               numberOfRole === 1 ? (
                 <Badge 
-                  text="User" 
+                  text="Simple" 
                   color="text-blue-800" 
                   bgColor="bg-blue-100" 
                   borderColor="border-blue-300"
@@ -54,7 +54,7 @@ export default function Component(props) {
                 />
               ) : otherRole?.name === 'TAILOR' ? (
                 <Badge 
-                  text="Tailor" 
+                  text="Tailleur" 
                   color="text-green-800" 
                   bgColor="bg-green-100" 
                   borderColor="border-green-300"
@@ -63,7 +63,7 @@ export default function Component(props) {
               ) : 
               otherRole?.name === 'SELLER' ? (
                 <Badge 
-                  text="Seller" 
+                  text="Vendeur" 
                   color="text-purple-800" 
                   bgColor="bg-purple-100" 
                   borderColor="border-purple-300"
