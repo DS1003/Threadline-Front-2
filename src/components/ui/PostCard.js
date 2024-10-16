@@ -221,7 +221,7 @@ export default function PostCard() {
       {posts.map((post) => (
         <div
           key={post.id}
-          className="max-w-2xl mt-3 bg-white rounded-lg shadow-md overflow-hidden"
+          className="max-w-2xl mt-3  bg-white rounded-lg shadow-md overflow-hidden"
         >
           <div className="p-4">
             <div className="flex  items-center justify-between mb-4">
@@ -307,7 +307,7 @@ export default function PostCard() {
                   <img
                     src={post.content}
                     alt="Story"
-                    className="w-full h-90 object-cover rounded-lg"
+                    className="w-full h-[600px] object-cover rounded-lg"
                     onClick={() => handleImageClick(post.id, post.content)}
                   />
                 ) : /\.(mp4|webm|ogg)$/i.test(post.content) ? (
@@ -417,11 +417,11 @@ export default function PostCard() {
           className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           onClick={closeImageModal}
         >
-          <div className="relative">
+          <div className="relative ">
             <img
               src={selectedImage}
               alt="Agrandie"
-              className="max-w-full max-h-full rounded-lg"
+              className="max-w-full max-h-full h-[900px] rounded-lg"
             />
             <button
               className="absolute top-2 right-2 text-white"
