@@ -1,7 +1,6 @@
 import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import About from './components/About';
-import Register from './components/Register';
 import PageLoader from './components/PageLoader';
 
 // Lazy loading the Dashboard & MainFeed component
@@ -10,6 +9,7 @@ const MainFeed = lazy(() => import('./components/MAinFeed'));
 const Login = lazy(() => import('./components/Login'));
 const ProfilePage = lazy(() => import('./components/ui/ProfilePage'));
 const MessagingPage = lazy(() => import('./components/Messaging'));
+const Register = lazy(() => import('./components/Register'));
 
 const AppRoutes = () => {
   

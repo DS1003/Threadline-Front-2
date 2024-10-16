@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Trash,Camera, X, Heart, Share2, MessageCircle, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Trash,Camera, X, Heart, Share2, Send, Image, Film, ChevronLeft, ChevronRight } from 'lucide-react';
 import apiService from '../services/ApiService';
  // Assuming you are using react-feather for icons
 const user = JSON.parse(localStorage.getItem('user'));
@@ -29,6 +29,7 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
     </button>
   </div>
 );
+
 const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   // Define the state for stories
   const [content, setContent] = useState('');
@@ -154,6 +155,7 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
     </div>
   );
 };
+
 const StoryViewModal = ({ isOpen, onClose, story }) => {
   const [stories, setStories] = useState([]);
   const [liked, setLiked] = useState(false);
@@ -265,8 +267,6 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
     </div>
   );
 };
-
-
 
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
