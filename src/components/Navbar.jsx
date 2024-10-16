@@ -113,7 +113,7 @@ const Navbar = (props) => {
       className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'
         }`}
     >
-      <div className="container  mx-auto px-4">
+      <div className="container  mx-auto px-2">
         <div className="flex items-center  justify-between h-16">
           {/* Logo and Search */}
           <div className="flex items-center  flex-1">
