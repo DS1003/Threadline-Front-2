@@ -35,7 +35,7 @@ export default function PostCard() {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
-  const [commentCount, setCommentCount] = useState(12);
+  const [commentCount, setCommentCount] = useState(0);
   const [shareCount, setShareCount] = useState(5);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -297,7 +297,7 @@ export default function PostCard() {
                   <span>{post.likeCount}</span>
                 </button>
                 <button
-                  onClick={() => setShowCommentModal(true)}
+                  onClick={() => {setCurrentPost(post); setShowCommentModal(true);}}
                   className="flex items-center space-x-1 text-gray-500"
                 >
                   <MessageCircle className="w-5 h-5" />
@@ -350,7 +350,7 @@ export default function PostCard() {
       )}
       {showCommentModal && (
         <CommentModal
-          postImage="https://avatars.githubusercontent.com/u/100100154?v=4"
+          postId={currentPost?.id}
           onClose={() => setShowCommentModal(false)}
         />
       )}
