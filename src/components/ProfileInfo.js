@@ -21,7 +21,7 @@ export default function Component(props) {
         />
         <div>
           <div className="flex items-center gap-1">
-            <h2 className="text-lg font-bold">{user.firstname} {user.lastname}</h2>
+            <h2 className="text-lg font-bold">{user.firstname}</h2>
             <VerifiedIcon className="w-5 h-5 text-[#CC8C87]" />
           </div>
           <p className="text-gray-500 text-sm">{user.email}</p>
