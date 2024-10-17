@@ -5,23 +5,23 @@ import UserStories from './UserStories';
  // Assuming you are using react-feather for icons
 const user = JSON.parse(localStorage.getItem('user'));
 
-const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
+
+const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory, story }) => (
   <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
       onClick={isUser ? onAddStory : onViewStory}
       className="w-full h-36 sm:h-44 relative rounded-xl overflow-hidden group"
     >
       <img
-        src={image}
-        alt={`${user}'s story`}
+        src={story?.author?.photoUrl || image}
+        alt={`${story?.author?.firstname || user}'s story`}
         className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
-    
+
       {isUser ? (
         <div className="absolute inset-x-2 bottom-2 bg-white bg-opacity-90 rounded-lg py-1 text-center transition-all duration-300 group-hover:bg-opacity-100">
           <Camera className="w-6 h-6 mx-auto text-[#CC8C87]" />
-          {/* Changed span to button */}
           <button
             onClick={onAddStory}
             className="text-xs font-medium text-[#242424] focus:outline-none"
@@ -31,12 +31,15 @@ const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
         </div>
       ) : (
         <div className="absolute inset-x-2 bottom-2 text-center">
-          <span className="text-xs font-medium text-white drop-shadow-lg">{user}</span>
+          <span className="text-xs font-medium text-white drop-shadow-lg">
+            {story?.author?.firstname || user}
+          </span>
         </div>
       )}
     </button>
   </div>
 );
+
 
 const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   // Define the state for stories
@@ -220,6 +223,10 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
       <div className="relative w-full max-w-lg h-[80vh]">
+      <div className="flex items-center">
+            <img src={currentStory.author.photoUrl} alt={currentStory.author.photoUrl} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <h2 className="text-lg font-semibold text-gray-800">{currentStory.user}</h2>
+          </div>
         <button onClick={onClose} className="absolute top-4 right-4 text-white z-10">
           <X size={24} />
         </button>
@@ -237,17 +244,33 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
               </div>
             )
           ) : null}
-          <div className="absolute bottom-4 left-4 right-4 flex justify-between">
-            <button onClick={prevStory} className="text-white" disabled={currentStoryIndex === 0}>
-              <ChevronLeft size={24} />
-            </button>
-            <button onClick={nextStory} className="text-white" disabled={currentStoryIndex === stories.length - 1}>
-              <ChevronRight size={24} />
-            </button>
-          </div>
+
+          {/* Chevron Navigation */}
+          <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
+  <button
+    onClick={prevStory}
+    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
+    disabled={currentStoryIndex === 0}
+  >
+    <ChevronLeft size={32} />
+  </button>
+</div>
+
+<div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+  <button
+    onClick={nextStory}
+    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
+    disabled={currentStoryIndex === stories.length - 1}
+  >
+    <ChevronRight size={32} />
+  </button>
+</div>
+          {/* Delete Button for Author */}
           {currentStory.authorId === user.id && (
-            <button 
-              onClick={() => handleDelete(currentStory.id)} 
+            <button
+              onClick={() => handleDelete(currentStory.id)}
               className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300"
             >
               <Trash size={24} />
@@ -259,7 +282,6 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
     </div>
   );
 };
-
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
