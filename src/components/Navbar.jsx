@@ -11,7 +11,8 @@ import {
   X,
   PlusCircle,
   Search,
-  ChevronDown
+  ChevronDown,
+  Settings
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -28,6 +29,10 @@ const Navbar = (props) => {
   if (user) {
     isAuthenticated = true
   }
+
+  const handleProfileClick = () => {
+    navigate('/profile');
+  };
 
   const notifications = [
     { id: 1, content: "Nouveau message de Alice", time: "Il y a 5 minutes", type: "message" },
@@ -67,8 +72,8 @@ const Navbar = (props) => {
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`flex items-center justify-center w-14 h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
-          ? 'text-[#CC8C87] bg-[#FDF1F2]'
-          : 'text-[#242424] hover:bg-[#FDF1F2]'
+        ? 'text-[#CC8C87] bg-[#FDF1F2]'
+        : 'text-[#242424] hover:bg-[#FDF1F2]'
         }`}
     >
       {to ? (
@@ -178,7 +183,6 @@ const Navbar = (props) => {
                         />
                         <div>
                           <p className="font-semibold text-white">{user.firstname} {user.lastname}</p>
-                          <p className="text-sm text-white opacity-80">Voir votre profil</p>
                         </div>
                       </div>
                     </div>
@@ -188,10 +192,21 @@ const Navbar = (props) => {
                       onClick={() => setIsProfileMenuOpen(false)}
                     >
                       <div className="bg-[#EAB0B7] p-2 rounded-full mr-3">
-                        <User className="w-5 h-5 text-white" />
+                        <Settings className="w-5 h-5 text-white" />
                       </div>
                       <span>Paramètres et confidentialité</span>
                     </NavLink>
+
+                    <button
+                      onClick={handleProfileClick}
+                      className="w-full flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2] transition-all duration-200"
+                    >
+                      <div className="bg-[#EAB0B7] p-2 rounded-full mr-3">
+                        <User className="w-5 h-5 text-white" />
+                      </div>
+                      <span>Voir profil</span>
+                    </button>
+
                     <button
                       onClick={handleLogout}
                       className="w-full flex items-center px-4 py-3 text-[#242424] hover:bg-[#FDF1F2] transition-all duration-200"

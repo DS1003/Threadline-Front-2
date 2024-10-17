@@ -6,15 +6,15 @@ import UserStories from './UserStories';
 const user = JSON.parse(localStorage.getItem('user'));
 
 const StoryCircle = ({ user, image, isUser, onAddStory, onViewStory }) => (
-  <div className="flex-shrink-0   w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
+  <div className="flex-shrink-0 w-24 sm:w-28 transition-transform duration-300 hover:scale-105">
     <button
       onClick={isUser ? onAddStory : onViewStory}
-      className="w-full  h-36 sm:h-44 relative rounded-xl overflow-hidden group"
+      className="w-full h-36 sm:h-44 relative rounded-xl overflow-hidden group"
     >
       <img
         src={image}
         alt={`${user}'s story`}
-        className="w-full h-full  object-cover transition-transform duration-300 group-hover:scale-110"
+        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/60" />
     
@@ -209,7 +209,7 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
       <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div className="flex justify-between items-center p-4 bg-gray-50">
           <div className="flex items-center">
-            <img src={user.photoUrl} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <img src={story.author.photoUrl} alt={story.author.photoUrl} className="w-10 h-10 rounded-full object-cover mr-3" />
             <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -282,7 +282,7 @@ const Stories = () => {
   const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(null);
-  const storiesPerPage =2;
+  const storiesPerPage =5;
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -371,18 +371,11 @@ const Stories = () => {
         ref={carouselRef}
         className="flex space-x-4 overflow-x-hidden scroll-smooth"
       >
-        <StoryCircle
-          user="Vous"
-          image={user.photoUrl}
-          isUser={true}
-          onAddStory={() => setIsAddModalOpen(true)}
-          onViewStory={() => {}}
-        />
         <UserStories />
         {displayedStories.map((story) => (
           <StoryCircle
             key={story.id}
-            user={story.author ? story.author.id : 'Utilisateur'}
+            user={story.author.lastname ? `${story.author.firstname} ${story.author.lastname}` : 'Utilisateur'}
             image={story.content}
             isUser={false}
             onAddStory={() => {}}

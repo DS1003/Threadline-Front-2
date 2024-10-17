@@ -29,7 +29,6 @@ const ProfilePage = () => {
   // Vérification des rôles pour décider d'afficher ou non le composant UpdateRoleUser
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
 
-  
   const posts = [
     {
       id: 1,
@@ -56,14 +55,6 @@ const ProfilePage = () => {
     },
   ];
 
-  const measurements = {
-    height: '5\'8"',
-    weight: '130 lbs',
-    chest: '34"',
-    waist: '28"',
-    hips: '36"',
-    shoeSize: 'US 8',
-  };
 
   return (
     <div className="bg-gray-100 min-h-screen">
@@ -77,7 +68,11 @@ const ProfilePage = () => {
               <UpdateRoleUser user={user} setUser={setUser} />
             )}
 
-            <UserMeasurements measurements={measurements} />
+            {/* Passer les fonctions d'ajout et de suppression à UserMeasurements */}
+            <UserMeasurements 
+              user={user}
+            />
+            
             <InstagramStyleFavorites posts={posts} />
           </div>
           <div className="md:col-span-2">
