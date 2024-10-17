@@ -32,7 +32,7 @@ import Loader from "./Loader";
 export default function PostCard() {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
-  const [likeCount, setLikeCount] = useState(0);
+  const [likeCount, setLikeCount] = useState([]);
   const [commentCount, setCommentCount] = useState(12);
   const [shareCount, setShareCount] = useState(5);
   const [showRatingModal, setShowRatingModal] = useState(false);
@@ -69,11 +69,14 @@ export default function PostCard() {
           throw new Error("Aucun post n'a été récupéré");
         }
 
-        const data = response.posts.map((post) => ({
-          ...post,
-          liked: false,
-          likeCount: 0,
-        }));
+        const data = response.posts.map((post) => {
+         
+          return {
+            ...post,
+            liked: post.postLikes.some((like) => like.userId === user.id),
+            likeCount: post.postLikes.length,
+          };
+        });
 
         setPosts(data);
       } catch (error) {
@@ -122,20 +125,42 @@ export default function PostCard() {
     setSelectedImage(null); // Ferme la modal
   };
 
-  const handleLike = (postId) => {
+  const handleLike = async (postId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      // Envoyer la requête API pour mettre à jour le like
+      const response = await apiService.request(
+        "POST",
+        `/post/like`,
+        {postId},
+        user.token
+      );
+  
     setPosts((prevPosts) =>
       prevPosts.map((post) =>
         post.id === postId
           ? {
               ...post,
-              liked: !post.liked,
-              likeCount: post.liked ? post.likeCount - 1 : post.likeCount + 1,
+              liked: !post.liked, 
+              likeCount: post.liked
+                  ? post.likeCount - 1
+                  : post.likeCount + 1,
             }
           : post
       )
     );
-    console.log(postId);
+    console.log(response.message); 
+    } catch (error) {
+      console.error("Erreur lors de l'actualisation du like:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Impossible de reagir à ce poste",
+      });
+    }
   };
+  
 
   const handleBookmark = (postId) => {
     setPosts((prevPosts) =>
@@ -229,6 +254,7 @@ export default function PostCard() {
                 <div className="flex items-center space-x-2">
                   <img
                     src={post.author.photoUrl}
+                    alt={post.author.firstname}
                     className="w-10 h-10 rounded-full"
                   />
                   <div>
@@ -346,7 +372,7 @@ export default function PostCard() {
                   <span>{post.likeCount}</span>
                 </button>
                 <button
-                  onClick={() => setShowCommentModal(true)}
+                  onClick={() => {setCurrentPost(post); setShowCommentModal(true);}}
                   className="flex items-center space-x-1 text-gray-500"
                 >
                   <MessageCircle className="w-5 h-5" />
@@ -399,7 +425,7 @@ export default function PostCard() {
       )}
       {showCommentModal && (
         <CommentModal
-          postImage="https://avatars.githubusercontent.com/u/100100154?v=4"
+          postId={currentPost?.id}
           onClose={() => setShowCommentModal(false)}
         />
       )}
