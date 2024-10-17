@@ -174,7 +174,6 @@ export default function PostCard() {
         user.token
       );
   
-      // Mettre à jour l'état local après la réponse du backend
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
@@ -191,7 +190,7 @@ export default function PostCard() {
   
       Swal.fire({
         icon: response.status === 201 ? "success" : "info",
-        title: response.data.message,
+        title: response.message,
       });
     } catch (error) {
       console.error("Erreur lors de l'ajout/suppression du favori:", error);
@@ -256,7 +255,6 @@ export default function PostCard() {
 
   const handleEditPost = (post) => {
     setCurrentPost(post);
-    // console.log(post);
     setShowEditModal(true);
   };
 
@@ -419,19 +417,20 @@ export default function PostCard() {
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={handleBookmark}
+                  onClick={() => handleBookmark(post.id)}
                   className={`${
-                    bookmarked ? "text-blue-500" : "text-gray-500"
+                    post.bookmarked ? "text-blue-500" : "text-gray-500"
                   } transition-colors duration-200`}
                 >
                   <Bookmark
                     className={`w-5 h-5 ${
-                      bookmarked ? "fill-current" : ""
+                      post.bookmarked ? "fill-current" : ""
                     } transform transition-transform duration-200 ${
-                      bookmarked ? "scale-125" : ""
+                      post.bookmarked ? "scale-125" : ""
                     }`}
-                  />
+                    />
                 </button>
+                    <span></span>
                 <button
                   onClick={() => setShowRatingModal(true)}
                   className={`${
