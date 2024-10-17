@@ -17,7 +17,6 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
     inseam: '',       // Femmes
   });
 
-  // Vérifiez si l'objet `user` est défini avant d'essayer d'y accéder
   const userGender = user ? user.gender : null;
 
   useEffect(() => {
@@ -25,13 +24,20 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
       setNewMeasurement(measurement);
     } else {
       // Réinitialiser les champs avec des valeurs spécifiques selon le genre
-      setNewMeasurement((prev) => ({
-        ...prev,
-        thigh: '', // Valeur commune
-        ...(userGender === 'MALE'
-          ? { chest: '', waist: '', hips: '', shoulder: '', sleeveLength: '', neck: '', back: '', armhole: '', calf: '' }
-          : { chest: '', waist: '', hips: '', shoulder: '', bust: '', inseam: '' })
-      }));
+      setNewMeasurement({
+        chest: '',
+        waist: '',
+        hips: '',
+        shoulder: '',
+        sleeveLength: userGender === 'MALE' ? '' : undefined,
+        neck: userGender === 'MALE' ? '' : undefined,
+        back: userGender === 'MALE' ? '' : undefined,
+        armhole: userGender === 'MALE' ? '' : undefined,
+        thigh: '',
+        calf: userGender === 'MALE' ? '' : undefined,
+        bust: userGender === 'FEMALE' ? '' : undefined,
+        inseam: userGender === 'FEMALE' ? '' : undefined,
+      });
     }
   }, [measurement, userGender]);
 
@@ -78,7 +84,7 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
           {renderInputField('waist', 'Taille')}
           {renderInputField('hips', 'Hanches')}
           {renderInputField('shoulder', 'Épaules')}
-          
+
           {userGender === 'MALE' ? (
             <>
               {renderInputField('sleeveLength', 'Longueur de manche')}
@@ -93,75 +99,9 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
               {renderInputField('inseam', 'Entrejambe')}
             </>
           )}
-          
+
           {renderInputField('thigh', 'Cuisse')}
 
-          <div className="flex justify-between">
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="text"
-              name="chest"
-              placeholder="Poitrine"
-              value={newMeasurement.chest}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="waist"
-              placeholder="Taille"
-              value={newMeasurement.waist}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="hips"
-              placeholder="Hanches"
-              value={newMeasurement.hips}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="shoulder"
-              placeholder="Épaule"
-              value={newMeasurement.shoulder}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="bust"
-              placeholder="Poitrine"
-              value={newMeasurement.bust}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="inseam"
-              placeholder="Entrejambe"
-              value={newMeasurement.inseam}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300"
-            />
-            <input
-              type="text"
-              name="thigh"
-              placeholder="Cuisse"
-              value={newMeasurement.thigh}
-              onChange={handleChange}
-              required
-              className="border border-gray-300 rounded-lg p-3 shadow-sm focus:outline-none focus:border-[#CC8C87] transition duration-300 col-span-2"
-            />
-          </div>
           <div className="flex justify-between mt-6">
             <button
               type="submit"

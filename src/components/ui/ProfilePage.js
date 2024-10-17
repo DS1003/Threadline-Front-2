@@ -18,11 +18,11 @@ const ProfilePage = () => {
         const parsedUser = JSON.parse(userFromStorage);
         setUser(parsedUser);
       } catch (error) {
-        console.error("Erreur lors du parsing de l'utilisateur depuis le localStorage", error);
+        console.error("Erreur lors de la parsing de l'utilisateur depuis le localStorage", error);
       }
     }
   }, []);
- 
+
   const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
 
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
@@ -44,12 +44,13 @@ const ProfilePage = () => {
       <span className="ml-2">{label}</span>
     </button>
   );
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#CC8C87] to-[#CC8C87] py-8">
       <div className="container mx-auto px-4">
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           <ProfileHeader user={{ ...user, coverPhoto }} />
-          
+
           <div className="p-6">
             <div className="flex justify-between mt-16 items-center mb-6">
               <div className="flex space-x-4">
@@ -77,17 +78,13 @@ const ProfilePage = () => {
               </div>
             )}
 
-            <UserMeasurements 
-              user={user}
-            />
-            
-            <InstagramStyleFavorites posts={posts} />
-          </div>
-          <div className="md:col-span-2">
-            <UserPosts posts={posts} />
-            {activeTab === 'favorites' && <InstagramStyleFavorites posts={posts} />}
+            {activeTab === 'favorites' && (
+              <InstagramStyleFavorites posts={posts} />
+            )}
 
-            {activeTab === 'posts' && <UserPosts posts={posts} />}
+            {activeTab === 'posts' && (
+              <UserPosts posts={posts} />
+            )}
           </div>
         </div>
       </div>
