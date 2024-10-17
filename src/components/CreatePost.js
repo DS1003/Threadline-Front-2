@@ -1,13 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Edit3, Image, X } from 'lucide-react';
+import { Edit3, Image, X, Send } from 'lucide-react';
 import ApiService from '../services/ApiService';
 import Swal from 'sweetalert2';
 
-
-
-export default function CreatePostCard(props) {
-  const {user} = props;
-  console.log(user);
+export default function CreatePostCard({ user }) {
   const [postContent, setPostContent] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
@@ -44,7 +40,6 @@ export default function CreatePostCard(props) {
     }
 
     try {
-      console.log(formData);
       const response = await ApiService.request('POST', '/posts/create', formData, user.token);
       console.log('Post créé avec succès:', response);
 
@@ -54,29 +49,28 @@ export default function CreatePostCard(props) {
         icon: 'success',
         confirmButtonText: 'Ok',
       });
-
       
       setPostContent('');
       setTags([]);
       setSelectedFile(null);
     } catch (error) {
       console.error('Erreur lors de la création du post:', error);
-      alert('Une erreur est survenue lors de la création du post.');
+      Swal.fire({
+        title: 'Erreur!',
+        text: 'Une erreur est survenue lors de la création du post.',
+        icon: 'error',
+        confirmButtonText: 'Ok',
+      });
     }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Post Content:', postContent);
-    console.log('Tags:', tags);
-    console.log('Selected File:', selectedFile);
-
-    createPost(); 
-  
+    createPost();
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 max-w-2xl">
+    <div className="bg-white rounded-lg shadow-md p-4 max-w-2xl mx-auto">
       <div className="flex items-center mb-4">
         <Edit3 className="w-5 h-5 text-[#CC8C87] mr-2" />
         <span className="text-gray-600 font-medium">Create Post</span>
@@ -86,7 +80,7 @@ export default function CreatePostCard(props) {
           <img
             src={user.photoUrl}
             alt="User avatar"
-            className="w-10 h-10 rounded-full mr-3"
+            className="w-10 h-10 rounded-full mr-3 flex-shrink-0"
           />
           <textarea
             className="flex-grow p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
@@ -111,25 +105,25 @@ export default function CreatePostCard(props) {
               </span>
             ))}
           </div>
-          <div className="flex">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               placeholder="Add a tag"
               value={currentTag}
               onChange={(e) => setCurrentTag(e.target.value)}
-              className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
+              className="flex-grow p-2 border border-gray-300 rounded-lg sm:rounded-l-lg sm:rounded-r-none focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
             />
             <button
               type="button"
               onClick={handleAddTag}
-              className="bg-[#CC8C87] text-white px-4 py-2 rounded-r-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
+              className="bg-[#CC8C87] text-white px-4 py-2 rounded-lg sm:rounded-l-none sm:rounded-r-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-[#CC8C87]"
             >
               Add Tag
             </button>
           </div>
         </div>
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-4">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+          <div className="flex items-center">
             <button 
               type="button" 
               onClick={() => fileInputRef.current.click()} 
@@ -143,19 +137,20 @@ export default function CreatePostCard(props) {
               type="file"
               accept="image/*,video/*"
               onChange={handleFileChange}
-              style={{ display: 'none' }}
+              className="hidden"
             />
           </div>
           {selectedFile && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 truncate max-w-full">
               File selected: {selectedFile.name}
             </div>
           )}
         </div>
         <button
           type="submit"
-          className="mt-4 w-full bg-[#CC8C87] text-white px-4 py-2 rounded-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="mt-4 w-full bg-[#CC8C87] text-white px-4 py-2 rounded-lg hover:bg-[#cc8c87ce] focus:outline-none focus:ring-2 focus:ring-[#CC8C87] flex items-center justify-center"
         >
+          <Send size={20} className="mr-2" />
           Post
         </button>
       </form>
