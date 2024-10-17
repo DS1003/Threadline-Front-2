@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Heart,
   MessageCircle,
@@ -30,6 +31,10 @@ import Swal from "sweetalert2";
 import Loader from "./Loader";
 
 export default function PostCard() {
+  const navigate = useNavigate();
+  const handleProfileClick = (authorId) => {
+    navigate('/profile');
+  };
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState([]);
@@ -284,10 +289,11 @@ export default function PostCard() {
             <div className="flex  items-center justify-between mb-4">
               {post.author && (
                 <div className="flex items-center space-x-2">
-                  <img
+                <img
                     src={post.author.photoUrl}
                     alt={post.author.firstname}
-                    className="w-10 h-10 rounded-full"
+                    className="w-10 h-10 rounded-full cursor-pointer"
+                    onClick={() => handleProfileClick(post.author.id)}
                   />
                   <div>
                     <p className="font-semibold">{post.author.firstname}</p>{" "}

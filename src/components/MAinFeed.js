@@ -12,6 +12,7 @@ import Navbar from './Navbar';
 import withAuth from '../hoc/withAuth';
 
 const MainFeed = (props) => {
+    
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRightElementsOpen, setIsRightElementsOpen] = useState(false);
     const [balance, setBalance] = useState(500);
