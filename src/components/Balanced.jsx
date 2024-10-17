@@ -31,7 +31,7 @@ const PaymentMethodBadge = ({ method }) => {
   );
 };
 
-const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefresh, onPurchase }) => {
+const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefresh, onPurchase, user }) => {
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [isPurchaseOpen, setPurchaseOpen] = useState(false);
   const [purchaseStep, setPurchaseStep] = useState(1);
@@ -70,8 +70,8 @@ const TokenBalanceCard = ({ balance, lastPurchaseDate, purchaseHistory, onRefres
     <div className="overflow-hidden bg-gradient-to-br from-[#CC8C87] to-[#ffd9d9] rounded-3xl p-8 text-white shadow-2xl mb-4 w-full max-w-md mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-6xl font-bold mb-2">{balance}</h2>
-          <p className="text-lg font-semibold text-[#4A4A4A]">JETONS</p>
+          <h2 className="text-6xl font-bold mb-2">{user.credit}</h2>
+          <p className="text-lg font-semibold text-[#4A4A4A]">CREDIT</p>
         </div>
         <div className="bg-white bg-opacity-20 p-4 rounded-full">
           <Gift size={40} className="text-[#4A4A4A]" />

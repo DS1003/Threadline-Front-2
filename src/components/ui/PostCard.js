@@ -254,6 +254,7 @@ export default function PostCard() {
                 <div className="flex items-center space-x-2">
                   <img
                     src={post.author.photoUrl}
+                    alt={post.author.firstname}
                     className="w-10 h-10 rounded-full"
                   />
                   <div>

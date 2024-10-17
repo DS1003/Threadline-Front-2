@@ -5,18 +5,18 @@ import MeasurementModal from './MeasurementModal';
 import ConfirmationModal from './ConfirmationModal'; // Import the ConfirmationModal
 import apiService from '../../services/ApiService';
 
-const UserMeasurements = ({ user, onAddMeasurement, onDeleteMeasurement }) => {
+const UserMeasurements = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false); // State for confirmation modal
   const [currentMeasurement, setCurrentMeasurement] = useState(null);
-  const [measurements, setMeasurestments] = useState([]);
+  const [measurements, setMeasurements] = useState([]);
   const [measurementToDelete, setMeasurementToDelete] = useState(null); // Store the measurement ID to delete
 
   useEffect(() => {
     const fetchMeasurements = async () => {
       try {
         const response = await apiService.request('GET', '/measurements/all', null, user?.token);
-        setMeasurestments(response.data);
+        setMeasurements(response.data);
       } catch (error) {
         console.error('Erreur lors de la récupération des mesures:', error);
       }
@@ -37,7 +37,15 @@ const UserMeasurements = ({ user, onAddMeasurement, onDeleteMeasurement }) => {
   };
 
   const handleAddMeasurement = (newMeasurement) => {
-    onAddMeasurement(newMeasurement);
+    setMeasurements((prevMeasurements) => {
+      if (currentMeasurement) {
+        // Mise à jour d'une mesure existante
+        return prevMeasurements.map((m) => (m.id === currentMeasurement.id ? newMeasurement : m));
+      } else {
+        // Ajout d'une nouvelle mesure
+        return [...prevMeasurements, newMeasurement];
+      }
+    });
     closeModal();
   };
 
@@ -49,19 +57,17 @@ const UserMeasurements = ({ user, onAddMeasurement, onDeleteMeasurement }) => {
 
   // Confirm delete measurement
   const confirmDeleteMeasurement = async () => {
-    if (measurementToDelete) {
-      try {
-        const response = await apiService.request('DELETE', `/measurements/delete/${measurementToDelete}`, null, user?.token);
-        if (response.status === 200) {
-          setMeasurestments((prev) => prev.filter((m) => m.id !== measurementToDelete));
-          onDeleteMeasurement(measurementToDelete); // Optionally pass this up to the parent
-        }
-      } catch (error) {
-        console.error('Erreur lors de la suppression des mesures:', error);
-      } finally {
-        setIsConfirmationOpen(false);
-        setMeasurementToDelete(null); // Reset the ID
+    if (!measurementToDelete) return;
+    try {
+      const response = await apiService.request('DELETE', `/measurements/delete/${measurementToDelete}`, null, user?.token);
+      if (response.status === 200) {
+        setMeasurements((prev) => prev.filter((m) => m.id !== measurementToDelete));
       }
+    } catch (error) {
+      console.error('Erreur lors de la suppression des mesures:', error);
+    } finally {
+      setIsConfirmationOpen(false);
+      setMeasurementToDelete(null);
     }
   };
 
