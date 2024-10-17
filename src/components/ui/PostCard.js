@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import {
   Heart,
   MessageCircle,
@@ -30,9 +31,14 @@ import Swal from "sweetalert2";
 import Loader from "./Loader";
 
 export default function PostCard({user}) {
+  const navigate = useNavigate();
+  const handleProfileClick = (authorId) => {
+    navigate('/profile');
+  };
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState([]);
+  const [commentCount, setCommentCount] = useState([]);
   const [shareCount, setShareCount] = useState(5);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -70,6 +76,8 @@ export default function PostCard({user}) {
             liked: post.postLikes.some((like) => like.userId === user.id),
             likeCount: post.postLikes.length,
             commentCount: post.comments.length
+            bookmarked: post.favorites.some((favorite) => favorite.userId === user.id),
+            favoriteCount: post._count?.favorites || post.favorites.length || 0,
           };
         });
 
@@ -157,13 +165,44 @@ export default function PostCard({user}) {
   };
   
 
-  const handleBookmark = (postId) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId ? { ...post, bookmarked: !post.bookmarked } : post
-      )
-    );
+  const handleBookmark = async (postId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+        const response = await apiService.request(
+        "POST",
+        `/favorites/add-to-favorites/${postId}`,
+        null,
+        user.token
+      );
+  
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                bookmarked: !post.bookmarked, // Inverser l'état des favoris
+                favoriteCount: post.bookmarked
+                  ? post.favoriteCount - 1
+                  : post.favoriteCount + 1, // Ajuster le comptage des favoris
+              }
+            : post
+        )
+      );
+  
+      Swal.fire({
+        icon: response.status === 201 ? "success" : "info",
+        title: response.message,
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout/suppression du favori:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Impossible de marquer ce poste en favori",
+      });
+    }
   };
+  
 
   const handleRating = (newRating) => {
     setRating(newRating);
@@ -217,7 +256,6 @@ export default function PostCard({user}) {
 
   const handleEditPost = (post) => {
     setCurrentPost(post);
-    // console.log(post);
     setShowEditModal(true);
   };
 
@@ -255,10 +293,11 @@ export default function PostCard({user}) {
             <div className="flex  items-center justify-between mb-4">
               {post.author && (
                 <div className="flex items-center space-x-2">
-                  <img
+                <img
                     src={post.author.photoUrl}
                     alt={post.author.firstname}
-                    className="w-10 h-10 rounded-full"
+                    className="w-10 h-10 rounded-full cursor-pointer"
+                    onClick={() => handleProfileClick(post.author.id)}
                   />
                   <div>
                     <p className="font-semibold">{post.author.firstname}</p>{" "}
@@ -388,19 +427,20 @@ export default function PostCard({user}) {
               </div>
               <div className="flex space-x-2">
                 <button
-                  onClick={handleBookmark}
+                  onClick={() => handleBookmark(post.id)}
                   className={`${
-                    bookmarked ? "text-blue-500" : "text-gray-500"
+                    post.bookmarked ? "text-blue-500" : "text-gray-500"
                   } transition-colors duration-200`}
                 >
                   <Bookmark
                     className={`w-5 h-5 ${
-                      bookmarked ? "fill-current" : ""
+                      post.bookmarked ? "fill-current" : ""
                     } transform transition-transform duration-200 ${
-                      bookmarked ? "scale-125" : ""
+                      post.bookmarked ? "scale-125" : ""
                     }`}
-                  />
+                    />
                 </button>
+                    <span></span>
                 <button
                   onClick={() => setShowRatingModal(true)}
                   className={`${

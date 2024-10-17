@@ -1,48 +1,58 @@
-// MeasurementDetailModal.js
 import React from 'react';
+import { X } from 'lucide-react';
 
 const MeasurementDetailModal = ({ isOpen, onClose, measurement }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-      <div className="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
-        <h2 className="text-xl font-bold mb-4 text-center text-gray-800">Détails de la Mesure</h2>
-        {measurement && (
-          <ul className="space-y-2">
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Taille :</span>
-              <span>{measurement.height} cm</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Poids :</span>
-              <span>{measurement.weight} kg</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Poitrine :</span>
-              <span>{measurement.chest} cm</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Taille :</span>
-              <span>{measurement.waist} cm</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Hanches :</span>
-              <span>{measurement.hips} cm</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="font-semibold">Pointure :</span>
-              <span>{measurement.shoeSize}</span>
-            </li>
-          </ul>
-        )}
-        <div className="mt-6">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex justify-center items-center z-50">
+      <div className="relative bg-gradient-to-br from-[#f0f4ff] to-[#e9f1ff] rounded-3xl shadow-2xl p-8 max-w-md mx-auto overflow-hidden">
+        {/* Background animation */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#CC8C87] to-[#CC8C87] opacity-10 animate-pulse"></div>
+        
+        {/* Glass effect overlay */}
+        <div className="absolute inset-0 backdrop-blur-sm bg-white bg-opacity-40 rounded-3xl"></div>
+        
+        <div className="relative z-10">
           <button
             onClick={onClose}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300"
+            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition duration-300"
           >
-            Fermer
+            <X className="w-6 h-6" />
           </button>
+          
+          <h2 className="text-3xl font-bold mb-6 text-center text-[#3a3a3a]">Détails de la Mesure</h2>
+          
+          {measurement && (
+            <div className="bg-white bg-opacity-60 rounded-2xl shadow-lg p-6 backdrop-blur-md">
+              <ul className="space-y-4">
+                {[
+                  { label: 'Taille', value: measurement.height, unit: 'cm' },
+                  { label: 'Poids', value: measurement.weight, unit: 'kg' },
+                  { label: 'Poitrine', value: measurement.chest, unit: 'cm' },
+                  { label: 'Taille', value: measurement.waist, unit: 'cm' },
+                  { label: 'Hanches', value: measurement.hips, unit: 'cm' },
+                  { label: 'Pointure', value: measurement.shoeSize, unit: '' },
+                ].map(({ label, value, unit }) => (
+                  <li key={label} className="flex justify-between items-center text-gray-700">
+                    <span className="font-semibold text-[#CC8C87]">{label} :</span>
+                    <span className="bg-[#CC8C87] bg-opacity-10 px-3 py-1 rounded-full">
+                      {value} {unit}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          
+          <div className="mt-8 flex justify-center">
+            <button
+              onClick={onClose}
+              className="bg-gradient-to-r from-[#CC8C87] to-[#B87872] text-white py-2 px-6 rounded-full hover:from-[#B87872] hover:to-[#A76A64] transition duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Fermer
+            </button>
+          </div>
         </div>
       </div>
     </div>

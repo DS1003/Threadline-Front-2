@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
-import { Scissors, ShoppingCart, UserPen } from 'lucide-react'; // Importer l'icône de Lucide
-import Swal from 'sweetalert2'; // Toujours utiliser SweetAlert pour les alertes
+import { Scissors, ShoppingCart, UserPen } from 'lucide-react';
+import Swal from 'sweetalert2';
 import apiService from '../../services/ApiService';
-// Par exemple, si ApiService est dans un dossier services à la racine.
-
 
 export default function UpdateRoleUser({ user, setUser }) {
-
   const [isTaillorClicked, setIsTaillorClicked] = useState(false);
   const [isSellerClicked, setIsSellerClicked] = useState(false);
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
@@ -14,36 +11,34 @@ export default function UpdateRoleUser({ user, setUser }) {
   const handleTailorClick = () => {
     setIsTaillorClicked(true);
     setIsSellerClicked(false);
-  }
+  };
 
   const handleSellerClick = () => {
     setIsSellerClicked(true);
     setIsTaillorClicked(false);
-  }
+  };
 
   const becomeSeller = async () => {
-    const role = { role: 'SELLER', token: user.token }
+    const role = { role: 'SELLER', token: user.token };
     updateProfile(role);
-  }
+  };
 
   const becomeTailor = async () => {
-    const role = { role: 'TAILOR', token: user.token }
+    const role = { role: 'TAILOR', token: user.token };
     updateProfile(role);
-  }
+  };
 
   async function updateProfile(role) {
     try {
       const response = await apiService.request('PUT', 'users/update-profile', role, user.token);
-      console.log(response);
       if (response) {
         Swal.fire({
           icon: 'success',
           title: 'Succès!',
           text: 'Le rôle a été mis à jour avec succès!',
-          timer: 3000, // Fermer après 3 secondes
+          timer: 3000,
         });
         const updatedUser = response.data;
-        console.log(updatedUser);
         localStorage.setItem('user', JSON.stringify(updatedUser));
         setUser(updatedUser);
         setIsProfileUpdated(true);
@@ -54,54 +49,85 @@ export default function UpdateRoleUser({ user, setUser }) {
         title: 'Erreur!',
         text: 'Erreur lors de la mise à jour du rôle',
       });
-      console.error('Erreur:', error);
     }
   }
 
   return (
     <>
-      {!isProfileUpdated &&
-        (
-          <div className="bg-gradient-to-br font-bold from-white to-[#FFF5F4] rounded-xl border-2  shadow-lg p-8 mb-6 max-w-md mx-auto">
-            <h2 className="text-[20px] mb-6 text-[#4A4A4A] border-b-2 border-[#CC8C87] pb-2 text-center flex items-center justify-center">
-              <div className="bg-[#CC8C87] p-3 rounded-full mr-4"><UserPen className='text-white w-6 h-6' /></div>
-              Mettre à jour votre profile
-            </h2>
-            <div className='flex justify-between items-center'>
-              <button className='flex items-center bg-[#838282] hover:bg-[#949494d2] text-white p-4 rounded-lg' onClick={handleTailorClick}>
-                <Scissors /> <span className='pl-2'>Devenir Tailleur</span>
-              </button>
-              <button className='flex items-center bg-[#838282] hover:bg-[#949494d2] text-white p-4 rounded-lg' onClick={handleSellerClick}>
-                <ShoppingCart /> <span className='pl-2'>Devenir Vendeur</span>
-              </button>
+      {!isProfileUpdated && (
+        <div className="bg-white shadow-lg rounded-xl border-2 border-gray-200 p-8 mb-6 max-w-lg mx-auto transition-transform hover:scale-105 transform-gpu">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-700 border-b pb-4 text-center flex items-center justify-center">
+            <div className="bg-pink-600 p-3 rounded-full mr-4">
+              <UserPen className="text-white w-6 h-6" />
             </div>
-            {
-              isTaillorClicked && (
-                <div className="mt-4">
-                  <p className='text-justify'>Lorsque vous devenez Tailleur, vous pourrez ajouter des modèles de couture sur une file d'actualité. Ces modèles seront vues par des visiteurs qui pourront les acheter, les partager ...</p>
-                  <p className='mt-2 text-justify'>NB: Ce rôle ne peut pas être mis à jour et vous ne pourrez plus devenir vendeur. Mais vous avez la possiblité de créer un autre compte pour devenir vendeur</p>
-                  <div className='mt-3 flex justify-between items-center'>
-                    <button className='bg-black text-white p-4 rounded-lg' onClick={() => setIsTaillorClicked(false)}>Annuler</button>
-                    <button className='bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white p-4 rounded-lg' onClick={becomeTailor}>Confirmer</button>
-                  </div>
-                </div>
-              )
-            }
-            {
-              isSellerClicked && (
-                <div className="mt-4">
-                  <p className='text-justify'>Lorsque vous devenez Vendeur, vous aurez la possibilité de vendre des tissus, des fils, tous les accessoires possibles pour la couture.</p>
-                  <p className='mt-2 text-justify'>NB: Ce rôle ne peut pas être mis à jour et vous ne pourrez plus devenir tailleur. Mais vous avez la possiblité de créer un autre compte pour devenir tailleur</p>
-                  <div className='mt-3 flex justify-between items-center'>
-                    <button className='bg-black text-white p-4 rounded-lg' onClick={() => setIsSellerClicked(false)}>Annuler</button>
-                    <button className='bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white p-4 rounded-lg' onClick={becomeSeller}>Confirmer</button>
-                  </div>
-                </div>
-              )
-            }
+            Mettre à jour votre profil
+          </h2>
+          <div className="flex justify-around items-center mb-6">
+            <button
+              className="flex items-center bg-gray-700 hover:bg-gray-800 text-white px-6 py-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              onClick={handleTailorClick}
+            >
+              <Scissors className="w-5 h-5 mr-2" /> Devenir Tailleur
+            </button>
+            <button
+              className="flex items-center bg-gray-700 hover:bg-gray-800 text-white px-6 py-4 rounded-lg transition-all duration-300 ease-in-out transform hover:scale-105"
+              onClick={handleSellerClick}
+            >
+              <ShoppingCart className="w-5 h-5 mr-2" /> Devenir Vendeur
+            </button>
           </div>
-        )
-      }
+
+          {isTaillorClicked && (
+            <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+              <p className="text-gray-600">
+                En tant que tailleur, vous pourrez ajouter des modèles de couture sur le fil d'actualité pour que les visiteurs puissent les voir, les partager, et les acheter.
+              </p>
+              <p className="mt-3 text-sm text-gray-500">
+                NB : Ce rôle est définitif. Vous ne pourrez pas devenir vendeur avec ce compte, mais vous pouvez créer un autre compte pour ce rôle.
+              </p>
+              <div className="flex justify-between mt-6">
+                <button
+                  className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all"
+                  onClick={() => setIsTaillorClicked(false)}
+                >
+                  Annuler
+                </button>
+                <button
+                  className="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition-all"
+                  onClick={becomeTailor}
+                >
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          )}
+
+          {isSellerClicked && (
+            <div className="bg-gray-50 p-4 rounded-lg shadow-inner">
+              <p className="text-gray-600">
+                En tant que vendeur, vous pourrez vendre des tissus, des fils, et d'autres accessoires nécessaires pour la couture.
+              </p>
+              <p className="mt-3 text-sm text-gray-500">
+                NB : Ce rôle est définitif. Vous ne pourrez pas devenir tailleur avec ce compte, mais vous pouvez créer un autre compte pour ce rôle.
+              </p>
+              <div className="flex justify-between mt-6">
+                <button
+                  className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all"
+                  onClick={() => setIsSellerClicked(false)}
+                >
+                  Annuler
+                </button>
+                <button
+                  className="bg-pink-600 text-white px-6 py-3 rounded-lg hover:bg-pink-700 transition-all"
+                  onClick={becomeSeller}
+                >
+                  Confirmer
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </>
   );
 }

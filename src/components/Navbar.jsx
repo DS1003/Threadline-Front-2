@@ -71,23 +71,23 @@ const Navbar = (props) => {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className={`flex items-center justify-center w-14 h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
+      className={`flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
         ? 'text-[#CC8C87] bg-[#FDF1F2]'
         : 'text-[#242424] hover:bg-[#FDF1F2]'
         }`}
     >
       {to ? (
         <NavLink to={to} className="flex items-center justify-center w-full h-full">
-          <Icon className="w-6 h-6" />
+          <Icon className="w-5 h-5 md:w-6 md:h-6" />
         </NavLink>
       ) : (
-        <Icon className="w-6 h-6" />
+        <Icon className="w-5 h-5 md:w-6 md:h-6" />
       )}
       {notificationCount > 0 && (
         <motion.span
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          className="absolute top-1 right-1 bg-[#CC8C87] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+          className="absolute top-0 right-0 bg-[#CC8C87] text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center"
         >
           {notificationCount}
         </motion.span>
@@ -98,15 +98,15 @@ const Navbar = (props) => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'message':
-        return <Mail className="w-5 h-5 text-blue-500" />;
+        return <Mail className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />;
       case 'like':
-        return <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>;
+        return <svg className="w-4 h-4 md:w-5 md:h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>;
       case 'follow':
-        return <Users className="w-5 h-5 text-green-500" />;
+        return <Users className="w-4 h-4 md:w-5 md:h-5 text-green-500" />;
       case 'event':
-        return <svg className="w-5 h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+        return <svg className="w-4 h-4 md:w-5 md:h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
       default:
-        return <Bell className="w-5 h-5 text-gray-500" />;
+        return <Bell className="w-4 h-4 md:w-5 md:h-5 text-gray-500" />;
     }
   };
 
@@ -118,14 +118,14 @@ const Navbar = (props) => {
       className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'
         }`}
     >
-      <div className="container  mx-auto px-2">
-        <div className="flex items-center  justify-between h-16">
+      <div className="container mx-auto px-2 md:px-4">
+        <div className="flex items-center justify-between h-16">
           {/* Logo and Search */}
-          <div className="flex items-center  flex-1">
-            <NavLink to="/feed" className="flex-shrink-0 ">
-              <span className="titreSite text-4xl  font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
+          <div className="flex items-center flex-1">
+            <NavLink to="/feed" className="flex-shrink-0 mr-4">
+              <span className="titreSite text-2xl md:text-4xl font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
             </NavLink>
-            <div className="relative hidden sm:block max-w-xs w-full">
+            <div className="relative hidden md:block max-w-xs w-full">
               <input
                 type="text"
                 placeholder="Rechercher sur Theardline"
@@ -136,7 +136,7 @@ const Navbar = (props) => {
           </div>
 
           {/* Main Navigation */}
-          <div className="flex items-center justify-center flex-1 space-x-2">
+          <div className="hidden md:flex items-center justify-center flex-1 space-x-2">
             <NavItem to="/feed" icon={Layout} />
             <NavItem to="/network" icon={Users} />
             <NavItem to="/messages" icon={Mail} notificationCount={3} />
@@ -172,7 +172,7 @@ const Navbar = (props) => {
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.2 }}
-                    className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
+                    className="absolute right-4 top-16 w-64 md:w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
                   >
                     <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
                       <div className="flex items-center">
@@ -257,7 +257,7 @@ const Navbar = (props) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="absolute right-4 top-16 w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
+            className="absolute right-4 top-16 w-64 md:w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
           >
             <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
               <h3 className="font-semibold text-lg text-white">Notifications</h3>
@@ -276,6 +276,7 @@ const Navbar = (props) => {
                     <div className="flex-1">
                       <p className="text-sm font-medium text-[#242424]">{notification.content}</p>
                       <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
+                    
                     </div>
                   </div>
                 </motion.div>

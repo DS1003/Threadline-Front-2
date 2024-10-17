@@ -164,16 +164,18 @@ const AddStoryModal = ({ isOpen, onClose, onAddStory }) => {
   );
 };
 
-const StoryViewModal = ({ isOpen, onClose, story }) => {
-  const [stories, setStories] = useState([]);
+const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId }) => {
+  const [currentStoryIndex, setCurrentStoryIndex] = useState(initialStoryIndex);
   const [liked, setLiked] = useState(false);
   const [comment, setComment] = useState('');
   const [comments, setComments] = useState([]);
 
-  if (!isOpen || !story) return null;
+  if (!isOpen || !stories || stories.length === 0) return null;
+
+  const currentStory = stories[currentStoryIndex];
 
   const handleLike = () => setLiked(!liked);
-  const handleShare = () => console.log("Sharing story:", story.user);
+  const handleShare = () => console.log("Sharing story:", currentStory.user);
   const handleComment = (e) => {
     e.preventDefault();
     if (comment.trim()) {
@@ -181,94 +183,77 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
       setComment('');
     }
   };
-  const handleDelete = async (storiesId) => {
+
+  const handleDelete = async (storyId) => {
     const confirmDelete = window.confirm("Êtes-vous sûr de vouloir supprimer cette story ?");
     if (!confirmDelete) return;
-  
+
     try {
-      const user = JSON.parse(localStorage.getItem('user'));
       const response = await apiService.request(
         "POST",
-        `/stories/delete/${storiesId}`,
+        `/stories/delete/${storyId}`,
         null,
-        user.token);
-        if (response){
-
-          alert("Story supprimée avec succès !");
+        user.token
+      );
+      if (response) {
+        alert("Story supprimée avec succès !");
+        if (stories.length === 1) {
+          onClose();
+        } else if (currentStoryIndex === stories.length - 1) {
+          setCurrentStoryIndex(currentStoryIndex - 1);
         }
-      onClose(); // Close the modal after deletion
-      setStories((prevStories) => prevStories.filter((storiesId) =>  storiesId!== story.id)); // Update the state
+      }
     } catch (error) {
       console.error("Erreur lors de la suppression de la story :", error);
       alert("Impossible de supprimer la story. Veuillez réessayer.");
     }
   };
-  
+
+  const prevStory = () => {
+    setCurrentStoryIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : prevIndex));
+  };
+
+  const nextStory = () => {
+    setCurrentStoryIndex((prevIndex) => (prevIndex < stories.length - 1 ? prevIndex + 1 : prevIndex));
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
-        <div className="flex justify-between items-center p-4 bg-gray-50">
-          <div className="flex items-center">
-            <img src={story.author.photoUrl} alt={story.author.photoUrl} className="w-10 h-10 rounded-full object-cover mr-3" />
-            <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
-          </div>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            <X size={24} />
-          </button>
-        </div>
-        <div className="relative">
-        {story.content ? (
-  /\.(jpg|jpeg|png|gif)$/i.test(story.content) ? (
-    <img src={story.content} alt="Story" className="w-full h-[calc(100vh-250px)] object-cover" />
-  ) : /\.(mp4|webm|ogg)$/i.test(story.content) ? (
-    <video src={story.content} controls className="w-full h-[calc(100vh-250px)] object-cover">
-      Votre navigateur ne supporte pas la lecture de vidéos.
-    </video>
-  ) : (
-    <div className="w-full h-[calc(100vh-250px)] flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
-      <p className="text-3xl font-bold text-white text-center px-6">{story.content}</p>
-    </div>
-  )
-) : null}
-
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent">
-            <div className="flex justify-between items-center">
-              <button onClick={handleLike} className={`flex items-center ${liked ? 'text-red-500' : 'text-white'}`}>
-                <Heart size={24} className={liked ? 'fill-current' : ''} />
-                <span className="ml-2 text-sm">{liked ? 'Aimé' : 'Aimer'}</span>
-              </button>
-              <button onClick={handleShare} className="flex items-center text-white">
-                <Share2 size={24} />
-                <span className="ml-2 text-sm">Partager</span>
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="p-4">
-        <button onClick={() => handleDelete(story.id)} className="flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300">
-  <Trash size={24} />
-</button>
-
-          <h3 className="font-semibold mb-2 text-gray-700">Commentaires</h3>
-          <div className="max-h-32 overflow-y-auto mb-4 space-y-2">
-            {comments.map((comment, index) => (
-              <div key={index} className="bg-gray-100 rounded-lg p-2">
-                <span className="font-semibold text-gray-800">{comment.user}:</span> {comment.text}
+      <div className="relative w-full max-w-lg h-[80vh]">
+        <button onClick={onClose} className="absolute top-4 right-4 text-white z-10">
+          <X size={24} />
+        </button>
+        <div className="relative h-full">
+          {currentStory?.content ? (
+            /\.(jpg|jpeg|png|gif)$/i.test(currentStory.content) ? (
+              <img src={currentStory.content} alt="Story" className="w-full h-full object-cover" />
+            ) : /\.(mp4|webm|ogg)$/i.test(currentStory.content) ? (
+              <video src={currentStory.content} controls className="w-full h-full object-cover">
+                Votre navigateur ne supporte pas la lecture de vidéos.
+              </video>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-purple-500 to-pink-500">
+                <p className="text-3xl font-bold text-white text-center px-6">{currentStory.content}</p>
               </div>
-            ))}
-          </div>
-          <form onSubmit={handleComment} className="flex">
-            <input
-              type="text"
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Ajouter un commentaire..."
-              className="flex-grow p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition duration-300">
-              <Send size={20} />
+            )
+          ) : null}
+          <div className="absolute bottom-4 left-4 right-4 flex justify-between">
+            <button onClick={prevStory} className="text-white" disabled={currentStoryIndex === 0}>
+              <ChevronLeft size={24} />
             </button>
-          </form>
+            <button onClick={nextStory} className="text-white" disabled={currentStoryIndex === stories.length - 1}>
+              <ChevronRight size={24} />
+            </button>
+          </div>
+          {currentStory.authorId === user.id && (
+            <button 
+              onClick={() => handleDelete(currentStory.id)} 
+              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300"
+            >
+              <Trash size={24} />
+              <span className="ml-2">Supprimer</span>
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -278,11 +263,12 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [selectedStory, setSelectedStory] = useState(null);
+  const [selectedAuthorId, setSelectedAuthorId] = useState(null);
+  const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
   const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(null);
-  const storiesPerPage =5;
+  const storiesPerPage = 5;
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -296,7 +282,17 @@ const Stories = () => {
       const fetchedStories = response.stories;
   
       if (fetchedStories) {
-        setStories(fetchedStories.filter(story => story.authorId !== user.id));
+        // Group stories by authorId, excluding the current user's stories
+        const groupedStories = fetchedStories.reduce((acc, story) => {
+          if (story.authorId !== user.id) {
+            if (!acc[story.authorId]) {
+              acc[story.authorId] = [];
+            }
+            acc[story.authorId].push(story);
+          }
+          return acc;
+        }, {});
+        setStories(groupedStories);
         setError(null);
       } else {
         console.error('Story data not found in response:', fetchedStories);
@@ -309,16 +305,23 @@ const Stories = () => {
   };
 
   const handleAddStory = (newStory) => {
-    setStories(prevStories => [newStory, ...prevStories.filter(story => story.authorId !== user.id)]);
+    setStories(prevStories => {
+      const newStories = { ...prevStories };
+      if (!newStories[newStory.authorId]) {
+        newStories[newStory.authorId] = [];
+      }
+      newStories[newStory.authorId].unshift(newStory);
+      return newStories;
+    });
   };
   
-  const handleViewStory = (story) => {
-    setSelectedStory(story);
+  const handleViewStory = (authorId, storyIndex) => {
+    setSelectedAuthorId(authorId);
+    setSelectedStoryIndex(storyIndex);
     setIsViewModalOpen(true);
   };
-  
   const nextPage = () => {
-    setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(stories.length / storiesPerPage) - 1));
+    setCurrentPage((prevPage) => Math.min(prevPage + 1, Math.ceil(Object.keys(stories).length / storiesPerPage) - 1));
   };
   
   const prevPage = () => {
@@ -334,9 +337,9 @@ const Stories = () => {
     }
   }, [currentPage]);
   
-  const totalPages = Math.ceil(stories.length / storiesPerPage);
+  const totalPages = Math.ceil(Object.keys(stories).length / storiesPerPage);
   
-  const displayedStories = stories.slice(
+  const displayedStories = Object.entries(stories).slice(
     currentPage * storiesPerPage,
     (currentPage + 1) * storiesPerPage
   );
@@ -372,14 +375,14 @@ const Stories = () => {
         className="flex space-x-4 overflow-x-hidden scroll-smooth"
       >
         <UserStories />
-        {displayedStories.map((story) => (
+        {displayedStories.map(([authorId, authorStories]) => (
           <StoryCircle
-            key={story.id}
-            user={story.author.lastname ? `${story.author.firstname} ${story.author.lastname}` : 'Utilisateur'}
-            image={story.content}
+            key={authorId}
+            user={authorStories[0].author.lastname ? `${authorStories[0].author.firstname} ${authorStories[0].author.lastname}` : 'Utilisateur'}
+            image={authorStories[0].content}
             isUser={false}
             onAddStory={() => {}}
-            onViewStory={() => handleViewStory(story)}
+            onViewStory={() => handleViewStory(authorId, 0)}
           />
         ))}
       </div>
@@ -399,17 +402,20 @@ const Stories = () => {
         onClose={() => setIsAddModalOpen(false)}
         onAddStory={handleAddStory}
       />
-      <StoryViewModal
-        isOpen={isViewModalOpen}
-        onClose={() => setIsViewModalOpen(false)}
-        story={selectedStory}
-      />
+      {selectedAuthorId && (
+        <StoryViewModal
+          isOpen={isViewModalOpen}
+          onClose={() => setIsViewModalOpen(false)}
+          stories={stories[selectedAuthorId]}
+          initialStoryIndex={selectedStoryIndex}
+          authorId={selectedAuthorId}
+        />
+      )}
     </div>
   );
 };
 
 export default Stories;
-
 // Styles pour la barre de défilement personnalisée
 const styles = `
   .custom-scrollbar::-webkit-scrollbar {
