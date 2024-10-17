@@ -7,26 +7,22 @@ import UserMeasurements from './UserMeasurements';
 import UpdateRoleUser from './UpdateRoleUser';
 
 const ProfilePage = () => {
-  const [user, setUser] = useState(null); // État pour stocker l'utilisateur connecté
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Récupérer les informations de l'utilisateur depuis localStorage
     const userFromStorage = localStorage.getItem('user');
     if (userFromStorage) {
       try {
         const parsedUser = JSON.parse(userFromStorage);
-        setUser(parsedUser); // Mettre à jour l'état avec les informations utilisateur
-        //setUserRole(parsedUser.roles.map(role => role.name)); // Récupérer le rôle
+        setUser(parsedUser);
       } catch (error) {
         console.error("Erreur lors du parsing de l'utilisateur depuis le localStorage", error);
       }
     }
   }, []);
  
-
   const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
- 
-  // Vérification des rôles pour décider d'afficher ou non le composant UpdateRoleUser
+
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
 
   const posts = [
@@ -55,7 +51,6 @@ const ProfilePage = () => {
     },
   ];
 
-
   return (
     <div className="bg-gray-100 min-h-screen">
       <ProfileHeader user={{ ...user, coverPhoto }} />
@@ -68,7 +63,6 @@ const ProfilePage = () => {
               <UpdateRoleUser user={user} setUser={setUser} />
             )}
 
-            {/* Passer les fonctions d'ajout et de suppression à UserMeasurements */}
             <UserMeasurements 
               user={user}
             />
