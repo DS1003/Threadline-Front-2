@@ -75,7 +75,7 @@ export default function PostCard({user}) {
             ...post,
             liked: post.postLikes.some((like) => like.userId === user.id),
             likeCount: post.postLikes.length,
-            commentCount: post.comments.length
+            commentCount: post.comments.length,
             bookmarked: post.favorites.some((favorite) => favorite.userId === user.id),
             favoriteCount: post._count?.favorites || post.favorites.length || 0,
           };
