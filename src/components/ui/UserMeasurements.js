@@ -66,7 +66,73 @@ const UserMeasurements = ({ user }) => {
     }
   };
 
+  const renderMeasurements = (m) => {
+    const commonMeasurements = [
+      { label: 'Poitrine', key: 'chest' },
+      { label: 'Taille', key: 'waist' },
+      { label: 'Hanches', key: 'hips' },
+      { label: 'Épaules', key: 'shoulder' },
+    ];
+
+    const maleMeasurements = [
+      { label: 'Longueur de manche', key: 'sleeveLength' },
+      { label: 'Cou', key: 'neck' },
+      { label: 'Dos', key: 'back' },
+      { label: 'Emmanchure', key: 'armhole' },
+      { label: 'Cuisse', key: 'thigh' },
+      { label: 'Mollet', key: 'calf' },
+    ];
+
+    const femaleMeasurements = [
+      { label: 'Buste', key: 'bust' },
+      { label: 'Entrejambe', key: 'inseam' },
+      { label: 'Cuisse', key: 'thigh' },
+    ];
+
+    const measurementsToRender = [
+      ...commonMeasurements,
+      ...(user.gender === 'MALE' ? maleMeasurements : femaleMeasurements),
+    ];
+
+    return measurementsToRender.map(({ label, key }) => (
+      m[key] && <p key={key} className="text-sm">{label}: {m[key]} cm</p>
+    ));
+  };
+
   return (
+    <div className="bg-gradient-to-br from-white to-[#FFF5F4] rounded-xl border-2 shadow-lg p-8 mb-6 max-w-md mx-auto">
+      <h2 className="text-3xl font-bold mb-6 text-[#4A4A4A] border-b-2 border-[#CC8C87] pb-2 flex items-center justify-center">
+        <Ruler className="w-8 h-8 mr-3 text-[#CC8C87]" />
+        Mesures
+      </h2>
+      <div className="grid grid-cols-1 gap-6">
+        {measurements.map((m) => (
+          <div key={m.id} className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg hover:scale-105">
+            <h3 className="text-lg font-semibold text-[#CC8C87]">Mesure</h3>
+            {renderMeasurements(m)}
+            <div className="flex justify-between mt-4">
+              <button
+                onClick={() => openModal(m)}
+                className="bg-[#CC8C87] text-white rounded-full py-2 px-4 hover:bg-[#a96d69]"
+              >
+                Modifier
+              </button>
+              <button
+                onClick={() => handleDeleteClick(m.id)}
+                className="bg-red-500 text-white rounded-full py-2 px-4 hover:bg-red-600"
+              >
+                Supprimer
+              </button>
+            </div>
+          </div>
+        ))}
+        <div className="flex justify-center">
+          <button
+            onClick={() => openModal()}
+            className="flex items-center justify-center bg-[#CC8C87] text-white rounded-full py-3 px-5 hover:bg-[#a96d69] mt-6"
+            title='Ajouter une mesure'
+          >
+            <FaPlus className="mr-2" />
     <div className="relative bg-gradient-to-br from-[#f0f4ff] to-[#e9f1ff] rounded-3xl shadow-2xl p-8 mb-6 max-w-4xl mx-auto overflow-hidden">
       {/* Background animation */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#CC8C87] to-[#CC8C87] opacity-10 animate-pulse"></div>
@@ -130,6 +196,14 @@ const UserMeasurements = ({ user }) => {
         </div>
       </div>
 
+      {/* Modal de confirmation pour suppression */}
+      <ConfirmationModal
+        isOpen={isConfirmationOpen}
+        onConfirm={confirmDeleteMeasurement}
+        onCancel={() => setIsConfirmationOpen(false)}
+      />
+
+      {/* Modal pour ajout/édition de mesure */}
       <MeasurementModal
         isOpen={isModalOpen}
         onClose={closeModal}

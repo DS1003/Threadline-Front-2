@@ -1,23 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import apiService from '../../services/ApiService'; // Importez le service API
+import apiService from '../../services/ApiService';
 
 const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
-  
   const [newMeasurement, setNewMeasurement] = useState({
-    waist: '',
     chest: '',
+    waist: '',
     hips: '',
     shoulder: '',
-    bust: '',
-    inseam: '',
-    thigh: '',
+    sleeveLength: '', // Hommes
+    neck: '',         // Hommes
+    back: '',         // Hommes
+    armhole: '',      // Hommes
+    thigh: '',        // Commun
+    calf: '',         // Hommes
+    bust: '',         // Femmes
+    inseam: '',       // Femmes
   });
+
+  // Vérifiez si l'objet `user` est défini avant d'essayer d'y accéder
+  const userGender = user ? user.gender : null;
 
   useEffect(() => {
     if (measurement) {
       setNewMeasurement(measurement);
+    } else {
+      // Réinitialiser les champs avec des valeurs spécifiques selon le genre
+      setNewMeasurement((prev) => ({
+        ...prev,
+        thigh: '', // Valeur commune
+        ...(userGender === 'MALE'
+          ? { chest: '', waist: '', hips: '', shoulder: '', sleeveLength: '', neck: '', back: '', armhole: '', calf: '' }
+          : { chest: '', waist: '', hips: '', shoulder: '', bust: '', inseam: '' })
+      }));
     }
-  }, [measurement]);
+  }, [measurement, userGender]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -29,23 +45,25 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
     try {
       const endpoint = measurement ? `/measurements/update/${measurement.id}` : '/measurements/add';
       const method = measurement ? 'PUT' : 'POST';
-      const response = await apiService.request(method, endpoint, newMeasurement, user.token);
+      const response = await apiService.request(method, endpoint, newMeasurement, user?.token);
       
       onAdd(response);
-      setNewMeasurement({
-        waist: '',
-        chest: '',
-        hips: '',
-        shoulder: '',
-        bust: '',
-        inseam: '',
-        thigh: '',
-      });
       onClose();
     } catch (error) {
       console.error('Erreur lors de la sauvegarde des mesures:', error);
     }
   };
+
+  const renderInputField = (name, placeholder) => (
+    <input
+      type="text"
+      name={name}
+      placeholder={placeholder}
+      value={newMeasurement[name]}
+      onChange={handleChange}
+      className="border p-2 mb-2 w-full"
+    />
+  );
 
   if (!isOpen) return null;
 
@@ -56,6 +74,29 @@ const MeasurementModal = ({ isOpen, onClose, onAdd, measurement, user }) => {
           {measurement ? 'Modifier la mesure' : 'Ajouter des mesures'}
         </h2>
         <form onSubmit={handleSubmit}>
+          {renderInputField('chest', 'Poitrine')}
+          {renderInputField('waist', 'Taille')}
+          {renderInputField('hips', 'Hanches')}
+          {renderInputField('shoulder', 'Épaules')}
+          
+          {userGender === 'MALE' ? (
+            <>
+              {renderInputField('sleeveLength', 'Longueur de manche')}
+              {renderInputField('neck', 'Cou')}
+              {renderInputField('back', 'Dos')}
+              {renderInputField('armhole', 'Emmanchure')}
+              {renderInputField('calf', 'Mollet')}
+            </>
+          ) : (
+            <>
+              {renderInputField('bust', 'Buste')}
+              {renderInputField('inseam', 'Entrejambe')}
+            </>
+          )}
+          
+          {renderInputField('thigh', 'Cuisse')}
+
+          <div className="flex justify-between">
           <div className="grid grid-cols-2 gap-4">
             <input
               type="text"

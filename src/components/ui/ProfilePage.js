@@ -22,8 +22,9 @@ const ProfilePage = () => {
       }
     }
   }, []);
-
+ 
   const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
+
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
 
   const posts = [
@@ -43,7 +44,6 @@ const ProfilePage = () => {
       <span className="ml-2">{label}</span>
     </button>
   );
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#CC8C87] to-[#CC8C87] py-8">
       <div className="container mx-auto px-4">
@@ -77,6 +77,14 @@ const ProfilePage = () => {
               </div>
             )}
 
+            <UserMeasurements 
+              user={user}
+            />
+            
+            <InstagramStyleFavorites posts={posts} />
+          </div>
+          <div className="md:col-span-2">
+            <UserPosts posts={posts} />
             {activeTab === 'favorites' && <InstagramStyleFavorites posts={posts} />}
 
             {activeTab === 'posts' && <UserPosts posts={posts} />}
