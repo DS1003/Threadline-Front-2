@@ -109,6 +109,7 @@ const UserStories = () => {
     return (
       <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
         <div className="relative w-full max-w-lg h-[80vh]">
+        
           <button onClick={closeStories} className="absolute top-4 right-4 text-white z-10">
             <X size={24} />
           </button>
@@ -126,14 +127,27 @@ const UserStories = () => {
                 </div>
               )
             ) : null}
-            <div className="absolute bottom-4 left-4 right-4 flex justify-between">
-              <button onClick={prevStory} className="text-white" disabled={currentStoryIndex === 0}>
-                <ChevronLeft size={24} />
-              </button>
-              <button onClick={nextStory} className="text-white" disabled={currentStoryIndex === userStories.length - 1}>
-                <ChevronRight size={24} />
-              </button>
-            </div>
+            <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
+  <button
+    onClick={prevStory}
+    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
+   disabled={currentStoryIndex === 0}
+  >
+    <ChevronLeft size={32} />
+  </button>
+</div>
+
+<div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+  <button
+    onClick={nextStory}
+    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
+    disabled={currentStoryIndex === userStories.length - 1}>
+  
+    <ChevronRight size={32} />
+  </button>
+</div>
             <button onClick={() => handleDelete(currentStory.id)} className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300">
               <Trash size={24} />
             </button>
