@@ -33,7 +33,7 @@ export default function PostCard() {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState([]);
-  const [commentCount, setCommentCount] = useState(12);
+  const [commentCount, setCommentCount] = useState([]);
   const [shareCount, setShareCount] = useState(5);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
@@ -75,6 +75,8 @@ export default function PostCard() {
             ...post,
             liked: post.postLikes.some((like) => like.userId === user.id),
             likeCount: post.postLikes.length,
+            bookmarked: post.favorites.some((favorite) => favorite.userId === user.id),
+            favoriteCount: post._count?.favorites || post.favorites.length || 0,
           };
         });
 
@@ -162,13 +164,45 @@ export default function PostCard() {
   };
   
 
-  const handleBookmark = (postId) => {
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId ? { ...post, bookmarked: !post.bookmarked } : post
-      )
-    );
+  const handleBookmark = async (postId) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+        const response = await apiService.request(
+        "POST",
+        `/favorites/add-to-favorites/${postId}`,
+        null,
+        user.token
+      );
+  
+      // Mettre à jour l'état local après la réponse du backend
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
+                ...post,
+                bookmarked: !post.bookmarked, // Inverser l'état des favoris
+                favoriteCount: post.bookmarked
+                  ? post.favoriteCount - 1
+                  : post.favoriteCount + 1, // Ajuster le comptage des favoris
+              }
+            : post
+        )
+      );
+  
+      Swal.fire({
+        icon: response.status === 201 ? "success" : "info",
+        title: response.data.message,
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout/suppression du favori:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: "Impossible de marquer ce poste en favori",
+      });
+    }
   };
+  
 
   const handleRating = (newRating) => {
     setRating(newRating);
