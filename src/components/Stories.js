@@ -209,7 +209,7 @@ const StoryViewModal = ({ isOpen, onClose, story }) => {
       <div className="bg-white rounded-xl w-full max-w-lg overflow-hidden shadow-2xl">
         <div className="flex justify-between items-center p-4 bg-gray-50">
           <div className="flex items-center">
-            <img src={user.photoUrl} alt={story.user} className="w-10 h-10 rounded-full object-cover mr-3" />
+            <img src={story.author.photoUrl} alt={story.author.photoUrl} className="w-10 h-10 rounded-full object-cover mr-3" />
             <h2 className="text-lg font-semibold text-gray-800">{story.user}</h2>
           </div>
           <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
@@ -282,7 +282,7 @@ const Stories = () => {
   const [stories, setStories] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(null);
-  const storiesPerPage =2;
+  const storiesPerPage =5;
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -375,7 +375,7 @@ const Stories = () => {
         {displayedStories.map((story) => (
           <StoryCircle
             key={story.id}
-            user={story.author ? story.author.id : 'Utilisateur'}
+            user={story.author.lastname ? `${story.author.firstname} ${story.author.lastname}` : 'Utilisateur'}
             image={story.content}
             isUser={false}
             onAddStory={() => {}}
