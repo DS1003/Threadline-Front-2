@@ -21,34 +21,32 @@ const Badge = ({ text, color, bgColor, borderColor, shadowColor }) => (
 );
 
 export default function Component(props) {
-  const navigate = useNavigate();
 
   const { user } = props;
 
   const numberOfRole = user.roles.length;
   const otherRole = user.roles.find((role) => role.name === 'TAILOR' || role.name === 'SELLER');
 
-  const handleProfileClick = () => {
-    navigate('/profile');
-  };
-
   return (
     <div className="w-full h-fit max-w-lg mb-3 bg-white rounded-lg shadow-sm p-4 relative">
-      <div className="flex items-center gap-3 mb-4">
-        <img
-          src={user.photoUrl}
-          alt={`${user.firstname}'s profile`}
-          className="w-12 h-12 rounded-full border-2 border-gray-200 shadow-md"
-        />
-        <div>
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold">{user.firstname}</h2>         
+      <div className='flex items-center gap-2'>
+        <div className='image'>
+          <img
+            src={user.photoUrl}
+            alt={`${user.firstname}'s profile`}
+            className="w-14 h-14 rounded-full border-2 border-gray-200 shadow-md"
+          />
+        </div>
+        <div className='englobe'>
+          <div className='flex justify-between items-center'>
+            <h2 className="text-lg font-bold">{user.firstname}</h2>
+           
           </div>
-          
-          <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
-            {user.email}
-            {otherRole?.name === 'SELLER' || otherRole?.name === 'TAILOR' ? <VerifiedIcon className="w-5 h-5 text-white fill-blue-500" /> : null}
-            {
+         
+            <p className="text-gray-500 text-sm flex justify-between items-center gap-2">
+              {user.email}
+              {otherRole?.name === 'SELLER' || otherRole?.name === 'TAILOR' ? <VerifiedIcon className="w-5 h-5 text-white fill-blue-500" /> : null}
+              {
                 numberOfRole === 1 ? (
                   <Badge
                     text="Simple"
@@ -77,31 +75,26 @@ export default function Component(props) {
                   )
                     : null
               }
-          </p>
+            </p>
+          
         </div>
-        <button
-          onClick={handleProfileClick}
-          className="absolute top-4 right-4 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white text-sm font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-        >
-          Voir profil
-        </button>
-        
       </div>
 
+
       <div className="flex justify-between mt-5">
-          <div className="text-center">
-            <p className="font-bold text-lg">2.3k</p>
-            <p className="text-xs text-gray-500">Follower</p>
-          </div>
-          <div className="text-center">
-            <p className="font-bold text-lg">235</p>
-            <p className="text-xs text-gray-500">Following</p>
-          </div>
-          <div className="text-center">
-            <p className="font-bold text-lg">80</p>
-            <p className="text-xs text-gray-500">Post</p>
-          </div>
+        <div className="text-center">
+          <p className="font-bold text-lg">2.3k</p>
+          <p className="text-xs text-gray-500">Follower</p>
         </div>
+        <div className="text-center">
+          <p className="font-bold text-lg">235</p>
+          <p className="text-xs text-gray-500">Following</p>
+        </div>
+        <div className="text-center">
+          <p className="font-bold text-lg">80</p>
+          <p className="text-xs text-gray-500">Post</p>
+        </div>
+      </div>
     </div>
   )
 }
