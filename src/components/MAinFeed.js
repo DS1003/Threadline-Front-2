@@ -74,7 +74,7 @@ const MainFeed = (props) => {
                     </div>
                     {/* Create post form */}
                     <CreatePostCard user={props.user} />
-                    <Post />
+                    <Post user={user}/>
                     {/* Add more posts as needed */}
                 </div>
             </div>

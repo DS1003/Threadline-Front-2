@@ -7,7 +7,6 @@ import Swal from 'sweetalert2';
 
 export default function CreatePostCard(props) {
   const {user} = props;
-  console.log(user);
   const [postContent, setPostContent] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
