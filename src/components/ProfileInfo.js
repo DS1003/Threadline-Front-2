@@ -39,7 +39,7 @@ export default function Component(props) {
         </div>
         <div className='englobe'>
           <div className='flex justify-between items-center'>
-            <h2 className="text-lg font-bold">{user.firstname}</h2>
+            <h2 className="text-lg font-bold">{user.firstname} {user.lastname}</h2>
            
           </div>
          

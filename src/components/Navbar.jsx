@@ -123,7 +123,7 @@ const Navbar = (props) => {
           {/* Logo and Search */}
           <div className="flex items-center  flex-1">
             <NavLink to="/feed" className="flex-shrink-0 ">
-              <span className="titreSite text-4xl   font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
+              <span className="titreSite text-4xl  font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
             </NavLink>
             <div className="relative hidden sm:block max-w-xs w-full">
               <input
