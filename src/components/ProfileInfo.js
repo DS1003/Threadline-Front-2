@@ -23,7 +23,7 @@ const Badge = ({ text, color, bgColor, borderColor, shadowColor }) => (
 export default function Component(props) {
   const navigate = useNavigate();
 
-  const {user} = props;
+  const { user } = props;
 
   const numberOfRole = user.roles.length;
   const otherRole = user.roles.find((role) => role.name === 'TAILOR' || role.name === 'SELLER');
@@ -37,65 +37,71 @@ export default function Component(props) {
       <div className="flex items-center gap-3 mb-4">
         <img
           src={user.photoUrl}
-          alt={`${user.firstname}'s profile picture`}
+          alt={`${user.firstname}'s profile`}
           className="w-12 h-12 rounded-full border-2 border-gray-200 shadow-md"
         />
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold">{user.firstname}</h2>
-            {
-              numberOfRole === 1 ? (
-                <Badge 
-                  text="Simple" 
-                  color="text-blue-800" 
-                  bgColor="bg-blue-100" 
-                  borderColor="border-blue-300"
-                  shadowColor="shadow-blue-200"
-                />
-              ) : otherRole?.name === 'TAILOR' ? (
-                <Badge 
-                  text="Tailleur" 
-                  color="text-green-800" 
-                  bgColor="bg-green-100" 
-                  borderColor="border-green-300"
-                  shadowColor="shadow-green-200"
-                />
-              ) : 
-              otherRole?.name === 'SELLER' ? (
-                <Badge 
-                  text="Vendeur" 
-                  color="text-purple-800" 
-                  bgColor="bg-purple-100" 
-                  borderColor="border-purple-300"
-                  shadowColor="shadow-purple-200"
-                />
-              ) 
-              : null
-            }
+            <h2 className="text-lg font-bold">{user.firstname}</h2>         
           </div>
-          <p className="text-gray-500 text-sm">{user.email}</p>
+          
+          <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
+            {user.email}
+            {otherRole?.name === 'SELLER' || otherRole?.name === 'TAILOR' ? <VerifiedIcon className="w-5 h-5 text-white fill-blue-500" /> : null}
+            {
+                numberOfRole === 1 ? (
+                  <Badge
+                    text="Simple"
+                    color="text-blue-800"
+                    bgColor="bg-blue-100"
+                    borderColor="border-blue-300"
+                    shadowColor="shadow-blue-200"
+                  />
+                ) : otherRole?.name === 'TAILOR' ? (
+                  <Badge
+                    text="Tailleur"
+                    color="text-green-800"
+                    bgColor="bg-green-100"
+                    borderColor="border-green-300"
+                    shadowColor="shadow-green-200"
+                  />
+                ) :
+                  otherRole?.name === 'SELLER' ? (
+                    <Badge
+                      text="Vendeur"
+                      color="text-purple-800"
+                      bgColor="bg-purple-100"
+                      borderColor="border-purple-300"
+                      shadowColor="shadow-purple-200"
+                    />
+                  )
+                    : null
+              }
+          </p>
         </div>
+        <button
+          onClick={handleProfileClick}
+          className="absolute top-4 right-4 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white text-sm font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+        >
+          Voir profil
+        </button>
+        
       </div>
-      <button 
-        onClick={handleProfileClick}
-        className="absolute top-4 right-4 bg-[#CC8C87] hover:bg-[#cc8c87d2] text-white text-sm font-semibold py-2 px-4 rounded-full transition-colors duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-      >
-        Voir profil
-      </button>
-      <div className="flex justify-between bg-gray-100 rounded-lg p-3 shadow-inner">
-        <div className="text-center">
-          <p className="font-bold text-lg">2.3k</p>
-          <p className="text-xs text-gray-500">Follower</p>
+
+      <div className="flex justify-between mt-5">
+          <div className="text-center">
+            <p className="font-bold text-lg">2.3k</p>
+            <p className="text-xs text-gray-500">Follower</p>
+          </div>
+          <div className="text-center">
+            <p className="font-bold text-lg">235</p>
+            <p className="text-xs text-gray-500">Following</p>
+          </div>
+          <div className="text-center">
+            <p className="font-bold text-lg">80</p>
+            <p className="text-xs text-gray-500">Post</p>
+          </div>
         </div>
-        <div className="text-center">
-          <p className="font-bold text-lg">235</p>
-          <p className="text-xs text-gray-500">Following</p>
-        </div>
-        <div className="text-center">
-          <p className="font-bold text-lg">80</p>
-          <p className="text-xs text-gray-500">Post</p>
-        </div>
-      </div>
     </div>
   )
 }

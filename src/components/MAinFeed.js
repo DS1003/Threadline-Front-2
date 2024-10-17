@@ -11,7 +11,7 @@ import Navbar from './Navbar';
 import withAuth from '../hoc/withAuth';
 
 
-const MainFeed= (props) => {
+const MainFeed = (props) => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
     const toggleSidebar = () => {
@@ -39,20 +39,29 @@ const MainFeed= (props) => {
         ]);
     };
 
+    const user = props.user;
+
+    const isTailor = user.roles.some(role => role.name === 'TAILOR');
+
     return (
         <div className="flex h-screen overflow-hidden">
-            <Navbar user={props.user}/>
+            <Navbar user={user} />
 
             {/* Left sidebar - fixed */}
             <div className="custom-scrollbar overflow-hidden w-1/4 p-8 fixed left-[10%] top-14 bottom-0">
-                <ProfileInfo user={props.user} />
-                <Balanced 
-                    balance={balance} 
-                    lastPurchaseDate="2024-05-24"
-                    purchaseHistory={purchaseHistory}
-                    onRefresh={handleRefresh}
-                    onPurchase={handlePurchase}
-                />
+                <ProfileInfo user={user} />
+                {
+                    isTailor && (
+                        <Balanced
+                            balance={balance}
+                            lastPurchaseDate="2024-05-24"
+                            purchaseHistory={purchaseHistory}
+                            onRefresh={handleRefresh}
+                            onPurchase={handlePurchase}
+                            user={user}
+                        />
+                    )
+                }
                 <Sidebar />
             </div>
 
@@ -84,7 +93,7 @@ const MainFeed= (props) => {
             <RightSidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
         </div>
     );
-}; export default withAuth(MainFeed) ;
+}; export default withAuth(MainFeed);
 // 
 const styles = `
   .custom-scrollbar::-webkit-scrollbar {
