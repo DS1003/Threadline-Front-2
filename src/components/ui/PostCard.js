@@ -30,7 +30,7 @@ import { format } from "date-fns";
 import Swal from "sweetalert2";
 import Loader from "./Loader";
 
-export default function PostCard() {
+export default function PostCard({user}) {
   const navigate = useNavigate();
   const handleProfileClick = (authorId) => {
     navigate('/profile');
@@ -54,11 +54,7 @@ export default function PostCard() {
 
   const [selectedImage, setSelectedImage] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  if (!user || !user.token) {
-    throw new Error("No authentication token found. Please log in.");
-  }
+  //const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -75,11 +71,11 @@ export default function PostCard() {
         }
 
         const data = response.posts.map((post) => {
-         
           return {
             ...post,
             liked: post.postLikes.some((like) => like.userId === user.id),
             likeCount: post.postLikes.length,
+            commentCount: post.comments.length
             bookmarked: post.favorites.some((favorite) => favorite.userId === user.id),
             favoriteCount: post._count?.favorites || post.favorites.length || 0,
           };
@@ -92,8 +88,9 @@ export default function PostCard() {
         setLoading(false);
       }
     };
-
-    fetchPosts();
+    if(user){
+      fetchPosts();
+    }
   }, [reload]);
 
   // Fonction pour forcer le rechargement des posts
@@ -111,7 +108,7 @@ export default function PostCard() {
         "POST",
         `/views/${postId}`,
         null,
-        user.token
+        user?.token
       );
       const updatedPost = response.post;
       console.log(updatedPost);
@@ -122,7 +119,6 @@ export default function PostCard() {
         )
       );
       triggerReload(); // Recharger les posts après mise à jour
-      console.log(posts);
     } catch (error) {
       console.error("Erreur lors de l'incrémentation des vues:", error);
     }
@@ -278,6 +274,14 @@ export default function PostCard() {
     return <div>Error: {error}</div>;
   }
 
+  const handleCommentAdded = (postId) => {
+    setPosts((prevPosts) =>
+      prevPosts.map((post) =>
+        post.id === postId ? { ...post, commentCount: post.commentCount + 1 } : post
+      )
+    );
+  };
+
   return (
     <div>
       {posts.map((post) => (
@@ -414,7 +418,7 @@ export default function PostCard() {
                   className="flex items-center space-x-1 text-gray-500"
                 >
                   <MessageCircle className="w-5 h-5" />
-                  <span>{commentCount}</span>
+                  <span>{post.commentCount}</span>
                 </button>
                 <button className="flex items-center space-x-1 text-gray-500">
                   <Share2 className="w-5 h-5" />
@@ -464,8 +468,10 @@ export default function PostCard() {
       )}
       {showCommentModal && (
         <CommentModal
-          postId={currentPost?.id}
+          post={currentPost}
+          user={user}
           onClose={() => setShowCommentModal(false)}
+          onCommentAdded={handleCommentAdded}
         />
       )}
 

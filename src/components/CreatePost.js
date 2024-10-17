@@ -3,7 +3,9 @@ import { Edit3, Image, X, Send } from 'lucide-react';
 import ApiService from '../services/ApiService';
 import Swal from 'sweetalert2';
 
-export default function CreatePostCard({ user }) {
+
+export default function CreatePostCard(props) {
+  const {user} = props;
   const [postContent, setPostContent] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
