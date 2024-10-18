@@ -2,7 +2,6 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import About from './components/About';
 import PageLoader from './components/PageLoader';
-import FuturisticProfilePage from './components/ui/ProfilePage';
 
 // Lazy loading the Dashboard & MainFeed component
 const Dashboard = lazy(() => import('./components/Dashboard'));

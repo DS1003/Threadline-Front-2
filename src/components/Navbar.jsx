@@ -276,7 +276,6 @@ const Navbar = (props) => {
                     <div className="flex-1">
                       <p className="text-sm font-medium text-[#242424]">{notification.content}</p>
                       <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
-                    
                     </div>
                   </div>
                 </motion.div>
