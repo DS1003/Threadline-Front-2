@@ -72,11 +72,7 @@ const FriendsList = () => {
         ))}
       </div>
 
-      <div className="mt-8 text-center">
-        <Button variant="ghost" className="text-[#CC8C87] hover:text-[#B87872] hover:bg-[#FDE8E4]">
-          Voir tous les amis
-        </Button>
-      </div>
+      
     </div>
   );
 };
