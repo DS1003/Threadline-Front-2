@@ -1,14 +1,38 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "./Button";
-import { Avatar, AvatarFallback, AvatarImage } from "./Avatar";
+import { Avatar, AvatarImage } from "./Avatar";
 import { UserMinus, Users } from 'lucide-react';
+import apiService from '../../services/ApiService';
 
 const FriendsList = () => {
-  // This is mock data. In a real application, you would fetch this data from an API
-  const friends = [
-    { id: 1, name: 'Alice Johnson', photo: '/api/placeholder/100/100' },
-    { id: 3, name: 'Charlie Brown', photo: '/api/placeholder/100/100' },
-  ];
+  const [friends, setFriends] = useState([]);
+
+  const fetchFollowedUsers = async () => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      const response = await apiService.request('GET', '/userFollow/getFollowedUsers', null, currentUser.token);
+      if (response && response.users) {
+        setFriends(response.users);
+      }
+    } catch (error) {
+      console.error('Error fetching followed users:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFollowedUsers();
+  }, []);
+
+  const handleUnfollow = async (friendId) => {
+    try {
+      const currentUser = JSON.parse(localStorage.getItem('user'));
+      await apiService.request('DELETE', `/userFollow/unfollow/${friendId}`, null, currentUser.token);
+      // Mettre à jour la liste des amis après le désabonnement
+      setFriends(friends.filter(friend => friend.id !== friendId));
+    } catch (error) {
+      console.error('Error unfollowing user:', error);
+    }
+  };
 
   return (
     <div className="bg-gradient-to-br from-white to-[#FDE8E4] rounded-3xl shadow-xl p-8 max-w-full mx-auto">
@@ -21,23 +45,25 @@ const FriendsList = () => {
         </h2>
         <div className="w-12 h-12 bg-[#CC8C87] rounded-full opacity-10 animate-pulse"></div>
       </div>
-      <div className="space-y-4">
+      
+      {/* Conteneur scrollable */}
+      <div className="space-y-4 h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-[#CC8C87] scrollbar-track-[#FDE8E4]">
         {friends.map((friend) => (
           <div 
             key={friend.id} 
             className="flex items-center space-x-4 p-4 bg-white bg-opacity-60 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-100 hover:bg-opacity-80 backdrop-blur-md"
           >
             <Avatar className="w-16 h-16 border-2 border-[#CC8C87]">
-              <AvatarImage src={friend.photo} alt={friend.name} />
+              <AvatarImage src={friend.photoUrl} alt={friend.photoUrl} />
             </Avatar>
             <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-[#4A4A4A]">{friend.name}</h3>
+              <h3 className="text-lg font-semibold text-[#4A4A4A]"> {friend.firstname} {friend.lastname} </h3>
               <div className="w-16 h-1 bg-[#CC8C87] rounded-full mt-1 opacity-50"></div>
             </div>
             <Button
               variant="outline"
               className="transition-all duration-300 bg-white text-[#CC8C87] border-[#CC8C87] hover:bg-[#CC8C87] hover:text-white"
-              onClick={() => {/* Logique pour ne plus suivre */}}
+              onClick={() => handleUnfollow(friend.id)}
             >
               <UserMinus className="w-4 h-4 mr-2" />
               Ne plus suivre
@@ -45,11 +71,8 @@ const FriendsList = () => {
           </div>
         ))}
       </div>
-      <div className="mt-8 text-center">
-        <Button variant="ghost" className="text-[#CC8C87] hover:text-[#B87872] hover:bg-[#FDE8E4]">
-          Voir tous les amis
-        </Button>
-      </div>
+
+      
     </div>
   );
 };

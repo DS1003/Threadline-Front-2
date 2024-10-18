@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Ruler, Plus } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Ruler, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent } from './Card';
+import { Button } from './Button';
 import MeasurementModal from './MeasurementModal';
 import ConfirmationModal from './ConfirmationModal';
 import apiService from '../../services/ApiService';
@@ -10,7 +13,9 @@ const UserMeasurements = ({ user }) => {
   const [currentMeasurement, setCurrentMeasurement] = useState(null);
   const [measurements, setMeasurements] = useState([]);
   const [measurementToDelete, setMeasurementToDelete] = useState(null);
-  const [isExpanded, setIsExpanded] = useState(false); // State for controlling visibility of measurements
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const measurementsPerPage = 1;
 
   useEffect(() => {
     const fetchMeasurements = async () => {
@@ -58,6 +63,9 @@ const UserMeasurements = ({ user }) => {
       const response = await apiService.request('DELETE', `/measurements/delete/${measurementToDelete}`, null, user?.token);
       if (response.status === 200) {
         setMeasurements((prev) => prev.filter((m) => m.id !== measurementToDelete));
+        if (currentPage > 0 && measurements.length % measurementsPerPage === 1) {
+          setCurrentPage(currentPage - 1);
+        }
       }
     } catch (error) {
       console.error('Erreur lors de la suppression des mesures:', error);
@@ -68,15 +76,12 @@ const UserMeasurements = ({ user }) => {
   };
 
   const renderMeasurements = (m) => {
-    const commonMeasurements = [
+    const measurementsToRender = [
       { label: 'Poitrine', key: 'chest' },
       { label: 'Taille', key: 'waist' },
       { label: 'Hanches', key: 'hips' },
       { label: 'Épaules', key: 'shoulder' },
       { label: 'Cuisse', key: 'thigh' },
-    ];
-
-    const maleMeasurements = [
       { label: 'Longueur de manche', key: 'sleeveLength' },
       { label: 'Cou', key: 'neck' },
       { label: 'Dos', key: 'back' },
@@ -84,71 +89,108 @@ const UserMeasurements = ({ user }) => {
       { label: 'Mollet', key: 'calf' },
     ];
 
-    const femaleMeasurements = [
-      { label: 'Buste', key: 'bust' },
-      { label: 'Entrejambe', key: 'inseam' },
-    ];
-
-    const measurementsToRender = [
-      ...commonMeasurements,
-      ...(user.gender === 'MALE' ? maleMeasurements : femaleMeasurements),
-    ];
-
-    return measurementsToRender.map(({ label, key }) => (
-      m[key] && <p key={key} className="text-sm">{label}: {m[key]} cm</p>
-    ));
+    return (
+      <div className="grid grid-cols-2 gap-2">
+        {measurementsToRender.map(({ label, key }) => (
+          m[key] && (
+            <div key={key} className="flex items-center">
+              <Ruler className="w-4 h-4 text-[#E5A6A6] mr-2" />
+              <span className="text-sm">{label}: <strong>{m[key]} cm</strong></span>
+            </div>
+          )
+        ))}
+      </div>
+    );
   };
 
+  const paginatedMeasurements = measurements.slice(
+    currentPage * measurementsPerPage,
+    (currentPage + 1) * measurementsPerPage
+  );
+
   return (
-    <div className="bg-gradient-to-br from-white to-[#FFF5F4] rounded-xl border-2 shadow-lg p-8 mb-6 max-w-md mx-auto">
-      <h2 className="text-3xl font-bold mb-6 text-[#4A4A4A] border-b-2 border-[#CC8C87] pb-2 flex items-center justify-center">
-        <Ruler className="w-8 h-8 mr-3 text-[#CC8C87]" />
-        Mesures
-      </h2>
-
-      <div className="flex justify-center mb-4">
-        <button
-          onClick={() => setIsExpanded(!isExpanded)} // Toggle expanded state
-          className="bg-[#CC8C87] text-white rounded-full py-2 px-4 hover:bg-[#a96d69]"
-        >
-          {isExpanded ? 'Masquer les mesures' : 'Afficher les mesures'} {/* Toggle button text */}
-        </button>
-      </div>
-
-      {isExpanded && ( // Conditionally render measurements
-        <div className="grid grid-cols-1 gap-6">
-          {measurements.map((m) => (
-            <div key={m.id} className="bg-white rounded-lg shadow-md p-4 transition-all duration-300 hover:shadow-lg hover:scale-105">
-              <h3 className="text-lg font-semibold text-[#CC8C87]">Mesure</h3>
-              {renderMeasurements(m)}
-              <div className="flex justify-between mt-4">
-                <button
-                  onClick={() => openModal(m)}
-                  className="bg-[#CC8C87] text-white rounded-full py-2 px-4 hover:bg-[#a96d69]"
-                >
-                  Modifier
-                </button>
-                <button
-                  onClick={() => handleDeleteClick(m.id)}
-                  className="bg-red-500 text-white rounded-full py-2 px-4 hover:bg-red-600"
-                >
-                  Supprimer
-                </button>
-              </div>
-            </div>
-          ))}
-          <div className="flex justify-center">
-            <button
-              onClick={() => openModal()}
-              className="flex items-center justify-center bg-[#CC8C87] text-white rounded-full py-3 px-5 hover:bg-[#a96d69] mt-6"
-              title='Ajouter une mesure'
+    <Card className="bg-[#FFF5F4] rounded-2xl shadow-md overflow-hidden">
+      <CardContent className="p-4">
+        <div className="flex justify-between items-center mb-2">
+          <h2 className="text-xl font-bold text-[#E5A6A6]">Mesures</h2>
+          {measurements.length > 0 && (
+            <Button
+              onClick={() => setIsExpanded(!isExpanded)}
+              variant="ghost"
+              size="sm"
+              className="text-[#E5A6A6]"
             >
-              <Plus className="mr-2" />
-              Ajouter une mesure
-            </button>
-          </div>
+              {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </Button>
+          )}
         </div>
-      )}
+
+        <AnimatePresence>
+          {isExpanded && measurements.length > 0 && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="overflow-hidden"
+            >
+              {paginatedMeasurements.map((m) => (
+                <div key={m.id} className="bg-white rounded-lg p-3 mb-2">
+                  {renderMeasurements(m)}
+                  <div className="flex justify-end mt-2 space-x-2">
+                    <Button
+                      onClick={() => openModal(m)}
+                      size="sm"
+                      className="bg-[#E5A6A6] hover:bg-[#D68F8F] text-white"
+                    >
+                      Modifier
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteClick(m.id)}
+                      size="sm"
+                      className="bg-red-500 hover:bg-red-600 text-white"
+                    >
+                      Supprimer
+                    </Button>
+                  </div>
+                </div>
+              ))}
+
+              <div className="flex justify-between items-center mt-2">
+                <Button
+                  onClick={() => setCurrentPage((prev) => Math.max(0, prev - 1))}
+                  disabled={currentPage === 0}
+                  size="sm"
+                  className="bg-[#E5A6A6] hover:bg-[#D68F8F] text-white"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <span className="text-sm text-[#E5A6A6] font-medium">
+                  {currentPage + 1} / {Math.ceil(measurements.length / measurementsPerPage)}
+                </span>
+                <Button
+                  onClick={() => setCurrentPage((prev) => Math.min(Math.ceil(measurements.length / measurementsPerPage) - 1, prev + 1))}
+                  disabled={currentPage === Math.ceil(measurements.length / measurementsPerPage) - 1}
+                  size="sm"
+                  className="bg-[#E5A6A6] hover:bg-[#D68F8F] text-white"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="flex justify-center mt-2">
+          <Button
+            onClick={() => openModal()}
+            className="bg-[#E5A6A6] hover:bg-[#D68F8F] text-white rounded-full py-1 px-3"
+          >
+            <Plus className="w-4 h-4 mr-1" />
+            {measurements.length === 0 ? "Ajouter une mesure" : "Nouvelle mesure"}
+          </Button>
+        </div>
+      </CardContent>
 
       <ConfirmationModal
         isOpen={isConfirmationOpen}
@@ -163,7 +205,7 @@ const UserMeasurements = ({ user }) => {
         measurement={currentMeasurement}
         user={user}
       />
-    </div>
+    </Card>
   );
 };
 
