@@ -88,8 +88,9 @@ const MainFeed = (props) => {
             </div>
 
             {/* Right sidebar */}
-            <div className="w-1/4 fixed right-0 top-20 bottom-0 overflow-y-auto hidden lg:block">
-                {/* Add content for the right sidebar if needed */}
+           {/* Right sidebar with UserSuggestions */}
+           <div className="w-1/4 fixed right-0 top-20 bottom-0 overflow-y-auto hidden lg:block bg-white shadow-lg">
+                <UserSuggestions />
             </div>
 
             {/* Mobile-only elements */}
@@ -112,20 +113,11 @@ const MainFeed = (props) => {
                     {/* Add any other elements you want to show in the mobile slide-out menu */}
                 </div>
             </div>
-            <div className={`fixed top-20 right-0 w-80 h-[calc(100vh-80px)] bg-white shadow-lg z-50 transform transition-transform duration-300 ${isUserSuggestionsOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-        <UserSuggestions />
-      </div>
-
-
+       
 
             {/* Mobile toggle buttons */}
             <div className="fixed bottom-6 right-6 z-50">
-            <button
-          onClick={toggleUserSuggestions}
-          className="bg-[#CC8C87] text-white p-3 rounded-full shadow-lg"
-        >
-          <UserPlus size={24} />
-        </button>
+          
                 <MessageButton onClick={toggleSidebar} />
                 <button
                     onClick={toggleRightElements}
