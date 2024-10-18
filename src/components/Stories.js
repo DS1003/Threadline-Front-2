@@ -178,7 +178,7 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
   const currentStory = stories[currentStoryIndex];
 
   const handleLike = () => setLiked(!liked);
-  const handleShare = () => console.log("Sharing story:", currentStory.user);
+  const handleShare = () => console.log("Sharing story:", currentStory?.author?.user);
   const handleComment = (e) => {
     e.preventDefault();
     if (comment.trim()) {
@@ -223,10 +223,13 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50">
       <div className="relative w-full max-w-lg h-[80vh]">
-      <div className="flex items-center">
+        {/* Check if currentStory and its author are available */}
+        {currentStory?.author && (
+          <div className="flex items-center">
             <img src={currentStory.author.photoUrl} alt={currentStory.author.photoUrl} className="w-10 h-10 rounded-full object-cover mr-3" />
-            <h2 className="text-lg font-semibold text-gray-800">{currentStory.user}</h2>
+            <h2 className="text-lg font-semibold text-gray-800">{currentStory.author.user}</h2>
           </div>
+        )}
         <button onClick={onClose} className="absolute top-4 right-4 text-white z-10">
           <X size={24} />
         </button>
@@ -247,41 +250,31 @@ const StoryViewModal = ({ isOpen, onClose, stories, initialStoryIndex, authorId 
 
           {/* Chevron Navigation */}
           <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-  <button
-    onClick={prevStory}
-    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
-    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
-    disabled={currentStoryIndex === 0}
-  >
-    <ChevronLeft size={32} />
-  </button>
-</div>
-
-<div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-  <button
-    onClick={nextStory}
-    className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
-    style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
-    disabled={currentStoryIndex === stories.length - 1}
-  >
-    <ChevronRight size={32} />
-  </button>
-</div>
-          {/* Delete Button for Author */}
-          {currentStory.authorId === user.id && (
             <button
-              onClick={() => handleDelete(currentStory.id)}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center text-white bg-red-500 px-3 py-1 rounded-lg hover:bg-red-600 transition duration-300"
+              onClick={prevStory}
+              className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+              style={{ filter: 'drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5))' }}
+              disabled={currentStoryIndex === 0}
             >
-              <Trash size={24} />
-              <span className="ml-2">Supprimer</span>
+              <ChevronLeft size={32} />
             </button>
-          )}
+          </div>
+
+          <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
+            <button
+              onClick={nextStory}
+              className="text-white p-3 rounded-full bg-black bg-opacity-50 hover:bg-opacity-70 transition-all duration-200"
+              disabled={currentStoryIndex === stories.length - 1}
+            >
+              <ChevronRight size={32} />
+            </button>
+          </div>
         </div>
       </div>
     </div>
   );
 };
+
 const Stories = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
