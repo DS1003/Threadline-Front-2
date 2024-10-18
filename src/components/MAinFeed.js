@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu } from 'lucide-react';
+import { Menu, UserPlus } from 'lucide-react';
 import ProfileInfo from './ProfileInfo';
 import StoryCircles from './Stories';
 import CreatePostCard from './CreatePost';
@@ -10,11 +10,12 @@ import MessageButton from './MessageButton';
 import Balanced from './Balanced';
 import Navbar from './Navbar';
 import withAuth from '../hoc/withAuth';
-
+import UserSuggestions from './UserSuggestions';
 const MainFeed = (props) => {
     
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRightElementsOpen, setIsRightElementsOpen] = useState(false);
+    const [isUserSuggestionsOpen, setIsUserSuggestionsOpen] = useState(false);
     const [balance, setBalance] = useState(500);
     const [purchaseHistory, setPurchaseHistory] = useState([
         { date: '2024-10-15', amount: 100 },
@@ -43,9 +44,16 @@ const MainFeed = (props) => {
             ...prevHistory
         ]);
     };
-
+    const toggleUserSuggestions = () => {
+        setIsUserSuggestionsOpen(!isUserSuggestionsOpen);
+    };
     const user = props.user;
     const isTailor = user.roles.some(role => role.name === 'TAILOR');
+    const suggestedUsers = [
+        { id: 1, name: 'Elise Morand', connection: 'Gaëlle Royrévol et 3 autres amis en commun', photo: 'https://example.com/elise.jpg' },
+        { id: 2, name: 'Pascal Sirom', connection: 'Université de Rouen-Normandie', photo: null },
+        // Ajoutez d'autres utilisateurs suggérés ici
+    ];
 
     return (
         <div className="flex h-screen overflow-hidden">
@@ -104,9 +112,20 @@ const MainFeed = (props) => {
                     {/* Add any other elements you want to show in the mobile slide-out menu */}
                 </div>
             </div>
+            <div className={`fixed top-20 right-0 w-80 h-[calc(100vh-80px)] bg-white shadow-lg z-50 transform transition-transform duration-300 ${isUserSuggestionsOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <UserSuggestions />
+      </div>
+
+
 
             {/* Mobile toggle buttons */}
             <div className="fixed bottom-6 right-6 z-50">
+            <button
+          onClick={toggleUserSuggestions}
+          className="bg-[#CC8C87] text-white p-3 rounded-full shadow-lg"
+        >
+          <UserPlus size={24} />
+        </button>
                 <MessageButton onClick={toggleSidebar} />
                 <button
                     onClick={toggleRightElements}
