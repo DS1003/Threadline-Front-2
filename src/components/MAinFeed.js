@@ -89,7 +89,7 @@ const MainFeed = (props) => {
 
             {/* Right sidebar */}
            {/* Right sidebar with UserSuggestions */}
-           <div className="w-1/4 fixed right-0 top-20 bottom-0 overflow-y-auto hidden lg:block bg-white shadow-lg">
+           <div className="w-1/4 fixed right-0 top-20  overflow-y-auto hidden lg:block  shadow-lg">
                 <UserSuggestions />
             </div>
 

@@ -187,19 +187,7 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
                     </div>
 
                     {/* Interaction buttons */}
-                    <div className="p-4 border-t border-b">
-                        <div className="flex justify-between mb-2">
-                            <div className="flex space-x-4">
-                                <button><Heart size={24} /></button>
-                                <button><MessageCircle size={24} /></button>
-                                <button><Share2 size={24} /></button>
-                            </div>
-                            <div className="flex space-x-4">
-                                <button><Star size={24} /></button>
-                                <button><Bookmark size={24} /></button>
-                            </div>
-                        </div>
-                    </div>
+                  
 
 
                     {/* Comment input */}

@@ -55,7 +55,7 @@ const ProfilePage = () => {
           <div className="p-6">
             <div className="flex justify-between mt-16 items-center mb-6">
               <div className="flex space-x-4">
-                <CustomTab icon={<User className="w-4 h-4" />} label="Info" value="info" />
+                <CustomTab icon={<User className="w-4 h-4" />} label="Infos" value="info" />
                 <CustomTab icon={<Heart className="w-4 h-4" />} label="Favoris" value="favorites" />
                 <CustomTab icon={<ImageIcon className="w-4 h-4" />} label="Posts" value="posts" />
                 <CustomTab icon={<Users className="w-4 h-4" />} label="Amis" value="friends" />
