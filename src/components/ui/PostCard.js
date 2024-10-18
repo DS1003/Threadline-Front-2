@@ -293,7 +293,7 @@ export default function PostCard({user,post}) {
       Swal.fire({
         icon: "error",
         title: "Erreur",
-        text: `Erreur: ${
+        text: ` ${
           error.response ? error.response.data.message : error.message
         }`,
       });
