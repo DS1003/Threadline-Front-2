@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { User, Heart, Image as ImageIcon, Edit } from 'lucide-react';
+import { User, Heart, Image as ImageIcon, Edit, Users } from 'lucide-react';
 import ProfileHeader from './ProfileHeader';
 import UserInfo from './UserInfo';
 import UserPosts from './UserPosts';
 import InstagramStyleFavorites from './InstagramStyleFavorites';
 import UserMeasurements from './UserMeasurements';
 import UpdateRoleUser from './UpdateRoleUser';
+import FriendsList from './FriendList';
 
 const ProfilePage = () => {
   const [user, setUser] = useState(null);
@@ -57,6 +58,7 @@ const ProfilePage = () => {
                 <CustomTab icon={<User className="w-4 h-4" />} label="Info" value="info" />
                 <CustomTab icon={<Heart className="w-4 h-4" />} label="Favoris" value="favorites" />
                 <CustomTab icon={<ImageIcon className="w-4 h-4" />} label="Posts" value="posts" />
+                <CustomTab icon={<Users className="w-4 h-4" />} label="Amis" value="friends" />
               </div>
               <button className="bg-[#CC8C87] text-white px-4 py-2 rounded-full flex items-center">
                 <Edit className="w-4 h-4 mr-2" />
@@ -84,6 +86,10 @@ const ProfilePage = () => {
 
             {activeTab === 'posts' && (
               <UserPosts posts={posts} />
+            )}
+
+            {activeTab === 'friends' && (
+              <FriendsList />
             )}
           </div>
         </div>
