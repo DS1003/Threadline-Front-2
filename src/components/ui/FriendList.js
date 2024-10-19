@@ -2,9 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "./Button";
 import { Avatar, AvatarImage } from "./Avatar";
 import { UserMinus, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/ApiService';
 
 const FriendsList = () => {
+  const navigate = useNavigate();
+  const handleProfileClick = ( currentUser) => {
+    navigate('/profileBis');
+  };
   const [friends, setFriends] = useState([]);
 
   const fetchFollowedUsers = async () => {

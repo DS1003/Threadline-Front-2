@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { User, UserPlus, Check } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../services/ApiService';
 
 const UserSuggestions = () => {
+  const navigate = useNavigate();
+  const handleProfileClick = ( currentUser) => {
+    navigate('/profileBis');
+  };
   const [users, setUsers] = useState([]);
   const [followingStates, setFollowingStates] = useState({});
 
@@ -63,7 +68,9 @@ const UserSuggestions = () => {
           >
             <div className="flex items-center space-x-3">
               {user.photoUrl ? (
-                <img src={user.photoUrl} alt={`${user.firstname} ${user.lastname}`} className="w-12 h-12 rounded-full object-cover shadow-sm" />
+                <img src={user.photoUrl} alt={`${user.firstname} ${user.lastname}`} className="w-12 h-12 rounded-full object-cover shadow-sm" 
+                onClick={() => handleProfileClick()}
+                />
               ) : (
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#CC8C87] to-[#B77E79] flex items-center justify-center shadow-sm">
                   <User className="text-white" size={24} />
