@@ -32,8 +32,8 @@ import Loader from "./Loader";
 
 export default function PostCard({user}) {
   const navigate = useNavigate();
-  const handleProfileClick = (authorId) => {
-    navigate('/profile');
+  const handleProfileClick = (userId) => {
+    navigate(`/profileBis/${userId}`);
   };
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);

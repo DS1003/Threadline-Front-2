@@ -27,7 +27,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/profileBis" element={<ProfilePageBis />} />
+        <Route path="/profileBis/:userId" element={<ProfilePageBis />} />
         <Route path="/messages" element={<MessageInterface />} />
         <Route path="/messages2" element={<Messages />} />
       </Routes>

@@ -1,53 +1,57 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { User, Image as ImageIcon, Users } from 'lucide-react';
 import ProfileHeader from './ProfileHeader';
 import UserInfo from './UserInfo';
 import UserPosts from './UserPosts';
-import MeasurementsList from './ MeasurementsList'; // Remplacer par votre nouveau composant
+import MeasurementsList from './ MeasurementsList';
 import FriendsList from './FriendList';
-import apiService from '../../services/ApiService'; // Assurez-vous que ce service est correctement configuré
+import apiService from '../../services/ApiService';
 
-const ProfilePageBis = ({ userId }) => {
-  // Utilisez localStorage pour l'utilisateur s'il existe déjà
-  const [user, setUser] = useState(() => {
-    const storedUser = localStorage.getItem('user');
-    return storedUser ? JSON.parse(storedUser) : null;
-  });
+const ProfilePageBis = () => {
+  const { userId } = useParams();
+  const [user, setUser] = useState(null);
+  const [measurements, setMeasurements] = useState(null);
   const [activeTab, setActiveTab] = useState('info');
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fonction asynchrone pour récupérer les données utilisateur de l'API
-    const fetchUser = async () => {
+    const fetchUserAndMeasurements = async () => {
+      setIsLoading(true);
       try {
-        const response = await apiService.request('GET', `/users/${userId}`);
-        const fetchedUser = response.data;
-        setUser(fetchedUser); // Mettre à jour l'état avec les données récupérées
-        localStorage.setItem('user', JSON.stringify(fetchedUser));
-        console.log(user); // Inspect if measurements are included
+        const userResponse = await apiService.request('GET', `/users/${userId}`);
+        const fetchedUser = userResponse.user ? userResponse.user : userResponse.data.user;
+        setUser(fetchedUser);
 
-        // Stocker dans localStorage
+        const measurementsResponse = await apiService.request('GET', `/measurements/${userId}`, null, null);
+        setMeasurements(measurementsResponse.data);
       } catch (error) {
-        console.error("Erreur lors de la récupération de l'utilisateur :", error);
+        console.error("Error fetching user or measurements:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    // Appeler la fonction pour récupérer l'utilisateur si non présent
-    if (!user) {
-      fetchUser();
+    if (userId) {
+      fetchUserAndMeasurements();
     }
-  }, [userId, user]);
+  }, [userId]);
 
   const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
-
-  const posts = [
-    // Remplir avec les données des publications de l'utilisateur
-  ];
 
   const tabs = [
     { icon: <User className="w-5 h-5" />, label: "Infos", value: "info" },
     { icon: <ImageIcon className="w-5 h-5" />, label: "Posts", value: "posts" },
     { icon: <Users className="w-5 h-5" />, label: "Amis", value: "friends" },
   ];
+
+  if (isLoading) {
+    return <div>Chargement...</div>;
+  }
+
+  if (!user) {
+    return <div>Utilisateur non trouvé</div>;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#CC8C87] to-[#E6A8A1] py-8">
@@ -84,19 +88,21 @@ const ProfilePageBis = ({ userId }) => {
                     <UserInfo user={user} />
                   </div>
                   <div className="lg:col-span-2">
-                  <MeasurementsList measurement={user?.measurements || {}} />
-
-                  {/* Utiliser le nouveau composant */}
+                    {measurements && measurements.length > 0 ? (
+                      <MeasurementsList measurement={measurements[0]} />
+                    ) : (
+                      <p>Aucune mesure disponible.</p>
+                    )}
                   </div>
                 </div>
               )}
 
               {activeTab === 'posts' && (
-                <UserPosts posts={posts} />
+                <UserPosts posts={user?.posts || []} />
               )}
 
               {activeTab === 'friends' && (
-                <FriendsList />
+                <FriendsList userId={user.id} showUnfollowButton={false} />
               )}
             </div>
           </div>
