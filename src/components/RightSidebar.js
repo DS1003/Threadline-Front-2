@@ -54,7 +54,7 @@ const RightSidebar = ({ isOpen, onClose }) => {
   }, [onClose]);
 
   return (
-    <div className={`fixed inset-y-0 right-0 w-fit mt-20 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto`}>
+    <div className={`fixed  inset-y-0 right-0 w-fit mt-20 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'} overflow-y-auto`}>
       <div className="p-4">
         <button onClick={onClose} className="absolute top-4 right-4 text-[#4A4A4A] hover:text-[#CC8C87]">
           <X size={24} />
