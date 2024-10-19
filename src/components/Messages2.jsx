@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Send, Paperclip, Smile, Mic, Phone, Video, MoreVertical, ChevronLeft, ChevronRight, Image, X, Play, Pause } from 'lucide-react';
+import { Search, Send, Paperclip, Smile, Mic, Phone, Video, MoreVertical, ChevronLeft, ChevronRight, Image, X, Play, Pause, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Alert from './ui/Alert';
+import { Button } from "./ui/Button"
+import { Input } from "./ui/Input"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar"
+import { Card, CardContent } from "./ui/Card"
+import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+// Removed import Link from 'next/link';
 
 const MessageInterface = () => {
   const [messages, setMessages] = useState([]);
@@ -34,8 +39,8 @@ const MessageInterface = () => {
       { id: 4, sender: 'Evan Scott', content: '@Kate ? 😉', time: '11:34 AM', type: 'text' },
       { id: 5, sender: 'You', content: 'She creates an atmosphere of mystery 😄', time: '11:36 AM', type: 'text' },
       { id: 6, sender: 'Evan Scott', content: "Kate, don't be like that and say something more :)", time: '11:44 AM', type: 'text' },
-      { id: 7, sender: 'You', content: '/api/placeholder/400/300', time: '11:50 AM', type: 'image' },
-      { id: 8, sender: 'Kate Johnson', content: '/api/placeholder/400/300', time: '11:55 AM', type: 'video' },
+      { id: 7, sender: 'You', content: '/placeholder.svg?height=300&width=400', time: '11:50 AM', type: 'image' },
+      { id: 8, sender: 'Kate Johnson', content: '/placeholder.svg?height=300&width=400', time: '11:55 AM', type: 'video' },
     ]);
   }, []);
 
@@ -98,12 +103,13 @@ const MessageInterface = () => {
       const newMsg = {
         id: messages.length + 1,
         sender: 'You',
-        content: '/api/placeholder/400/300',
+        content: '/placeholder.svg?height=300&width=400',
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         type: fileType
       };
       setMessages([...messages, newMsg]);
       setShowAlert(true);
+      toast.success("File uploaded successfully!");
       setTimeout(() => setShowAlert(false), 3000);
     }
   };
@@ -117,22 +123,29 @@ const MessageInterface = () => {
   const renderMessageContent = (message) => {
     switch (message.type) {
       case 'image':
-        return <img src={message.content} alt="Shared image" className="rounded-lg max-w-sm" />;
+        return (
+          <div className="relative group cursor-pointer">
+            <img src={message.content} alt="Shared image" className="rounded-lg max-w-sm" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Image className="w-8 h-8 text-white" />
+            </div>
+          </div>
+        );
       case 'video':
         return (
-          <div className="relative">
+          <div className="relative group cursor-pointer">
             <img src={message.content} alt="Video thumbnail" className="rounded-lg max-w-sm" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <Play className="w-12 h-12 text-white bg-black bg-opacity-50 rounded-full p-3" />
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Play className="w-12 h-12 text-white" />
             </div>
           </div>
         );
       case 'audio':
         return (
-          <div className="flex items-center space-x-2 bg-gray-100 rounded-full p-2">
-            <Play className="w-8 h-8 text-blue-500" />
-            <div className="h-1 bg-blue-500 rounded-full flex-grow"></div>
-            <span className="text-sm text-gray-500">{message.content}</span>
+          <div className="flex items-center space-x-2 bg-[#F0D4D0]/10 rounded-full p-2 cursor-pointer">
+            <Play className="w-8 h-8 text-[#F0D4D0]" />
+            <div className="h-1 bg-[#F0D4D0] rounded-full flex-grow"></div>
+            <span className="text-sm text-[#F0D4D0]">{message.content}</span>
           </div>
         );
       default:
@@ -141,22 +154,22 @@ const MessageInterface = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-white text-black">
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
-            className="w-80 bg-white border-r"
+            className="w-80 bg-white border-r border-gray-200"
           >
             <div className="p-4">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                <input
+                <Input
                   type="text"
                   placeholder="Search chats"
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F0D4D0]"
                 />
               </div>
             </div>
@@ -164,20 +177,22 @@ const MessageInterface = () => {
               {chats.map(chat => (
                 <div
                   key={chat.id}
-                  className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer ${
-                    selectedChat?.id === chat.id ? 'bg-blue-50' : ''
+                  className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer transition-colors duration-200 ${
+                    selectedChat?.id === chat.id ? 'bg-gray-100' : ''
                   }`}
                   onClick={() => setSelectedChat(chat)}
                 >
-                  <div className="w-12 h-12 bg-gray-300 rounded-full mr-4"></div>
+                  <Avatar className="w-12 h-12 mr-4">
+                    <AvatarImage src={`/placeholder.svg?height=48&width=48&text=${chat.name.charAt(0)}`} />
+                  </Avatar>
                   <div className="flex-grow">
-                    <h3 className="font-semibold">{chat.name}</h3>
+                    <h3 className="font-semibold text-gray-900">{chat.name}</h3>
                     <p className="text-sm text-gray-500">{chat.lastMessage}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs text-gray-500">{chat.time}</p>
+                    <p className="text-xs text-gray-400">{chat.time}</p>
                     {chat.unread > 0 && (
-                      <span className="bg-blue-500 text-white text-xs rounded-full px-2 py-1 mt-1 inline-block">
+                      <span className="bg-[#F0D4D0] text-white text-xs rounded-full px-2 py-1 mt-1 inline-block">
                         {chat.unread}
                       </span>
                     )}
@@ -190,24 +205,30 @@ const MessageInterface = () => {
       </AnimatePresence>
 
       <div className="flex-grow flex flex-col">
-        <div className="bg-white border-b p-4 flex items-center justify-between">
+        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
           <div className="flex items-center">
-            <button onClick={toggleSidebar} className="mr-4">
+            <Button variant="ghost" className="mr-4 text-gray-600 hover:bg-gray-100" onClick={() => console.log('Navigate to feed')}>
+              <ArrowLeft className="w-6 h-6" />
+            </Button>
+            <Button variant="ghost" onClick={toggleSidebar} className="mr-4 text-gray-600 hover:bg-gray-100">
               {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-            </button>
-            <h2 className="text-xl font-semibold">{selectedChat?.name}</h2>
+            </Button>
+            <h2 className="text-xl font-semibold text-gray-900">{selectedChat?.name}</h2>
           </div>
           <div className="flex space-x-4">
-            <Phone className="w-6 h-6 text-gray-500 cursor-pointer" />
-            <Video className="w-6 h-6 text-gray-500 cursor-pointer" />
-            <MoreVertical className="w-6 h-6 text-gray-500 cursor-pointer" />
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Phone className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Video className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><MoreVertical className="w-6 h-6" /></Button>
           </div>
         </div>
 
-        <div className="flex-grow overflow-y-auto p-4">
+        <div className="flex-grow overflow-y-auto p-4 bg-gray-50">
           {messages.map((message) => (
-            <div
+            <motion.div
               key={message.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
               className={`flex mb-4 ${
                 message.sender === 'You' ? 'justify-end' : 'justify-start'
               }`}
@@ -215,36 +236,33 @@ const MessageInterface = () => {
               <div
                 className={`max-w-xs md:max-w-md ${
                   message.sender === 'You'
-                    ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg'
-                    : 'bg-gray-200 rounded-r-lg rounded-bl-lg'
-                } p-3`}
+                    ? 'bg-[#F0D4D0] text-white rounded-l-lg rounded-br-lg'
+                    : 'bg-white text-gray-900 rounded-r-lg rounded-bl-lg'
+                } p-3 shadow-lg`}
               >
                 <p className="font-semibold mb-1">{message.sender}</p>
                 {renderMessageContent(message)}
-                <p className="text-xs mt-1 text-right">
+                <p className="text-xs mt-1 text-right opacity-70">
                   {message.time}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
           {isTyping && (
             <div className="flex justify-start mb-4">
-              <div className="bg-gray-200 rounded-lg p-3">
-                <p className="text-gray-500">Typing...</p>
+              <div className="bg-white rounded-lg p-3 shadow-lg">
+                <p className="text-[#F0D4D0]">Typing...</p>
               </div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="bg-white border-t p-4">
+        <div className="bg-white border-t border-gray-200 p-4">
           <div className="flex items-center space-x-2">
-            <button
-              onClick={() => fileInputRef.current.click()}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <Paperclip />
-            </button>
+            <Button variant="ghost" size="icon" onClick={() => fileInputRef.current.click()} className="text-gray-600 hover:bg-gray-100">
+              <Paperclip className="w-5 h-5" />
+            </Button>
             <input
               type="file"
               ref={fileInputRef}
@@ -252,24 +270,21 @@ const MessageInterface = () => {
               onChange={handleFileUpload}
               accept="image/*,video/*,audio/*"
             />
-            <button
-              onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <Smile />
-            </button>
-            <input
+            <Button variant="ghost" size="icon" onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)} className="text-gray-600 hover:bg-gray-100">
+              <Smile className="w-5 h-5" />
+            </Button>
+            <Input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Type a message"
-              className="flex-grow px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-grow bg-white text-gray-900 border-gray-300 focus:ring-[#F0D4D0]"
             />
-            <button
+            <Button
+              variant={isRecording ? "destructive" : "secondary"}
+              size="icon"
               onClick={isRecording ? handleSendMessage : toggleRecording}
-              className={`p-2 rounded-full ${
-                isRecording ? 'bg-red-500' : 'bg-blue-500'
-              } text-white`}
+              className={isRecording ? "bg-red-500 hover:bg-red-600" :   "bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white"}
             >
               {isRecording ? (
                 <div className="flex items-center">
@@ -279,30 +294,27 @@ const MessageInterface = () => {
               ) : (
                 <Mic className="w-5 h-5" />
               )}
-            </button>
-            <button
-              onClick={handleSendMessage}
-              className="p-2 rounded-full bg-blue-500 text-white"
-            >
+            </Button>
+            <Button onClick={handleSendMessage} className="bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white">
               <Send className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
       </div>
 
-      <AnimatePresence>
-      {showAlert && (
-        <motion.div
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 50 }}
-          className="absolute bottom-10 right-10"
-        >
-          <Alert type="success" message="File uploaded successfully!" />
-        </motion.div>
-      )}
-    </AnimatePresence>
-  </div>
+      <ToastContainer
+        position="bottom-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
+    </div>
   );
 };
 

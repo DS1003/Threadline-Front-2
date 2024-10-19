@@ -2,12 +2,14 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import About from './components/About';
 import PageLoader from './components/PageLoader';
+import MessageInterface from './components/Messages2';
 
 // Lazy loading the Dashboard & MainFeed component
 const Dashboard = lazy(() => import('./components/Dashboard'));
 const MainFeed = lazy(() => import('./components/MAinFeed'));
 const Login = lazy(() => import('./components/Login'));
 const ProfilePage = lazy(() => import('./components/ui/ProfilePage'));
+const ProfilePageBis = lazy(() => import('./components/ui/ProfilePageBis'));
 const MessagingPage = lazy(() => import('./components/Messaging'));
 const Register = lazy(() => import('./components/Register'));
 const Messages = lazy(() => import('./components/Messages2'));
@@ -25,7 +27,8 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/messages" element={<MessagingPage />} />
+        <Route path="/profileBis" element={<ProfilePageBis />} />
+        <Route path="/messages" element={<MessageInterface />} />
         <Route path="/messages2" element={<Messages />} />
       </Routes>
     </Suspense>

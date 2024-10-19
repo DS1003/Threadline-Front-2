@@ -50,7 +50,7 @@ const UserSuggestions = () => {
 
   return (
     <div className="bg-white rounded-xl mt-2 shadow-lg overflow-hidden border border-gray-100">
-      <div className="p-4 border-b border-gray-100">
+      <div className="p-4 border-b  border-gray-100">
         <h2 className="text-lg font-semibold text-[#CC8C87]">Suggestions d'amis</h2>
       </div>
       <div className="p-4 space-y-4">
