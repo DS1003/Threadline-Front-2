@@ -12,35 +12,42 @@ import {
   PlusCircle,
   Search,
   ChevronDown,
-  Settings
+  Settings,
+  Heart,
+  UserPlus,
+  MessageCircle,
+  Flag,
+  Edit
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const Navbar = (props) => {
-  const { user } = props;
+const Navbar = ({ user = null }) => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [activeNotificationTab, setActiveNotificationTab] = useState('all');
   const [scrolled, setScrolled] = useState(false);
-  let isAuthenticated = false;
   const notificationRef = useRef(null);
 
-  if (user) {
-    isAuthenticated = true
-  }
+  const isAuthenticated = !!user;
 
   const handleProfileClick = () => {
     navigate('/profile');
   };
 
-  const notifications = [
-    { id: 1, content: "Nouveau message de Alice", time: "Il y a 5 minutes", type: "message" },
-    { id: 2, content: "Bob a aimé votre publication", time: "Il y a 1 heure", type: "like" },
-    { id: 3, content: "Vous avez un nouveau follower", time: "Il y a 2 heures", type: "follow" },
-    { id: 4, content: "Rappel : Évènement demain", time: "Il y a 1 jour", type: "event" },
-    { id: 5, content: "Nouvelle mise à jour disponible", time: "Il y a 2 jours", type: "update" },
-  ];
+  const notifications = {
+    all: [
+      { id: 1, type: 'message', user: 'Alice Durand', content: 'vous a envoyé un message', time: '5 min ago', userImage: '/placeholder.svg?height=40&width=40' },
+      { id: 2, type: 'abonnement', user: 'Bob Martin', content: 's\'est abonné à vous', time: '30 min ago', userImage: '/placeholder.svg?height=40&width=40' },
+      { id: 3, type: 'signalement', user: 'Charlie Dupont', content: 'a signalé votre publication', time: '1 h ago', userImage: '/placeholder.svg?height=40&width=40' },
+      { id: 4, type: 'like', users: ['David Lefebvre', 'Emma Moreau'], othersCount: 3, content: 'ont aimé votre publication', time: '2 h ago', userImages: ['/placeholder.svg?height=40&width=40', '/placeholder.svg?height=40&width=40'] },
+      { id: 5, type: 'commentaire', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' },
+    ],
+    messages: [],
+    abonnements: [],
+    signalements: [],
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -72,8 +79,8 @@ const Navbar = (props) => {
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
-        ? 'text-[#CC8C87] bg-[#FDF1F2]'
-        : 'text-[#242424] hover:bg-[#FDF1F2]'
+          ? 'text-[#CC8C87] bg-[#FDF1F2]'
+          : 'text-[#242424] hover:bg-[#FDF1F2]'
         }`}
     >
       {to ? (
@@ -98,25 +105,70 @@ const Navbar = (props) => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'message':
-        return <Mail className="w-4 h-4 md:w-5 md:h-5 text-blue-500" />;
+        return <Mail className="w-5 h-5 text-[#CC8C87]" />;
+      case 'abonnement':
+        return <UserPlus className="w-5 h-5 text-[#EAB0B7]" />;
+      case 'signalement':
+        return <Flag className="w-5 h-5 text-[#CC8C87]" />;
       case 'like':
-        return <svg className="w-4 h-4 md:w-5 md:h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clipRule="evenodd" /></svg>;
-      case 'follow':
-        return <Users className="w-4 h-4 md:w-5 md:h-5 text-green-500" />;
-      case 'event':
-        return <svg className="w-4 h-4 md:w-5 md:h-5 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>;
+        return <Heart className="w-5 h-5 text-[#EAB0B7]" />;
+      case 'commentaire':
+        return <MessageCircle className="w-5 h-5 text-[#CC8C87]" />;
       default:
-        return <Bell className="w-4 h-4 md:w-5 md:h-5 text-gray-500" />;
+        return <Bell className="w-5 h-5 text-[#CC8C87]" />;
     }
   };
+
+  const NotificationTab = ({ type, isActive, onClick, count }) => (
+    <button
+      onClick={onClick}
+      className={`flex-1 py-2 px-3 text-sm font-medium transition-colors duration-200 ${isActive
+          ? 'text-[#CC8C87] border-b-2 border-[#CC8C87]'
+          : 'text-[#77696A] hover:text-[#CC8C87]'
+        }`}
+    >
+      <span className="capitalize">{type}</span>
+      {count > 0 && <span className="ml-1 text-xs bg-[#CC8C87] text-white rounded-full px-2 py-1">{count}</span>}
+    </button>
+  );
+
+  const NotificationItem = ({ notification }) => (
+    <div className="py-3 px-4 border-b border-gray-200 hover:bg-[#FDF1F2] transition-colors duration-200">
+      <div className="flex items-start">
+        <div className="flex-shrink-0 mr-3">
+          {notification.type === 'like' ? (
+            <div className="relative w-10 h-10">
+              <img src={notification.userImages[0]} alt="" className="w-8 h-8 rounded-full absolute top-0 left-0" />
+              <img src={notification.userImages[1]} alt="" className="w-8 h-8 rounded-full absolute bottom-0 right-0" />
+            </div>
+          ) : (
+            <img src={notification.userImage} alt="" className="w-10 h-10 rounded-full" />
+          )}
+        </div>
+        <div className="flex-grow min-w-0">
+          <p className="text-sm text-[#242424]">
+            <span className="font-semibold">
+              {notification.type === 'like'
+                ? `${notification.users[0]}, ${notification.users[1]} et ${notification.othersCount} autres `
+                : `${notification.user} `}
+            </span>
+            {notification.content}
+          </p>
+          <p className="mt-1 text-xs text-[#77696A]">{notification.time}</p>
+        </div>
+        <div className="flex-shrink-0 ml-3">
+          {getNotificationIcon(notification.type)}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ type: "spring", stiffness: 100 }}
-      className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'
-        }`}
+      className={`fixed w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-lg' : 'bg-white'}`}
     >
       <div className="container mx-auto px-2 md:px-4">
         <div className="flex items-center justify-between h-16">
@@ -140,11 +192,75 @@ const Navbar = (props) => {
             <NavItem to="/feed" icon={Layout} />
             <NavItem to="/network" icon={Users} />
             <NavItem to="/messages" icon={Mail} notificationCount={3} />
-            <NavItem
-              icon={Bell}
-              notificationCount={5}
-              onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
-            />
+            <div className="relative">
+              <button
+                onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
+                className={`flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl transition-colors duration-200 ${isNotificationsOpen ? 'bg-[#FDF1F2] text-[#CC8C87]' : 'hover:bg-[#FDF1F2]'
+                  }`}
+              >
+                <Bell className="w-5 h-5 md:w-6 md:h-6" />
+                {notifications.all.length > 0 && (
+                  <span className="absolute top-0 right-0 bg-[#CC8C87] text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
+                    {notifications.all.length}
+                  </span>
+                )}
+              </button>
+
+              <AnimatePresence>
+                {isNotificationsOpen && (
+                  <motion.div
+                    ref={notificationRef}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-[400px] bg-white rounded-lg shadow-xl overflow-hidden z-50"
+                  >
+                    <div className="flex justify-between items-center p-4 border-b border-gray-200">
+                      <h3 className="text-lg font-semibold text-[#242424]">Notifications</h3>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => setIsNotificationsOpen(false)}
+                          className="text-[#77696A] hover:text-[#CC8C87]"
+                        >
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex border-b border-gray-200">
+                      <NotificationTab
+                        type="Tout"
+                        isActive={activeNotificationTab === 'all'}
+                        onClick={() => setActiveNotificationTab('all')}
+                        count={notifications.all.length}
+                      />
+                      <NotificationTab
+                        type="Messages"
+                        isActive={activeNotificationTab === 'messages'}
+                        onClick={() => setActiveNotificationTab('messages')}
+                        count={notifications.messages.length}
+                      />
+                      <NotificationTab
+                        type="Abonnements"
+                        isActive={activeNotificationTab === 'abonnements'}
+                        onClick={() => setActiveNotificationTab('abonnements')}
+                        count={notifications.abonnements.length}
+                      />
+                    </div>
+                    <div className="max-h-[400px] overflow-y-auto">
+                      {notifications[activeNotificationTab].map((notification) => (
+                        <NotificationItem key={notification.id} notification={notification} />
+                      ))}
+                    </div>
+                    <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+                      <button className="px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7] transition-colors duration-200 text-sm font-medium">
+                        Tout marquer comme lu
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {/* Profile and More */}
@@ -163,6 +279,7 @@ const Navbar = (props) => {
                     className="w-8 h-8 rounded-full object-cover mr-2 border-2 border-[#EAB0B7]"
                   />
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
+
                 </motion.button>
 
                 {/* Profile Dropdown */}
@@ -248,46 +365,6 @@ const Navbar = (props) => {
             )}
           </motion.button>
         </div>
-
-        {/* Notifications Dropdown */}
-        {isNotificationsOpen && (
-          <motion.div
-            ref={notificationRef}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.2 }}
-            className="absolute right-4 top-16 w-64 md:w-96 bg-white rounded-lg shadow-xl py-2 border border-[#EAB0B7] overflow-hidden"
-          >
-            <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
-              <h3 className="font-semibold text-lg text-white">Notifications</h3>
-            </div>
-            <div className="max-h-96 overflow-y-auto">
-              {notifications.map((notification) => (
-                <motion.div
-                  key={notification.id}
-                  whileHover={{ backgroundColor: "#FDF1F2" }}
-                  className="px-4 py-3 border-b border-[#EAB0B7] transition-all duration-200"
-                >
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mr-3">
-                      {getNotificationIcon(notification.type)}
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-[#242424]">{notification.content}</p>
-                      <p className="text-xs text-[#77696A] mt-1">{notification.time}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-            <div className="px-4 py-3 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
-              <button className="w-full text-center text-white hover:underline font-medium transition-all duration-200">
-                Voir toutes les notifications
-              </button>
-            </div>
-          </motion.div>
-        )}
 
         {/* Mobile Navigation */}
         {isMenuOpen && (

@@ -123,14 +123,7 @@ const MessageInterface = () => {
   const renderMessageContent = (message) => {
     switch (message.type) {
       case 'image':
-        return (
-          <div className="relative group cursor-pointer">
-            <img src={message.content} alt="Shared image" className="rounded-lg max-w-sm" />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Image className="w-8 h-8 text-white" />
-            </div>
-          </div>
-        );
+        return <img src={message.content} alt="Shared-image" className="rounded-lg max-w-sm" />;
       case 'video':
         return (
           <div className="relative group cursor-pointer">
