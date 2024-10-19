@@ -30,7 +30,7 @@ import { format } from "date-fns";
 import Swal from "sweetalert2";
 import Loader from "./Loader";
 
-export default function PostCard({user}) {
+export default function PostCard({ user }) {
   const navigate = useNavigate();
   const handleProfileClick = (authorId) => {
     navigate('/profile');
@@ -88,7 +88,7 @@ export default function PostCard({user}) {
         setLoading(false);
       }
     };
-    if(user){
+    if (user) {
       fetchPosts();
     }
   }, [reload]);
@@ -136,24 +136,24 @@ export default function PostCard({user}) {
       const response = await apiService.request(
         "POST",
         `/post/like`,
-        {postId},
+        { postId },
         user.token
       );
-  
-    setPosts((prevPosts) =>
-      prevPosts.map((post) =>
-        post.id === postId
-          ? {
+
+      setPosts((prevPosts) =>
+        prevPosts.map((post) =>
+          post.id === postId
+            ? {
               ...post,
-              liked: !post.liked, 
+              liked: !post.liked,
               likeCount: post.liked
-                  ? post.likeCount - 1
-                  : post.likeCount + 1,
+                ? post.likeCount - 1
+                : post.likeCount + 1,
             }
-          : post
-      )
-    );
-    console.log(response.message); 
+            : post
+        )
+      );
+      console.log(response.message);
     } catch (error) {
       console.error("Erreur lors de l'actualisation du like:", error);
       Swal.fire({
@@ -163,32 +163,32 @@ export default function PostCard({user}) {
       });
     }
   };
-  
+
 
   const handleBookmark = async (postId) => {
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-        const response = await apiService.request(
+      const response = await apiService.request(
         "POST",
         `/favorites/add-to-favorites/${postId}`,
         null,
         user.token
       );
-  
+
       setPosts((prevPosts) =>
         prevPosts.map((post) =>
           post.id === postId
             ? {
-                ...post,
-                bookmarked: !post.bookmarked, // Inverser l'état des favoris
-                favoriteCount: post.bookmarked
-                  ? post.favoriteCount - 1
-                  : post.favoriteCount + 1, // Ajuster le comptage des favoris
-              }
+              ...post,
+              bookmarked: !post.bookmarked, // Inverser l'état des favoris
+              favoriteCount: post.bookmarked
+                ? post.favoriteCount - 1
+                : post.favoriteCount + 1, // Ajuster le comptage des favoris
+            }
             : post
         )
       );
-  
+
       Swal.fire({
         icon: response.status === 201 ? "success" : "info",
         title: response.message,
@@ -202,7 +202,7 @@ export default function PostCard({user}) {
       });
     }
   };
-  
+
 
   const handleRating = (newRating) => {
     setRating(newRating);
@@ -246,9 +246,8 @@ export default function PostCard({user}) {
       Swal.fire({
         icon: "error",
         title: "Erreur",
-        text: `Erreur: ${
-          error.response ? error.response.data.message : error.message
-        }`,
+        text: `Erreur: ${error.response ? error.response.data.message : error.message
+          }`,
       });
       console.error("Erreur lors de la suppression du post:", error);
     }
@@ -293,7 +292,7 @@ export default function PostCard({user}) {
             <div className="flex  items-center justify-between mb-4">
               {post.author && (
                 <div className="flex items-center space-x-2">
-                <img
+                  <img
                     src={post.author.photoUrl}
                     alt={post.author.firstname}
                     className="w-10 h-10 rounded-full cursor-pointer"
@@ -363,9 +362,8 @@ export default function PostCard({user}) {
               {post.tag.map((t) => (
                 <span
                   key={t.id}
-                  className={`badge bg-gray-200 text-gray-900 px-2 py-1 rounded-full text-sm ${
-                    post.bookmarked ? "text-white" : ""
-                  } transition-colors duration-200`}
+                  className={`badge bg-gray-200 text-gray-900 px-2 py-1 rounded-full text-sm ${post.bookmarked ? "text-white" : ""
+                    } transition-colors duration-200`}
                 >
                   {t.name}
                 </span>
@@ -400,21 +398,18 @@ export default function PostCard({user}) {
               <div className="flex space-x-4">
                 <button
                   onClick={() => handleLike(post.id)}
-                  className={`flex items-center space-x-1 ${
-                    post.liked ? "text-red-500" : "text-gray-500"
-                  } transition-colors duration-200`}
+                  className={`flex items-center space-x-1 ${post.liked ? "text-red-500" : "text-gray-500"
+                    } transition-colors duration-200`}
                 >
                   <Heart
-                    className={`w-5 h-5 ${
-                      post.liked ? "fill-current" : ""
-                    } transform transition-transform duration-200 ${
-                      post.liked ? "scale-125" : ""
-                    }`}
+                    className={`w-5 h-5 ${post.liked ? "fill-current" : ""
+                      } transform transition-transform duration-200 ${post.liked ? "scale-125" : ""
+                      }`}
                   />
                   <span>{post.likeCount}</span>
                 </button>
                 <button
-                  onClick={() => {setCurrentPost(post); setShowCommentModal(true);}}
+                  onClick={() => { setCurrentPost(post); setShowCommentModal(true); }}
                   className="flex items-center space-x-1 text-gray-500"
                 >
                   <MessageCircle className="w-5 h-5" />
@@ -428,31 +423,25 @@ export default function PostCard({user}) {
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleBookmark(post.id)}
-                  className={`${
-                    post.bookmarked ? "text-blue-500" : "text-gray-500"
-                  } transition-colors duration-200`}
+                  className={`${post.bookmarked ? "text-blue-500" : "text-gray-500"
+                    } transition-colors duration-200`}
                 >
                   <Bookmark
-                    className={`w-5 h-5 ${
-                      post.bookmarked ? "fill-current" : ""
-                    } transform transition-transform duration-200 ${
-                      post.bookmarked ? "scale-125" : ""
-                    }`}
-                    />
+                    className={`w-5 h-5 ${post.bookmarked ? "fill-current" : ""
+                      } transform transition-transform duration-200 ${post.bookmarked ? "scale-125" : ""
+                      }`}
+                  />
                 </button>
-                    <span></span>
+                <span></span>
                 <button
                   onClick={() => setShowRatingModal(true)}
-                  className={`${
-                    rating > 0 ? "text-yellow-500" : "text-gray-500"
-                  } transition-colors duration-200`}
+                  className={`${rating > 0 ? "text-yellow-500" : "text-gray-500"
+                    } transition-colors duration-200`}
                 >
                   <Star
-                    className={`w-5 h-5 ${
-                      rating > 0 ? "fill-current" : ""
-                    } transform transition-transform duration-200 ${
-                      rating > 0 ? "scale-125" : ""
-                    }`}
+                    className={`w-5 h-5 ${rating > 0 ? "fill-current" : ""
+                      } transform transition-transform duration-200 ${rating > 0 ? "scale-125" : ""
+                      }`}
                   />
                 </button>
               </div>
