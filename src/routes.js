@@ -2,6 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import About from './components/About';
 import PageLoader from './components/PageLoader';
+import MessageInterface from './components/Messages2';
 
 // Lazy loading the Dashboard & MainFeed component
 const Dashboard = lazy(() => import('./components/Dashboard'));
@@ -25,7 +26,7 @@ const AppRoutes = () => {
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/messages" element={<MessagingPage />} />
+        <Route path="/messages" element={<MessageInterface />} />
         <Route path="/messages2" element={<Messages />} />
       </Routes>
     </Suspense>
