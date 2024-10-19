@@ -18,6 +18,8 @@
     "crypto-browserify": "^3.12.0",
     "date-fns": "^4.1.0",
     "dotenv": "^16.4.5",
+    "emoji-mart": "^5.6.0",
+    "emoji-picker-react": "^4.12.0",
     "framer-motion": "^11.11.8",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.451.0",
