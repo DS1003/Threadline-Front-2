@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, ChevronLeft, ChevronRight, Ruler, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from './Card';
 import { Button } from './Button';
 import MeasurementModal from './MeasurementModal';
 import ConfirmationModal from './ConfirmationModal';
+import MeasurementsList from './ MeasurementsList';
 import apiService from '../../services/ApiService';
-
 const UserMeasurements = ({ user }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isConfirmationOpen, setIsConfirmationOpen] = useState(false);
@@ -75,34 +75,6 @@ const UserMeasurements = ({ user }) => {
     }
   };
 
-  const renderMeasurements = (m) => {
-    const measurementsToRender = [
-      { label: 'Poitrine', key: 'chest' },
-      { label: 'Taille', key: 'waist' },
-      { label: 'Hanches', key: 'hips' },
-      { label: 'Épaules', key: 'shoulder' },
-      { label: 'Cuisse', key: 'thigh' },
-      { label: 'Longueur de manche', key: 'sleeveLength' },
-      { label: 'Cou', key: 'neck' },
-      { label: 'Dos', key: 'back' },
-      { label: 'Emmanchure', key: 'armhole' },
-      { label: 'Mollet', key: 'calf' },
-    ];
-
-    return (
-      <div className="grid grid-cols-2 gap-2">
-        {measurementsToRender.map(({ label, key }) => (
-          m[key] && (
-            <div key={key} className="flex items-center">
-              <Ruler className="w-4 h-4 text-[#E5A6A6] mr-2" />
-              <span className="text-sm">{label}: <strong>{m[key]} cm</strong></span>
-            </div>
-          )
-        ))}
-      </div>
-    );
-  };
-
   const paginatedMeasurements = measurements.slice(
     currentPage * measurementsPerPage,
     (currentPage + 1) * measurementsPerPage
@@ -136,7 +108,7 @@ const UserMeasurements = ({ user }) => {
             >
               {paginatedMeasurements.map((m) => (
                 <div key={m.id} className="bg-white rounded-lg p-3 mb-2">
-                  {renderMeasurements(m)}
+                  <MeasurementsList measurement={m} />
                   <div className="flex justify-end mt-2 space-x-2">
                     <Button
                       onClick={() => openModal(m)}
