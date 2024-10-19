@@ -11,7 +11,8 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
     const [loading, setLoading] = useState(false);
     const [replyingTo, setReplyingTo] = useState(null);
     const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-    const [showSubEmojiPicker, setShowSubEmojiPicker] = useState(false); // New state for sub-comment emoji picker
+    const [showSubEmojiPicker, setShowSubEmojiPicker] = useState(false);
+    const [showReplies, setShowReplies] = useState({}); // Track which comments' replies are visible
     const fileInputRef = useRef(null);
 
     useEffect(() => {
@@ -34,13 +35,13 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
     };
 
     const handleSubEmojiClick = (emojiObject) => {
-        setSubComment(prev => ({ ...prev, comment: prev.comment + emojiObject.emoji })); // Update sub-comment
-        setShowSubEmojiPicker(false); // Hide the sub-comment emoji picker
+        setSubComment(prev => ({ ...prev, comment: prev.comment + emojiObject.emoji }));
+        setShowSubEmojiPicker(false);
     };
 
     const handleSubmitComment = async (e) => {
         e.preventDefault();
-        if (!comment.trim()) return; // Prevent submission if comment is empty
+        if (!comment.trim()) return;
         setLoading(true);
         
         try {
@@ -50,7 +51,7 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
             }, user.token);
 
             setComments(prev => [...prev, response.comment]);
-            setComment(''); // Reset the comment input
+            setComment('');
 
             if (onCommentAdded) onCommentAdded(post.id);
         } catch (error) {
@@ -62,7 +63,7 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
 
     const handleSubmitSubComment = async (e) => {
         e.preventDefault();
-        if (!subComment.comment.trim()) return; // Prevent submission if subcomment is empty
+        if (!subComment.comment.trim()) return;
         setLoading(true);
         
         try {
@@ -73,12 +74,7 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
             }, user.token);
 
             setComments(prev => {
-                return prev.map(c => {
-                    if (c.id === subComment.parentId) {
-                        return { ...c, replies: [...(c.replies || []), response.comment] };
-                    }
-                    return c;
-                });
+                return updateCommentReplies(prev, subComment.parentId, response.comment);
             });
 
             setSubComment({ comment: '', parentId: null });
@@ -93,13 +89,31 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
     };
 
     const handleReplyClick = (commentId) => {
-        setReplyingTo(commentId); // Set the replyingTo state to the current comment ID
-        setSubComment({ comment: '', parentId: commentId }); // Prepare the sub-comment state
+        setReplyingTo(commentId);
+        setSubComment({ comment: '', parentId: commentId });
     };
 
     const handleCancelReply = () => {
-        setReplyingTo(null); // Reset replyingTo state
-        setSubComment({ comment: '', parentId: null }); // Reset the sub-comment state
+        setReplyingTo(null);
+        setSubComment({ comment: '', parentId: null });
+    };
+
+    const toggleReplies = (commentId) => {
+        setShowReplies(prev => ({
+            ...prev,
+            [commentId]: !prev[commentId]
+        }));
+    };
+
+    const updateCommentReplies = (comments, parentId, newReply) => {
+        return comments.map(comment => {
+            if (comment.id === parentId) {
+                return { ...comment, replies: [...(comment.replies || []), newReply] };
+            } else if (comment.replies) {
+                return { ...comment, replies: updateCommentReplies(comment.replies, parentId, newReply) };
+            }
+            return comment;
+        });
     };
 
     const renderComments = (comments) => {
@@ -117,22 +131,16 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
                             <ThumbsUp size={15} className="cursor-pointer" />
                             <ThumbsDown size={15} className="cursor-pointer" />
                             <button onClick={() => handleReplyClick(comment.id)} className="text-blue-500 hover:text-blue-600 text-sm">Répondre</button>
+                            {comment.replies && comment.replies.length > 0 && ( // Only show button if replies exist
+                                <button onClick={() => toggleReplies(comment.id)} className="text-gray-500 hover:text-gray-600 text-sm ml-2">
+                                    {showReplies[comment.id] ? 'Masquer réponses' : `Voir ${comment.replies.length} réponses`}
+                                </button>
+                            )}
                         </div>
 
-                        {comment.replies && comment.replies.length > 0 && (
+                        {showReplies[comment.id] && comment.replies && comment.replies.length > 0 && (
                             <div className="ml-6 mt-2">
-                                {comment.replies.map(reply => (
-                                    <div key={reply.id} className="flex gap-3 mb-3">
-                                        <img src={reply.author?.photoUrl} alt={`${reply.author?.firstname} ${reply.author?.lastname}`} className="w-6 h-6 rounded-full" />
-                                        <div className="flex-1">
-                                            <p>
-                                                <span className="font-semibold">{reply.author?.firstname} {reply.author?.lastname}</span>
-                                                <span className="text-xs text-gray-500 ml-2">{new Date(reply.createdAt).toLocaleString()}</span>
-                                            </p>
-                                            <p>{reply.content}</p>
-                                        </div>
-                                    </div>
-                                ))}
+                                {renderComments(comment.replies)}
                             </div>
                         )}
 
@@ -206,8 +214,8 @@ const CommentModal = ({ post, onClose, user, onCommentAdded }) => {
                         {showEmojiPicker && (
                             <EmojiPicker onEmojiClick={handleEmojiClick} />
                         )}
-                        <div className='mt-2 flex justify-end'>
-                            <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700 mr-3">Annuler</button>
+                        <div className='mt-2 flex justify-end gap-2'>
+                            <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-gray-700">Annuler</button>
                             <button type="submit" disabled={!comment.trim() || loading} className={`px-3 py-1 rounded-full text-sm font-semibold ${loading ? 'bg-gray-300 cursor-not-allowed' : 'bg-blue-500 text-white hover:bg-blue-600'}`}>
                                 {loading ? <Loading /> : "Commenter"}
                             </button>
