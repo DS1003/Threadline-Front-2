@@ -20,6 +20,10 @@ import {
   Edit
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AiOutlineHeart, AiOutlineComment, AiOutlineMail } from 'react-icons/ai';
+import { BiFlag } from 'react-icons/bi';
+import { FiUserPlus } from 'react-icons/fi';
+import apiService from '../services/ApiService';
 
 const Navbar = ({ user = null }) => {
   const navigate = useNavigate();
@@ -30,24 +34,29 @@ const Navbar = ({ user = null }) => {
   const [scrolled, setScrolled] = useState(false);
   const notificationRef = useRef(null);
 
+  const [notifications, setNotifications] = useState([]);
+
   const isAuthenticated = !!user;
 
   const handleProfileClick = () => {
     navigate('/profile');
   };
 
-  const notifications = {
+  /*const notifications = {
     all: [
       { id: 1, type: 'message', user: 'Alice Durand', content: 'vous a envoyé un message', time: '5 min ago', userImage: '/placeholder.svg?height=40&width=40' },
       { id: 2, type: 'abonnement', user: 'Bob Martin', content: 's\'est abonné à vous', time: '30 min ago', userImage: '/placeholder.svg?height=40&width=40' },
-      { id: 3, type: 'signalement', user: 'Charlie Dupont', content: 'a signalé votre publication', time: '1 h ago', userImage: '/placeholder.svg?height=40&width=40' },
+      { id: 3, type: 'report', user: 'Charlie Dupont', content: 'a signalé votre publication', time: '1 h ago', userImage: '/placeholder.svg?height=40&width=40' },
       { id: 4, type: 'like', users: ['David Lefebvre', 'Emma Moreau'], othersCount: 3, content: 'ont aimé votre publication', time: '2 h ago', userImages: ['/placeholder.svg?height=40&width=40', '/placeholder.svg?height=40&width=40'] },
-      { id: 5, type: 'commentaire', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' },
+      { id: 5, type: 'comment', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' },
     ],
+    comments: [{ id: 5, type: 'comment', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' }],
+    likes: [],
     messages: [],
-    abonnements: [],
-    signalements: [],
-  };
+    follows: [],
+    reports: [],
+
+  };*/
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,6 +76,19 @@ const Navbar = ({ user = null }) => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      // Simulate fetching data from an API
+      const response = await apiService.request('GET', '/users/notifications', null, null, user.token);
+      console.log(response);
+      //console.log(response);
+      //console.log(response.notifications)
+      //const data = await response.json();
+      //setNotifications(response.notifications);
+    };
+    //fetchNotifications();
+  });
+
   const handleLogout = () => {
     localStorage.removeItem('user');
     setIsProfileMenuOpen(false);
@@ -79,8 +101,8 @@ const Navbar = ({ user = null }) => {
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       className={`flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl transition-colors duration-200 relative ${isNotificationsOpen && Icon === Bell
-          ? 'text-[#CC8C87] bg-[#FDF1F2]'
-          : 'text-[#242424] hover:bg-[#FDF1F2]'
+        ? 'text-[#CC8C87] bg-[#FDF1F2]'
+        : 'text-[#242424] hover:bg-[#FDF1F2]'
         }`}
     >
       {to ? (
@@ -108,60 +130,61 @@ const Navbar = ({ user = null }) => {
         return <Mail className="w-5 h-5 text-[#CC8C87]" />;
       case 'abonnement':
         return <UserPlus className="w-5 h-5 text-[#EAB0B7]" />;
-      case 'signalement':
+      case 'report':
         return <Flag className="w-5 h-5 text-[#CC8C87]" />;
       case 'like':
         return <Heart className="w-5 h-5 text-[#EAB0B7]" />;
-      case 'commentaire':
+      case 'comment':
         return <MessageCircle className="w-5 h-5 text-[#CC8C87]" />;
       default:
         return <Bell className="w-5 h-5 text-[#CC8C87]" />;
     }
   };
 
-  const NotificationTab = ({ type, isActive, onClick, count }) => (
+  const NotificationTab = ({ type, isActive, onClick, count, icon }) => (
     <button
       onClick={onClick}
-      className={`flex-1 py-2 px-3 text-sm font-medium transition-colors duration-200 ${isActive
-          ? 'text-[#CC8C87] border-b-2 border-[#CC8C87]'
-          : 'text-[#77696A] hover:text-[#CC8C87]'
+      className={`flex pt-3 pb-1 px-3 text-sm font-medium transition-colors duration-200 mb-3 ${isActive
+        ? 'text-[#CC8C87] border-b-2 border-[#CC8C87]'
+        : 'text-[#77696A] hover:text-[#CC8C87]'
         }`}
     >
-      <span className="capitalize">{type}</span>
+       {icon && <span>{icon}</span>}
+      <span className="capitalize">{type} </span>
       {count > 0 && <span className="ml-1 text-xs bg-[#CC8C87] text-white rounded-full px-2 py-1">{count}</span>}
     </button>
   );
 
-  const NotificationItem = ({ notification }) => (
-    <div className="py-3 px-4 border-b border-gray-200 hover:bg-[#FDF1F2] transition-colors duration-200">
-      <div className="flex items-start">
-        <div className="flex-shrink-0 mr-3">
-          {notification.type === 'like' ? (
-            <div className="relative w-10 h-10">
-              <img src={notification.userImages[0]} alt="" className="w-8 h-8 rounded-full absolute top-0 left-0" />
-              <img src={notification.userImages[1]} alt="" className="w-8 h-8 rounded-full absolute bottom-0 right-0" />
-            </div>
-          ) : (
-            <img src={notification.userImage} alt="" className="w-10 h-10 rounded-full" />
-          )}
-        </div>
-        <div className="flex-grow min-w-0">
-          <p className="text-sm text-[#242424]">
-            <span className="font-semibold">
-              {notification.type === 'like'
-                ? `${notification.users[0]}, ${notification.users[1]} et ${notification.othersCount} autres `
-                : `${notification.user} `}
-            </span>
-            {notification.content}
-          </p>
-          <p className="mt-1 text-xs text-[#77696A]">{notification.time}</p>
-        </div>
-        <div className="flex-shrink-0 ml-3">
-          {getNotificationIcon(notification.type)}
-        </div>
-      </div>
-    </div>
-  );
+  // const NotificationItem = ({ notification }) => (
+  //   <div className="py-3 px-4 border-b border-gray-200 hover:bg-[#FDF1F2] transition-colors duration-200">
+  //     <div className="flex items-start">
+  //       <div className="flex-shrink-0 mr-3">
+  //         {notification.type === 'like' ? (
+  //           <div className="relative w-10 h-10">
+  //             <img src={notification.userImages[0]} alt="" className="w-8 h-8 rounded-full absolute top-0 left-0" />
+  //             <img src={notification.userImages[1]} alt="" className="w-8 h-8 rounded-full absolute bottom-0 right-0" />
+  //           </div>
+  //         ) : (
+  //           <img src={notification.userImage} alt="" className="w-10 h-10 rounded-full" />
+  //         )}
+  //       </div>
+  //       <div className="flex-grow min-w-0">
+  //         <p className="text-sm text-[#242424]">
+  //           <span className="font-semibold">
+  //             {notification.type === 'like'
+  //               ? `${notification.users[0]}, ${notification.users[1]} et ${notification.othersCount} autres `
+  //               : `${notification.user} `}
+  //           </span>
+  //           {notification.content}
+  //         </p>
+  //         <p className="mt-1 text-xs text-[#77696A]">{notification.time}</p>
+  //       </div>
+  //       <div className="flex-shrink-0 ml-3">
+  //         {getNotificationIcon(notification.type)}
+  //       </div>
+  //     </div>
+  //   </div>
+  // );
 
   return (
     <motion.nav
@@ -199,9 +222,9 @@ const Navbar = ({ user = null }) => {
                   }`}
               >
                 <Bell className="w-5 h-5 md:w-6 md:h-6" />
-                {notifications.all.length > 0 && (
+                {notifications.length > 0 && (
                   <span className="absolute top-0 right-0 bg-[#CC8C87] text-white text-xs rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center">
-                    {notifications.all.length}
+                    {notifications.length}
                   </span>
                 )}
               </button>
@@ -227,31 +250,57 @@ const Navbar = ({ user = null }) => {
                         </button>
                       </div>
                     </div>
-                    <div className="flex border-b border-gray-200">
-                      <NotificationTab
-                        type="Tout"
-                        isActive={activeNotificationTab === 'all'}
-                        onClick={() => setActiveNotificationTab('all')}
-                        count={notifications.all.length}
-                      />
-                      <NotificationTab
-                        type="Messages"
-                        isActive={activeNotificationTab === 'messages'}
-                        onClick={() => setActiveNotificationTab('messages')}
-                        count={notifications.messages.length}
-                      />
-                      <NotificationTab
-                        type="Abonnements"
-                        isActive={activeNotificationTab === 'abonnements'}
-                        onClick={() => setActiveNotificationTab('abonnements')}
-                        count={notifications.abonnements.length}
-                      />
+                    <div className='flex border-b border-gray-200 overflow-x-auto scrollbar-hide'>
+                      <div className="flex space-x-4">
+                        <NotificationTab
+                          type="Tout"
+                          isActive={activeNotificationTab === 'all'}
+                          onClick={() => setActiveNotificationTab('all')}
+                          count={1}
+                        />
+                        <NotificationTab
+                          type="Commentaires"
+                          icon={<AiOutlineComment className="w-5 h-5" />} 
+                          isActive={activeNotificationTab === 'comments'}
+                          onClick={() => setActiveNotificationTab('comments')}
+                          count={24}
+                        />
+                        <NotificationTab
+                          type="Likes"
+                          icon={<AiOutlineHeart className="w-5 h-5" />}
+                          isActive={activeNotificationTab === 'likes'}
+                          onClick={() => setActiveNotificationTab('likes')}
+                          count={1}
+                        />
+                        <NotificationTab
+                          type="Abonnements"
+                          icon={<FiUserPlus className="w-5 h-5" />}
+                          isActive={activeNotificationTab === 'follows'}
+                          onClick={() => setActiveNotificationTab('follows')}
+                          count={3}
+                        />
+                        <NotificationTab
+                          type="Signalements"
+                          icon={<BiFlag className="w-5 h-5" />}
+                          isActive={activeNotificationTab === 'reports'}
+                          onClick={() => setActiveNotificationTab('reports')}
+                          count={10}
+                        />
+                        <NotificationTab
+                          type="Messages"
+                          icon={<AiOutlineMail className="w-5 h-5" />}
+                          isActive={activeNotificationTab === 'messages'}
+                          onClick={() => setActiveNotificationTab('messages')}
+                          count={22}
+                        />
+                      </div>
+
                     </div>
-                    <div className="max-h-[400px] overflow-y-auto">
+                    {/* <div className="max-h-[400px] overflow-y-auto">
                       {notifications[activeNotificationTab].map((notification) => (
                         <NotificationItem key={notification.id} notification={notification} />
                       ))}
-                    </div>
+                    </div> */}
                     <div className="p-4 border-t border-gray-200 flex justify-between items-center">
                       <button className="px-4 py-2 bg-[#CC8C87] text-white rounded-md hover:bg-[#EAB0B7] transition-colors duration-200 text-sm font-medium">
                         Tout marquer comme lu
