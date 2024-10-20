@@ -13,6 +13,7 @@ const ProfilePageBis = lazy(() => import('./components/ui/ProfilePageBis'));
 const MessagingPage = lazy(() => import('./components/Messaging'));
 const Register = lazy(() => import('./components/Register'));
 const Messages = lazy(() => import('./components/Messages2'));
+const ProfilePage2 = lazy(() => import('./components/ProfilePage2'));
 
 const AppRoutes = () => {
   
@@ -30,6 +31,7 @@ const AppRoutes = () => {
         <Route path="/profileBis/:userId" element={<ProfilePageBis />} />
         <Route path="/messages" element={<MessageInterface />} />
         <Route path="/messages2" element={<Messages />} />
+        <Route path="/profile2" element={<ProfilePage2 />} />
       </Routes>
     </Suspense>
   );
