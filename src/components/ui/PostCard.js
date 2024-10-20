@@ -9,6 +9,7 @@ import {
   MoreVertical,
   Trash2,
   Edit,
+  Flag,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -25,6 +26,7 @@ import RatingModal from "./RatingModal";
 import CommentModal from "./CommentModal";
 import apiService from "../../services/ApiService";
 import EditPostModal from "../../components/modal/EditPostModal";
+import ReportModal from "../../components/modal/ReportModal";
 import { format } from "date-fns";
 
 import Swal from "sweetalert2";
@@ -54,6 +56,9 @@ export default function PostCard({user,post}) {
   const [currentPost, setCurrentPost] = useState(null);
 
   const [selectedImage, setSelectedImage] = useState(null);
+
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
 
   //const user = JSON.parse(localStorage.getItem("user"));
 
@@ -312,7 +317,7 @@ export default function PostCard({user,post}) {
             title: 'Accès refusé',
             text: 'Vous n\'êtes pas autorisé à modifier ce post.',
         });
-        return; // Arrête l'exécution si l'utilisateur n'est pas l'auteur
+        return; 
     }
 
     setCurrentPost(post);
@@ -341,6 +346,54 @@ export default function PostCard({user,post}) {
       )
     );
   };
+
+  const handleReportPost = (post) => {
+    setCurrentPost(post);
+    setShowReportModal(true);
+  };
+  
+  const handleSubmitReport = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      if (!user || !user.token) {
+        Swal.fire({
+          icon: "error",
+          title: "Erreur",
+          text: "Vous devez être connecté pour signaler un post.",
+        });
+        return;
+      }
+
+      const response = await apiService.request(
+        "POST",
+        `/post/report`, 
+        {
+          postId: currentPost.id,  
+          reason: reportReason     
+        },
+        user.token 
+      );
+
+      if (response) {
+        Swal.fire({
+          icon: "success",
+          title: "Succès",
+          text: "Le post a été signalé avec succès.",
+        });
+        setShowReportModal(false); 
+        setReportReason('');       
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: ` ${
+          error.response ? error.response.data.message : error.message
+        }`,
+      });
+    }
+  };
+
 
   return (
     <div>
@@ -414,6 +467,20 @@ export default function PostCard({user,post}) {
                         </AlertDialogFooter>
                       </AlertDialogContent>
                     </AlertDialog>
+                    <button
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left"
+                      onClick={() => handleReportPost(post)}
+                    >
+                      <Flag className="mr-2 h-4 w-4" />
+                      Signaler le post
+                    </button>
+                    <ReportModal
+                      show={showReportModal}
+                      onClose={() => setShowReportModal(false)} 
+                      onSubmitReport={handleSubmitReport}
+                      reportReason={reportReason}
+                      setReportReason={setReportReason}
+                    />
                   </div>
                 )}
               </div>
