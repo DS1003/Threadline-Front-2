@@ -103,6 +103,7 @@ const MessageInterface = () => {
           };
           setMessages(prevMessages => [...prevMessages, newMsg]);
           setNewMessage('');
+          console.log('Message sent successfully');
         } else {
           throw new Error(response.msg || 'Failed to send message');
         }
@@ -128,6 +129,7 @@ const MessageInterface = () => {
         setAudioURL(audioUrl);
         setIsRecording(false);
         
+        // Send audio message to the server
         const formData = new FormData();
         formData.append('audio', audioBlob);
         formData.append('receiverId', selectedChat.id);
@@ -135,7 +137,7 @@ const MessageInterface = () => {
         apiService.request('POST', '/messages/audio', formData, token)
           .then(() => {
             toast.success('Audio message sent');
-            fetchMessages();
+            fetchMessages(); // Refresh messages to include the new audio message
           })
           .catch(error => {
             toast.error('Failed to send audio message');
@@ -159,11 +161,11 @@ const MessageInterface = () => {
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
-            className="w-80 bg-white border-r border-gray-200 shadow-md"
+            className="w-80 bg-white border-r border-gray-200"
           >
             <div className="p-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <Input
                   type="text"
                   placeholder="Search chats"
@@ -195,38 +197,65 @@ const MessageInterface = () => {
       </AnimatePresence>
 
       <div className="flex-grow flex flex-col">
-        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm">
-          <div className="flex items-center">
-            <Button variant="ghost" onClick={toggleSidebar} className="mr-4 text-[#4A4A4A] hover:bg-[#CC8C87]/10">
-              {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-            </Button>
-          </div>
+        <div className="bg-white border-b border-gray-200 p-4 flex items-center">
+          <Button variant="ghost" onClick={toggleSidebar} className="mr-4">
+            {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+          </Button>
+          <h2 className="text-xl font-semibold">
+            {selectedChat ? `${selectedChat.firstname} ${selectedChat.lastname}` : 'Select a chat'}
+          </h2>
         </div>
+
         <div className="flex-grow overflow-y-auto p-4">
           {messages.map((message) => (
-            <div key={message.id} className="mb-4">
-              <p className="text-sm">{message.sender}</p>
-              <p>{message.content}</p>
-              <p className="text-xs text-gray-400">{message.time}</p>
+            <div
+              key={message.id}
+              className={`flex mb-4 ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}
+            >
+              <div className={`max-w-xs md:max-w-md ${
+                message.sender === 'You' 
+                  ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg' 
+                  : 'bg-white text-gray-800 rounded-r-lg rounded-bl-lg'
+              } p-3 shadow`}
+              >
+                {message.type === 'text' ? (
+                  <p>{message.content}</p>
+                ) : (
+                  <audio controls src={message.content} />
+                )}
+                <p className="text-xs mt-1 text-right opacity-70">{message.time}</p>
+              </div>
             </div>
           ))}
-          <div ref={messagesEndRef}></div>
+          <div ref={messagesEndRef} />
         </div>
-        <div className="p-4 border-t border-gray-200">
+
+        <div className="bg-white border-t border-gray-200 p-4">
           <div className="flex items-center">
             <Input
               type="text"
+              placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type your message..."
               className="flex-grow mr-4"
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             />
-            <Button onClick={handleSendMessage} className="text-[#CC8C87]">
+            <Button variant="ghost" onClick={handleSendMessage} className="mr-4">
               <Send />
             </Button>
+            {isRecording ? (
+              <Button variant="ghost" onClick={stopRecording}>
+                <StopCircle className="text-red-500" />
+              </Button>
+            ) : (
+              <Button variant="ghost" onClick={startRecording}>
+                <Mic />
+              </Button>
+            )}
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
   );
 };
