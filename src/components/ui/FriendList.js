@@ -2,37 +2,60 @@ import React, { useState, useEffect } from 'react';
 import { Button } from "./Button";
 import { Avatar, AvatarImage } from "./Avatar";
 import { UserMinus, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import apiService from '../../services/ApiService';
 
-const FriendsList = () => {
+const FriendsList = ({ userId, showUnfollowButton = true }) => {
+  const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleProfileClick = (friendId) => {
+    navigate(`/profileBis/${friendId}`);
+  };
 
   const fetchFollowedUsers = async () => {
+    if (!userId) {
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
     try {
       const currentUser = JSON.parse(localStorage.getItem('user'));
-      const response = await apiService.request('GET', '/userFollow/getFollowedUsers', null, currentUser.token);
+      const endpoint = `/userFollow/getFollowedUsers/${userId}`;
+      const response = await apiService.request('GET', endpoint, null, currentUser.token);
       if (response && response.users) {
         setFriends(response.users);
       }
     } catch (error) {
       console.error('Error fetching followed users:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchFollowedUsers();
-  }, []);
+  }, [userId]);
 
   const handleUnfollow = async (friendId) => {
     try {
       const currentUser = JSON.parse(localStorage.getItem('user'));
       await apiService.request('DELETE', `/userFollow/unfollow/${friendId}`, null, currentUser.token);
-      // Mettre à jour la liste des amis après le désabonnement
       setFriends(friends.filter(friend => friend.id !== friendId));
     } catch (error) {
       console.error('Error unfollowing user:', error);
     }
   };
+
+  if (isLoading) {
+    return <div>Chargement des amis...</div>;
+  }
+
+  if (!userId) {
+    return <div>Impossible de charger la liste des amis.</div>;
+  }
 
   return (
     <div className="bg-gradient-to-br from-white to-[#FDE8E4] rounded-3xl shadow-xl p-8 max-w-full mx-auto">
@@ -46,7 +69,6 @@ const FriendsList = () => {
         <div className="w-12 h-12 bg-[#CC8C87] rounded-full opacity-10 animate-pulse"></div>
       </div>
       
-      {/* Conteneur scrollable */}
       <div className="space-y-4 h-64 overflow-y-auto scrollbar-thin scrollbar-thumb-[#CC8C87] scrollbar-track-[#FDE8E4]">
         {friends.map((friend) => (
           <div 
@@ -54,25 +76,29 @@ const FriendsList = () => {
             className="flex items-center space-x-4 p-4 bg-white bg-opacity-60 rounded-2xl shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-100 hover:bg-opacity-80 backdrop-blur-md"
           >
             <Avatar className="w-16 h-16 border-2 border-[#CC8C87]">
-              <AvatarImage src={friend.photoUrl} alt={friend.photoUrl} />
+              <AvatarImage 
+                src={friend.photoUrl} 
+                alt={friend.photoUrl} 
+                onClick={() => handleProfileClick(friend.id)}
+              />
             </Avatar>
             <div className="flex-grow">
-              <h3 className="text-lg font-semibold text-[#4A4A4A]"> {friend.firstname} {friend.lastname} </h3>
+              <h3 className="text-lg font-semibold text-[#4A4A4A]">{friend.firstname} {friend.lastname}</h3>
               <div className="w-16 h-1 bg-[#CC8C87] rounded-full mt-1 opacity-50"></div>
             </div>
-            <Button
-              variant="outline"
-              className="transition-all duration-300 bg-white text-[#CC8C87] border-[#CC8C87] hover:bg-[#CC8C87] hover:text-white"
-              onClick={() => handleUnfollow(friend.id)}
-            >
-              <UserMinus className="w-4 h-4 mr-2" />
-              Ne plus suivre
-            </Button>
+            {showUnfollowButton && (
+              <Button
+                variant="outline"
+                className="transition-all duration-300 bg-white text-[#CC8C87] border-[#CC8C87] hover:bg-[#CC8C87] hover:text-white"
+                onClick={() => handleUnfollow(friend.id)}
+              >
+                <UserMinus className="w-4 h-4 mr-2" />
+                Ne plus suivre
+              </Button>
+            )}
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 };
