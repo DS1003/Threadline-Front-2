@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Heart, Image as ImageIcon, Edit, Users, Settings } from 'lucide-react';
 import ProfileHeader from './ProfileHeader';
 import UserInfo from './UserInfo';
-import UserPosts from './UserPosts';
+import UserPostsComponents from './UserPostsComponents';
 import InstagramStyleFavorites from './InstagramStyleFavorites';
 import UserMeasurements from './UserMeasurements';
 import UpdateRoleUser from './UpdateRoleUser';
@@ -19,7 +19,7 @@ const ProfilePage = () => {
         const parsedUser = JSON.parse(userFromStorage);
         setUser(parsedUser);
       } catch (error) {
-        console.error("Erreur lors de la parsing de l'utilisateur depuis le localStorage", error);
+        console.error("Erreur lors du parsing de l'utilisateur depuis le localStorage", error);
       }
     }
   }, []);
@@ -27,10 +27,6 @@ const ProfilePage = () => {
   const coverPhoto = 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666';
 
   const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
-
-  const posts = [
-    // ... (posts data remains unchanged)
-  ];
 
   const tabs = [
     { icon: <User className="w-5 h-5" />, label: "Infos", value: "info" },
@@ -83,16 +79,16 @@ const ProfilePage = () => {
               )}
 
               {activeTab === 'favorites' && (
-                <InstagramStyleFavorites posts={posts} />
+                <InstagramStyleFavorites posts={[]} />
               )}
 
-              {activeTab === 'posts' && (
-                <UserPosts posts={posts} />
+              {activeTab === 'posts' && user && (
+                <UserPostsComponents user={user} />
               )}
 
- {activeTab === 'friends' && (
-  <FriendsList userId={user.id} showUnfollowButton={true} />
-)}
+              {activeTab === 'friends' && user && (
+                <FriendsList userId={user.id} showUnfollowButton={true} />
+              )}
             </div>
           </div>
         </div>

@@ -1,153 +1,160 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, Send, Paperclip, Smile, Mic, Phone, Video, MoreVertical, ChevronLeft, ChevronRight, Image, X, Play, Pause, ArrowLeft } from 'lucide-react';
+import { Search, Send, ChevronLeft, ChevronRight, Mic, StopCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from "./ui/Button"
-import { Input } from "./ui/Input"
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar"
-import { Card, CardContent } from "./ui/Card"
+import { Button } from "./ui/Button";
+import { Input } from "./ui/Input";
+import { Avatar, AvatarImage } from "./ui/Avatar";
+import apiService from '../services/ApiService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Removed import Link from 'next/link';
 
 const MessageInterface = () => {
+  const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-  const [selectedChat, setSelectedChat] = useState(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingDuration, setRecordingDuration] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [audioURL, setAudioURL] = useState(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedChat, setSelectedChat] = useState(null);
   const messagesEndRef = useRef(null);
-  const fileInputRef = useRef(null);
-
-  const chats = [
-    { id: 1, name: 'Real estate deals', unread: 3, lastMessage: 'New property listing!', time: '11:45 AM' },
-    { id: 2, name: 'Kate Johnson', unread: 0, lastMessage: 'Thanks for the update', time: '10:30 AM' },
-    { id: 3, name: 'Tamara Shevchenko', unread: 1, lastMessage: 'Meeting at 3 PM?', time: 'Yesterday' },
-    { id: 4, name: 'Joshua Clarkson', unread: 0, lastMessage: 'Contract signed!', time: 'Yesterday' },
-    { id: 5, name: 'Jeroen Zoet', unread: 2, lastMessage: 'New market analysis', time: 'Monday' },
-  ];
+  const mediaRecorderRef = useRef(null);
+  const userInfo = JSON.parse(localStorage.getItem('user'));
+  const connectedUserId = userInfo?.id || null;
+  const token = userInfo?.token || null;
 
   useEffect(() => {
-    setSelectedChat(chats[0]);
-    setMessages([
-      { id: 1, sender: 'Kate Johnson', content: "Hi everyone, let's start the call soon!", time: '11:24 AM', type: 'text' },
-      { id: 2, sender: 'Kate Johnson', content: 'Recently I saw properties in a great location that I did not pay attention to before 😊', time: '11:24 AM', type: 'text' },
-      { id: 3, sender: 'Evan Scott', content: "Ooo, why don't you say something more", time: '11:34 AM', type: 'text' },
-      { id: 4, sender: 'Evan Scott', content: '@Kate ? 😉', time: '11:34 AM', type: 'text' },
-      { id: 5, sender: 'You', content: 'She creates an atmosphere of mystery 😄', time: '11:36 AM', type: 'text' },
-      { id: 6, sender: 'Evan Scott', content: "Kate, don't be like that and say something more :)", time: '11:44 AM', type: 'text' },
-      { id: 7, sender: 'You', content: '/placeholder.svg?height=300&width=400', time: '11:50 AM', type: 'image' },
-      { id: 8, sender: 'Kate Johnson', content: '/placeholder.svg?height=300&width=400', time: '11:55 AM', type: 'video' },
-    ]);
-  }, []);
+    if (connectedUserId && token) {
+      fetchUsers();
+    }
+  }, [connectedUserId, token]);
+
+  useEffect(() => {
+    if (selectedChat && token) {
+      fetchMessages();
+    }
+  }, [selectedChat, token]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
-  useEffect(() => {
-    let interval;
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
-      }, 1000);
-    } else {
-      setRecordingDuration(0);
+  const fetchUsers = async () => {
+    try {
+      const response = await apiService.request('GET', '/users/getAll', null, token);
+      if (Array.isArray(response.users)) {
+        const filteredUsers = response.users.filter(user => user.id !== connectedUserId);
+        setUsers(filteredUsers);
+        if (filteredUsers.length > 0) {
+          setSelectedChat(filteredUsers[0]);
+        }
+      } else {
+        console.error('Expected an array of users, but received:', response);
+        toast.error('Error loading users');
+      }
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      toast.error('Failed to load users');
     }
-    return () => clearInterval(interval);
-  }, [isRecording]);
+  };
+
+  const fetchMessages = async () => {
+    if (!selectedChat) return;
+    
+    try {
+      const response = await apiService.request('GET', `/messages/connected-user?receiverId=${selectedChat.id}`, null, token);
+      if (Array.isArray(response.messages)) {
+        const formattedMessages = response.messages.map(msg => ({
+          id: msg.id,
+          sender: msg.senderId === connectedUserId ? 'You' : 'Other',
+          content: msg.content,
+          time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          type: 'text',
+        }));
+        setMessages(formattedMessages);
+      } else {
+        console.error('Expected an array of messages, but received:', response);
+        toast.error('Error loading messages');
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      toast.error('Failed to load messages');
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
-  const handleSendMessage = () => {
-    if (newMessage.trim() !== '' || isRecording) {
-      const newMsg = {
-        id: messages.length + 1,
-        sender: 'You',
-        content: isRecording ? `Audio message (${recordingDuration}s)` : newMessage,
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: isRecording ? 'audio' : 'text'
-      };
-      setMessages([...messages, newMsg]);
-      setNewMessage('');
-      setIsRecording(false);
-      setRecordingDuration(0);
-      simulateResponse();
+  const handleSendMessage = async () => {
+    if (newMessage.trim() !== '' && selectedChat && token) {
+      try {
+        const response = await apiService.request('POST', '/messages/new', { 
+          content: newMessage, 
+          receiverId: selectedChat.id 
+        }, token);
+        
+        if (response.status) {
+          const newMsg = {
+            id: response.message.id,
+            sender: 'You',
+            content: newMessage,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            type: 'text',
+          };
+          setMessages(prevMessages => [...prevMessages, newMsg]);
+          setNewMessage('');
+          console.log('Message sent successfully');
+        } else {
+          throw new Error(response.msg || 'Failed to send message');
+        }
+      } catch (error) {
+        console.error('Error sending message:', error);
+        toast.error('Failed to send message');
+      }
     }
   };
 
-  const simulateResponse = () => {
-    setIsTyping(true);
-    setTimeout(() => {
-      const responseMsg = {
-        id: messages.length + 2,
-        sender: selectedChat.name,
-        content: "Thanks for your message! I'll get back to you soon.",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: 'text'
-      };
-      setMessages(prev => [...prev, responseMsg]);
-      setIsTyping(false);
-    }, 3000);
+  const startRecording = () => {
+    setIsRecording(true);
+    navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+      mediaRecorderRef.current = new MediaRecorder(stream);
+      mediaRecorderRef.current.start();
+      const audioChunks = [];
+      mediaRecorderRef.current.addEventListener('dataavailable', event => {
+        audioChunks.push(event.data);
+      });
+      mediaRecorderRef.current.addEventListener('stop', () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/mp3' });
+        const audioUrl = URL.createObjectURL(audioBlob);
+        setAudioURL(audioUrl);
+        setIsRecording(false);
+        
+        // Send audio message to the server
+        const formData = new FormData();
+        formData.append('audio', audioBlob);
+        formData.append('receiverId', selectedChat.id);
+        
+        apiService.request('POST', '/messages/audio', formData, token)
+          .then(() => {
+            toast.success('Audio message sent');
+            fetchMessages(); // Refresh messages to include the new audio message
+          })
+          .catch(error => {
+            toast.error('Failed to send audio message');
+          });
+      });
+    });
   };
 
-  const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileType = file.type.split('/')[0];
-      const newMsg = {
-        id: messages.length + 1,
-        sender: 'You',
-        content: '/placeholder.svg?height=300&width=400',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: fileType
-      };
-      setMessages([...messages, newMsg]);
-      setShowAlert(true);
-      toast.success("File uploaded successfully!");
-      setTimeout(() => setShowAlert(false), 3000);
-    }
-  };
-
-  const toggleRecording = () => {
-    setIsRecording(!isRecording);
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    setIsRecording(false);
   };
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
-  const renderMessageContent = (message) => {
-    switch (message.type) {
-      case 'image':
-        return <img src={message.content} alt="Shared-image" className="rounded-lg max-w-sm" />;
-      case 'video':
-        return (
-          <div className="relative group cursor-pointer">
-            <img src={message.content} alt="Video thumbnail" className="rounded-lg max-w-sm" />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Play className="w-12 h-12 text-white" />
-            </div>
-          </div>
-        );
-      case 'audio':
-        return (
-          <div className="flex items-center space-x-2 bg-[#F0D4D0]/10 rounded-full p-2 cursor-pointer">
-            <Play className="w-8 h-8 text-[#F0D4D0]" />
-            <div className="h-1 bg-[#F0D4D0] rounded-full flex-grow"></div>
-            <span className="text-sm text-[#F0D4D0]">{message.content}</span>
-          </div>
-        );
-      default:
-        return <p>{message.content}</p>;
-    }
-  };
-
   return (
-    <div className="flex h-screen bg-white text-black">
+    <div className="flex h-screen bg-gray-100">
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -162,33 +169,25 @@ const MessageInterface = () => {
                 <Input
                   type="text"
                   placeholder="Search chats"
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F0D4D0]"
+                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none"
                 />
               </div>
             </div>
             <div className="overflow-y-auto h-[calc(100vh-80px)]">
-              {chats.map(chat => (
+              {users.map(user => (
                 <div
-                  key={chat.id}
-                  className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer transition-colors duration-200 ${
-                    selectedChat?.id === chat.id ? 'bg-gray-100' : ''
+                  key={user.id}
+                  className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer ${
+                    selectedChat?.id === user.id ? 'bg-gray-100' : ''
                   }`}
-                  onClick={() => setSelectedChat(chat)}
+                  onClick={() => setSelectedChat(user)}
                 >
                   <Avatar className="w-12 h-12 mr-4">
-                    <AvatarImage src={`/placeholder.svg?height=48&width=48&text=${chat.name.charAt(0)}`} />
+                    <AvatarImage src={user.photoUrl} alt={`${user.firstname} ${user.lastname}`} />
                   </Avatar>
-                  <div className="flex-grow">
-                    <h3 className="font-semibold text-gray-900">{chat.name}</h3>
-                    <p className="text-sm text-gray-500">{chat.lastMessage}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-xs text-gray-400">{chat.time}</p>
-                    {chat.unread > 0 && (
-                      <span className="bg-[#F0D4D0] text-white text-xs rounded-full px-2 py-1 mt-1 inline-block">
-                        {chat.unread}
-                      </span>
-                    )}
+                  <div>
+                    <h3 className="font-semibold">{user.firstname} {user.lastname}</h3>
+                    <p className="text-sm text-gray-500">Last message...</p>
                   </div>
                 </div>
               ))}
@@ -198,115 +197,59 @@ const MessageInterface = () => {
       </AnimatePresence>
 
       <div className="flex-grow flex flex-col">
-        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <div className="flex items-center">
-            <Button variant="ghost" className="mr-4 text-gray-600 hover:bg-gray-100" onClick={() => console.log('Navigate to feed')}>
-              <ArrowLeft className="w-6 h-6" />
-            </Button>
-            <Button variant="ghost" onClick={toggleSidebar} className="mr-4 text-gray-600 hover:bg-gray-100">
-              {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
-            </Button>
-            <h2 className="text-xl font-semibold text-gray-900">{selectedChat?.name}</h2>
-          </div>
-          <div className="flex space-x-4">
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Phone className="w-6 h-6" /></Button>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Video className="w-6 h-6" /></Button>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><MoreVertical className="w-6 h-6" /></Button>
-          </div>
+        <div className="bg-white border-b border-gray-200 p-4 flex items-center">
+          <Button variant="ghost" onClick={toggleSidebar} className="mr-4">
+            {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
+          </Button>
+          <h2 className="text-xl font-semibold">
+            {selectedChat ? `${selectedChat.firstname} ${selectedChat.lastname}` : 'Select a chat'}
+          </h2>
         </div>
 
-        <div className="flex-grow overflow-y-auto p-4 bg-gray-50">
+        <div className="flex-grow overflow-y-auto p-4">
           {messages.map((message) => (
-            <motion.div
+            <div
               key={message.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className={`flex mb-4 ${
-                message.sender === 'You' ? 'justify-end' : 'justify-start'
-              }`}
+              className={`flex mb-4 ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}
             >
-              <div
-                className={`max-w-xs md:max-w-md ${
-                  message.sender === 'You'
-                    ? 'bg-[#F0D4D0] text-white rounded-l-lg rounded-br-lg'
-                    : 'bg-white text-gray-900 rounded-r-lg rounded-bl-lg'
-                } p-3 shadow-lg`}
+              <div className={`max-w-xs md:max-w-md ${
+                message.sender === 'You' 
+                  ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg' 
+                  : 'bg-white text-gray-800 rounded-r-lg rounded-bl-lg'
+              } p-3 shadow`}
               >
-                <p className="font-semibold mb-1">{message.sender}</p>
-                {renderMessageContent(message)}
-                <p className="text-xs mt-1 text-right opacity-70">
-                  {message.time}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-          {isTyping && (
-            <div className="flex justify-start mb-4">
-              <div className="bg-white rounded-lg p-3 shadow-lg">
-                <p className="text-[#F0D4D0]">Typing...</p>
+                {message.type === 'text' ? (
+                  <p>{message.content}</p>
+                ) : (
+                  <audio controls src={message.content} />
+                )}
+                <p className="text-xs mt-1 text-right opacity-70">{message.time}</p>
               </div>
             </div>
-          )}
+          ))}
           <div ref={messagesEndRef} />
         </div>
 
         <div className="bg-white border-t border-gray-200 p-4">
-          <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={() => fileInputRef.current.click()} className="text-gray-600 hover:bg-gray-100">
-              <Paperclip className="w-5 h-5" />
-            </Button>
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              onChange={handleFileUpload}
-              accept="image/*,video/*,audio/*"
-            />
-            <Button variant="ghost" size="icon" onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)} className="text-gray-600 hover:bg-gray-100">
-              <Smile className="w-5 h-5" />
-            </Button>
+          <div className="flex items-center">
             <Input
               type="text"
+              placeholder="Type a message..."
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message"
-              className="flex-grow bg-white text-gray-900 border-gray-300 focus:ring-[#F0D4D0]"
+              className="flex-grow mr-4"
+              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             />
-            <Button
-              variant={isRecording ? "destructive" : "secondary"}
-              size="icon"
-              onClick={isRecording ? handleSendMessage : toggleRecording}
-              className={isRecording ? "bg-red-500 hover:bg-red-600" :   "bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white"}
-            >
-              {isRecording ? (
-                <div className="flex items-center">
-                  <Pause className="w-5 h-5" />
-                  <span className="ml-2">{recordingDuration}s</span>
-                </div>
-              ) : (
-                <Mic className="w-5 h-5" />
-              )}
-            </Button>
-            <Button onClick={handleSendMessage} className="bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white">
+            <Button onClick={handleSendMessage} className="mr-2">
               <Send className="w-5 h-5" />
+            </Button>
+            <Button onClick={isRecording ? stopRecording : startRecording} className="mr-2">
+              {isRecording ? <StopCircle className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
             </Button>
           </div>
         </div>
       </div>
-
-      <ToastContainer
-        position="bottom-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-        theme="light"
-      />
+      <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
     </div>
   );
 };
