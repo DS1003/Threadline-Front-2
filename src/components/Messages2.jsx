@@ -7,162 +7,97 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/Avatar"
 import { Card, CardContent } from "./ui/Card"
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-// Removed import Link from 'next/link';
 
 const MessageInterface = () => {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
-  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
-  const [selectedChat, setSelectedChat] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([
+    { id: 1, sender: 'John Doe', content: 'Bonjour !', time: '10:30 AM' },
+    { id: 2, sender: 'You', content: 'Salut John, comment ça va ?', time: '10:31 AM' },
+    { id: 3, sender: 'John Doe', content: 'Ça va bien, merci ! Et toi ?', time: '10:32 AM' },
+    { id: 4, sender: 'You', content: 'Très bien aussi, merci !', time: '10:33 AM' },
+  ]);
+  const [newMessage, setNewMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingDuration, setRecordingDuration] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const [showAlert, setShowAlert] = useState(false);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
+  
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
   const chats = [
-    { id: 1, name: 'Real estate deals', unread: 3, lastMessage: 'New property listing!', time: '11:45 AM' },
-    { id: 2, name: 'Kate Johnson', unread: 0, lastMessage: 'Thanks for the update', time: '10:30 AM' },
-    { id: 3, name: 'Tamara Shevchenko', unread: 1, lastMessage: 'Meeting at 3 PM?', time: 'Yesterday' },
-    { id: 4, name: 'Joshua Clarkson', unread: 0, lastMessage: 'Contract signed!', time: 'Yesterday' },
-    { id: 5, name: 'Jeroen Zoet', unread: 2, lastMessage: 'New market analysis', time: 'Monday' },
+    { id: 1, name: 'John Doe', lastMessage: 'Très bien aussi, merci !', time: '10:33 AM', unread: 0 },
+    { id: 2, name: 'Jane Smith', lastMessage: 'On se voit demain ?', time: '11:45 AM', unread: 2 },
+    { id: 3, name: 'Alice Johnson', lastMessage: 'N\'oublie pas la réunion', time: '12:15 PM', unread: 1 },
   ];
 
   useEffect(() => {
-    setSelectedChat(chats[0]);
-    setMessages([
-      { id: 1, sender: 'Kate Johnson', content: "Hi everyone, let's start the call soon!", time: '11:24 AM', type: 'text' },
-      { id: 2, sender: 'Kate Johnson', content: 'Recently I saw properties in a great location that I did not pay attention to before 😊', time: '11:24 AM', type: 'text' },
-      { id: 3, sender: 'Evan Scott', content: "Ooo, why don't you say something more", time: '11:34 AM', type: 'text' },
-      { id: 4, sender: 'Evan Scott', content: '@Kate ? 😉', time: '11:34 AM', type: 'text' },
-      { id: 5, sender: 'You', content: 'She creates an atmosphere of mystery 😄', time: '11:36 AM', type: 'text' },
-      { id: 6, sender: 'Evan Scott', content: "Kate, don't be like that and say something more :)", time: '11:44 AM', type: 'text' },
-      { id: 7, sender: 'You', content: '/placeholder.svg?height=300&width=400', time: '11:50 AM', type: 'image' },
-      { id: 8, sender: 'Kate Johnson', content: '/placeholder.svg?height=300&width=400', time: '11:55 AM', type: 'video' },
-    ]);
+    // Sélectionner le premier chat par défaut
+    if (chats.length > 0 && !selectedChat) {
+      setSelectedChat(chats[0]);
+    }
   }, []);
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  useEffect(() => {
-    let interval;
-    if (isRecording) {
-      interval = setInterval(() => {
-        setRecordingDuration(prev => prev + 1);
-      }, 1000);
-    } else {
-      setRecordingDuration(0);
-    }
-    return () => clearInterval(interval);
-  }, [isRecording]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   const handleSendMessage = () => {
-    if (newMessage.trim() !== '' || isRecording) {
+    if (newMessage.trim() !== '') {
       const newMsg = {
         id: messages.length + 1,
         sender: 'You',
-        content: isRecording ? `Audio message (${recordingDuration}s)` : newMessage,
+        content: newMessage,
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: isRecording ? 'audio' : 'text'
       };
       setMessages([...messages, newMsg]);
       setNewMessage('');
-      setIsRecording(false);
-      setRecordingDuration(0);
-      simulateResponse();
     }
-  };
-
-  const simulateResponse = () => {
-    setIsTyping(true);
-    setTimeout(() => {
-      const responseMsg = {
-        id: messages.length + 2,
-        sender: selectedChat.name,
-        content: "Thanks for your message! I'll get back to you soon.",
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: 'text'
-      };
-      setMessages(prev => [...prev, responseMsg]);
-      setIsTyping(false);
-    }, 3000);
   };
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const fileType = file.type.split('/')[0];
-      const newMsg = {
-        id: messages.length + 1,
-        sender: 'You',
-        content: '/placeholder.svg?height=300&width=400',
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        type: fileType
-      };
-      setMessages([...messages, newMsg]);
-      setShowAlert(true);
-      toast.success("File uploaded successfully!");
-      setTimeout(() => setShowAlert(false), 3000);
-    }
+    console.log('File uploaded:', event.target.files[0]);
+    toast.info('Fichier téléchargé avec succès !');
   };
 
   const toggleRecording = () => {
     setIsRecording(!isRecording);
-  };
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-
-  const renderMessageContent = (message) => {
-    switch (message.type) {
-      case 'image':
-        return <img src={message.content} alt="Shared-image" className="rounded-lg max-w-sm" />;
-      case 'video':
-        return (
-          <div className="relative group cursor-pointer">
-            <img src={message.content} alt="Video thumbnail" className="rounded-lg max-w-sm" />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Play className="w-12 h-12 text-white" />
-            </div>
-          </div>
-        );
-      case 'audio':
-        return (
-          <div className="flex items-center space-x-2 bg-[#F0D4D0]/10 rounded-full p-2 cursor-pointer">
-            <Play className="w-8 h-8 text-[#F0D4D0]" />
-            <div className="h-1 bg-[#F0D4D0] rounded-full flex-grow"></div>
-            <span className="text-sm text-[#F0D4D0]">{message.content}</span>
-          </div>
-        );
-      default:
-        return <p>{message.content}</p>;
+    if (!isRecording) {
+      setRecordingDuration(0);
+      // Logique de démarrage d'enregistrement ici
+    } else {
+      // Logique d'arrêt d'enregistrement et d'envoi de message audio ici
+      toast.info('Enregistrement audio envoyé !');
     }
   };
 
+  const renderMessageContent = (message) => {
+    // Pour l'instant, nous affichons simplement le contenu texte
+    return <p>{message.content}</p>;
+  };
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   return (
-    <div className="flex h-screen bg-white text-black">
+    <div className="flex h-screen bg-white text-[#4A4A4A]">
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
             initial={{ x: -300 }}
             animate={{ x: 0 }}
             exit={{ x: -300 }}
-            className="w-80 bg-white border-r border-gray-200"
+            className="w-80 bg-white border-r border-gray-200 shadow-md"
           >
             <div className="p-4">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#CC8C87]" />
                 <Input
                   type="text"
-                  placeholder="Search chats"
-                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F0D4D0]"
+                  placeholder="Rechercher des conversations"
+                  className="w-full pl-10 pr-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#CC8C87] text-[#4A4A4A]"
                 />
               </div>
             </div>
@@ -171,21 +106,21 @@ const MessageInterface = () => {
                 <div
                   key={chat.id}
                   className={`flex items-center p-4 hover:bg-gray-100 cursor-pointer transition-colors duration-200 ${
-                    selectedChat?.id === chat.id ? 'bg-gray-100' : ''
+                    selectedChat?.id === chat.id ? 'bg-[#CC8C87]/10' : ''
                   }`}
                   onClick={() => setSelectedChat(chat)}
                 >
                   <Avatar className="w-12 h-12 mr-4">
-                    <AvatarImage src={`/placeholder.svg?height=48&width=48&text=${chat.name.charAt(0)}`} />
+                    <AvatarImage src={`/api/placeholder/48/48?text=${chat.name.charAt(0)}`} />
                   </Avatar>
                   <div className="flex-grow">
-                    <h3 className="font-semibold text-gray-900">{chat.name}</h3>
+                    <h3 className="font-semibold text-[#4A4A4A]">{chat.name}</h3>
                     <p className="text-sm text-gray-500">{chat.lastMessage}</p>
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-gray-400">{chat.time}</p>
                     {chat.unread > 0 && (
-                      <span className="bg-[#F0D4D0] text-white text-xs rounded-full px-2 py-1 mt-1 inline-block">
+                      <span className="bg-[#CC8C87] text-white text-xs rounded-full px-2 py-1 mt-1 inline-block">
                         {chat.unread}
                       </span>
                     )}
@@ -198,20 +133,20 @@ const MessageInterface = () => {
       </AnimatePresence>
 
       <div className="flex-grow flex flex-col">
-        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between shadow-sm">
           <div className="flex items-center">
-            <Button variant="ghost" className="mr-4 text-gray-600 hover:bg-gray-100" onClick={() => console.log('Navigate to feed')}>
+            <Button variant="ghost" className="mr-4 text-[#4A4A4A] hover:bg-[#CC8C87]/10" onClick={() => console.log('Navigate to feed')}>
               <ArrowLeft className="w-6 h-6" />
             </Button>
-            <Button variant="ghost" onClick={toggleSidebar} className="mr-4 text-gray-600 hover:bg-gray-100">
+            <Button variant="ghost" onClick={toggleSidebar} className="mr-4 text-[#4A4A4A] hover:bg-[#CC8C87]/10">
               {isSidebarOpen ? <ChevronLeft /> : <ChevronRight />}
             </Button>
-            <h2 className="text-xl font-semibold text-gray-900">{selectedChat?.name}</h2>
+            <h2 className="text-xl font-semibold text-[#4A4A4A]">{selectedChat?.name}</h2>
           </div>
           <div className="flex space-x-4">
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Phone className="w-6 h-6" /></Button>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><Video className="w-6 h-6" /></Button>
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:bg-gray-100"><MoreVertical className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="text-[#CC8C87] hover:bg-[#CC8C87]/10"><Phone className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="text-[#CC8C87] hover:bg-[#CC8C87]/10"><Video className="w-6 h-6" /></Button>
+            <Button variant="ghost" size="icon" className="text-[#CC8C87] hover:bg-[#CC8C87]/10"><MoreVertical className="w-6 h-6" /></Button>
           </div>
         </div>
 
@@ -229,9 +164,9 @@ const MessageInterface = () => {
               <div
                 className={`max-w-xs md:max-w-md ${
                   message.sender === 'You'
-                    ? 'bg-[#F0D4D0] text-white rounded-l-lg rounded-br-lg'
-                    : 'bg-white text-gray-900 rounded-r-lg rounded-bl-lg'
-                } p-3 shadow-lg`}
+                    ? 'bg-[#CC8C87] text-white rounded-l-lg rounded-br-lg'
+                    : 'bg-white text-[#4A4A4A] rounded-r-lg rounded-bl-lg border border-gray-200'
+                } p-3 shadow-md`}
               >
                 <p className="font-semibold mb-1">{message.sender}</p>
                 {renderMessageContent(message)}
@@ -243,17 +178,17 @@ const MessageInterface = () => {
           ))}
           {isTyping && (
             <div className="flex justify-start mb-4">
-              <div className="bg-white rounded-lg p-3 shadow-lg">
-                <p className="text-[#F0D4D0]">Typing...</p>
+              <div className="bg-white rounded-lg p-3 shadow-md border border-gray-200">
+                <p className="text-[#CC8C87]">En train d'écrire...</p>
               </div>
             </div>
           )}
           <div ref={messagesEndRef} />
         </div>
 
-        <div className="bg-white border-t border-gray-200 p-4">
+        <div className="bg-white border-t border-gray-200 p-4 shadow-sm">
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" onClick={() => fileInputRef.current.click()} className="text-gray-600 hover:bg-gray-100">
+            <Button variant="ghost" size="icon" onClick={() => fileInputRef.current.click()} className="text-[#CC8C87] hover:bg-[#CC8C87]/10">
               <Paperclip className="w-5 h-5" />
             </Button>
             <input
@@ -263,21 +198,26 @@ const MessageInterface = () => {
               onChange={handleFileUpload}
               accept="image/*,video/*,audio/*"
             />
-            <Button variant="ghost" size="icon" onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)} className="text-gray-600 hover:bg-gray-100">
+            <Button variant="ghost" size="icon" onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)} className="text-[#CC8C87] hover:bg-[#CC8C87]/10">
               <Smile className="w-5 h-5" />
             </Button>
             <Input
               type="text"
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
-              placeholder="Type a message"
-              className="flex-grow bg-white text-gray-900 border-gray-300 focus:ring-[#F0D4D0]"
+              placeholder="Tapez un message"
+              className="flex-grow bg-white text-[#4A4A4A] border-gray-300 focus:ring-[#CC8C87] focus:border-[#CC8C87]"
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  handleSendMessage();
+                }
+              }}
             />
             <Button
               variant={isRecording ? "destructive" : "secondary"}
               size="icon"
               onClick={isRecording ? handleSendMessage : toggleRecording}
-              className={isRecording ? "bg-red-500 hover:bg-red-600" :   "bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white"}
+              className={isRecording ? "bg-red-500 hover:bg-red-600" : "bg-[#CC8C87] hover:bg-[#CC8C87]/90 text-white"}
             >
               {isRecording ? (
                 <div className="flex items-center">
@@ -288,7 +228,7 @@ const MessageInterface = () => {
                 <Mic className="w-5 h-5" />
               )}
             </Button>
-            <Button onClick={handleSendMessage} className="bg-[#F0D4D0] hover:bg-[#F0D4D0]/90 text-white">
+            <Button onClick={handleSendMessage} className="bg-[#CC8C87] hover:bg-[#CC8C87]/90 text-white">
               <Send className="w-5 h-5" />
             </Button>
           </div>
