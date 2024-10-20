@@ -198,7 +198,7 @@ const Navbar = ({ user = null }) => {
           {/* Logo and Search */}
           <div className="flex items-center flex-1">
             <NavLink to="/feed" className="flex-shrink-0 mr-4">
-              <span className="titreSite text-2xl md:text-4xl font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
+              <span className="titreSite text-2xl md:text-4xl   font-bold z-20 bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7] text-transparent bg-clip-text">Threadline</span>
             </NavLink>
             <div className="relative hidden md:block max-w-xs w-full">
               <input
