@@ -1,174 +1,164 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin, MoreHorizontal, Plus, User, Heart, Image as ImageIcon, Users, Twitter, Facebook, Instagram, Youtube, Twitch, Share2 } from 'lucide-react';
+import { MapPin, User, Heart, Image as ImageIcon, Users, Twitter, Facebook, Instagram, Youtube, Twitch, Share2, Edit, Settings, Camera } from 'lucide-react';
+
+// Composants fictifs - vous devrez les implémenter ou les remplacer par vos propres composants
+import UserInfo from './ui/UserInfo';
+import UserPosts from './ui/UserPosts';
+import InstagramStyleFavorites from './ui/InstagramStyleFavorites';
+import UserMeasurements from './ui/UserMeasurements';
+import UpdateRoleUser from './ui/UpdateRoleUser';
+import FriendsList from './ui/FriendList';
 
 const ProfilePage2 = () => {
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('posts');
+  const [activeTab, setActiveTab] = useState('info');
 
   useEffect(() => {
-    // Simulating user data fetch
-    setUser({
-      name: 'Marina Valentine',
-      username: '@marina_valentine',
-      role: 'Lead Product Designer at Apple',
-      location: 'Los Angeles, California',
-      followers: 930,
-      posts: 82,
-      likes: '5.7k',
-      coverPhoto: 'https://maishabeautyproducts.com/cdn/shop/files/Aesthetic_Minimal_Brand_Photo_Collage_Grid_Instagram_Post_3.png?v=1724042666'
-    });
+    const userFromStorage = localStorage.getItem('user');
+    if (userFromStorage) {
+      try {
+        const parsedUser = JSON.parse(userFromStorage);
+        setUser(parsedUser);
+      } catch (error) {
+        console.error("Erreur lors du parsing de l'utilisateur depuis le localStorage", error);
+      }
+    }
   }, []);
 
-  const tabs = [
-    { icon: <ImageIcon className="w-5 h-5" />, label: "Posts", value: "posts" },
-    { icon: <User className="w-5 h-5" />, label: "Info", value: "info" },
-    { icon: <Heart className="w-5 h-5" />, label: "Favorites", value: "favorites" },
-    { icon: <Users className="w-5 h-5" />, label: "Friends", value: "friends" },
-  ];
+  const coverPhoto = 'https://res.cloudinary.com/drxouwbms/image/upload/v1728761058/cgkho4rmytr3vizj7efa.png';
 
-  const badges = [
-    { color: 'bg-yellow-400', icon: '🏆' },
-    { color: 'bg-purple-500', icon: '🎮' },
-    { color: 'bg-green-500', icon: '🌟' },
-    { color: 'bg-blue-500', icon: '💎' },
-    { color: 'bg-gray-00', icon: '❤️' },
+  const isTailorOrSeller = user?.roles?.some(role => role.name === 'TAILOR' || role.name === 'SELLER');
+
+  const tabs = [
+    { icon: <User className="w-5 h-5" />, label: "Infos", value: "info" },
+    { icon: <Heart className="w-5 h-5" />, label: "Favoris", value: "favorites" },
+    { icon: <ImageIcon className="w-5 h-5" />, label: "Posts", value: "posts" },
+    { icon: <Users className="w-5 h-5" />, label: "Amis", value: "friends" },
   ];
 
   const socialIcons = [
-    { Icon: Facebook, color: 'text-blue-600' },
-    { Icon: Twitter, color: 'text-blue-400' },
-    { Icon: Instagram, color: 'text-pink-600' },
-    { Icon: Youtube, color: 'text-red-600' },
-    { Icon: Twitch, color: 'text-purple-600' },
+    { Icon: Facebook, color: 'text-blue-600', bg: 'bg-blue-100' },
+    { Icon: Twitter, color: 'text-blue-400', bg: 'bg-blue-50' },
+    { Icon: Instagram, color: 'text-pink-600', bg: 'bg-pink-100' },
+    { Icon: Youtube, color: 'text-red-600', bg: 'bg-red-100' },
+    { Icon: Twitch, color: 'text-purple-600', bg: 'bg-purple-100' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8">
-      <div className="container mx-auto px-4">
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-[#CC8C87] to-[#E6A8A1] py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto">
+        <div className="bg-white rounded-3xl shadow-2xl overflow-hidden transform transition-all duration-300 hover:scale-[1.02]">
           {/* Profile Header */}
-          <div className="relative">
-            <div className="h-64 bg-cover bg-center" style={{ backgroundImage: `url(${user?.coverPhoto})` }}></div>
-            <div className="absolute bottom-0 left-8 transform translate-y-1/2 flex items-end">
-              <img src="/placeholder.svg?height=120&width=120" alt="Profile" className="w-32 h-32 rounded-full border-4 border-white" />
-              <div className="ml-4 mb-4">
-                <h1 className="text-3xl font-bold text-white shadow-text">{user?.name}</h1>
-                <p className="text-xl text-white shadow-text">{user?.username}</p>
+          <div className="relative h-80 sm:h-96">
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url(${coverPhoto})` }}>
+              <div className="absolute inset-0 bg-black bg-opacity-30"></div>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 flex flex-col sm:flex-row items-center sm:items-end justify-between">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end mb-4 sm:mb-0">
+                <div className="relative">
+                  <img src={user?.profilePicture || "/placeholder.svg?height=120&width=120"} alt="Profile" className="w-32 h-32 rounded-full border-4 border-white object-cover shadow-lg" />
+                  <button className="absolute bottom-0 right-0 bg-white rounded-full p-2 shadow-lg">
+                    <Camera size={20} className="text-gray-600" />
+                  </button>
+                </div>
+                <div className="ml-0 sm:ml-6 mt-4 sm:mt-0 text-center sm:text-left">
+                  <h1 className="text-4xl font-bold text-white shadow-text">{user?.name}</h1>
+                  <p className="text-xl text-white shadow-text mt-1">{user?.username}</p>
+                </div>
+              </div>
+              <div className="flex space-x-3">
+                <button className="px-6 py-3 bg-white text-[#CC8C87] rounded-full font-semibold transition-all duration-300 hover:bg-opacity-90 hover:shadow-lg">
+                  Edit Profile
+                </button>
+                <button className="p-3 bg-white rounded-full hover:bg-gray-100 transition-all duration-300 shadow-lg">
+                  <Share2 size={20} className="text-gray-600" />
+                </button>
               </div>
             </div>
           </div>
 
-          <div className="pt-24 px-8 pb-8">
-            <div className="flex justify-between items-start">
+          <div className="px-6 sm:px-8 py-8">
+            <div className="flex flex-wrap justify-between items-center mb-8">
               <div>
-                <p className="text-gray-600">{user?.role}</p>
-                <div className="flex items-center text-sm text-gray-500 mt-1">
-                  <MapPin size={16} className="mr-1" />
+                <p className="text-xl text-gray-700 font-medium">{user?.role}</p>
+                <div className="flex items-center text-gray-500 mt-2">
+                  <MapPin size={18} className="mr-2" />
                   <span>{user?.location}</span>
                 </div>
-                <div className="flex items-center mt-4 space-x-4">
-                  <div className="text-center">
-                    <p className="font-bold text-xl">{user?.posts}</p>
-                    <p className="text-gray-500">posts</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-xl">{user?.followers}</p>
-                    <p className="text-gray-500">followers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-bold text-xl">{user?.likes}</p>
-                    <p className="text-gray-500">likes</p>
-                  </div>
-                </div>
               </div>
-              <div className="flex space-x-2">
-                <button className="px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 font-semibold">
-                  Add Friend +
-                </button>
-                <button className="p-2 border border-gray-300 rounded-full hover:bg-gray-100">
-                  <Share2 size={20} />
-                </button>
+              <div className="flex mt-4 sm:mt-0 space-x-3">
+                {socialIcons.map(({ Icon, color, bg }, index) => (
+                  <button key={index} className={`p-3 ${bg} rounded-full transition-all duration-300 hover:shadow-md`}>
+                    <Icon size={20} className={`${color}`} />
+                  </button>
+                ))}
               </div>
-            </div>
-
-            {/* Social Icons */}
-            <div className="flex mt-6 space-x-4">
-              {socialIcons.map(({ Icon, color }, index) => (
-                <Icon key={index} size={24} className={`${color} cursor-pointer`} />
-              ))}
             </div>
 
             {/* Tabs */}
-            <div className="mt-8">
-              <div className="flex border-b">
+            <div className="mb-8">
+              <div className="bg-gray-100 rounded-full p-1 flex">
                 {tabs.map((tab) => (
                   <button
                     key={tab.value}
-                    className={`flex items-center justify-center px-6 py-3 font-semibold transition-all duration-300 ${activeTab === tab.value
-                      ? 'border-b-2 border-blue-500 text-blue-500'
-                      : 'text-gray-500 hover:text-gray-700'
-                      }`}
+                    className={`flex-1 flex items-center justify-center px-4 py-3 rounded-full transition-all duration-300 ${
+                      activeTab === tab.value
+                        ? 'bg-gradient-to-r from-[#CC8C87] to-[#E6A8A1] text-white shadow-lg'
+                        : 'text-gray-600 hover:bg-gray-200'
+                    }`}
                     onClick={() => setActiveTab(tab.value)}
                   >
                     {tab.icon}
-                    <span className="ml-2">{tab.label}</span>
+                    <span className="ml-2 font-medium">{tab.label}</span>
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Tab Content */}
-            <div className="mt-8">
-              {activeTab === 'posts' && (
-                <div className="grid grid-cols-3 gap-4">
-                  {[...Array(6)].map((_, index) => (
-                    <div key={index} className="bg-gray-200 aspect-square rounded-lg"></div>
-                  ))}
-                </div>
-              )}
+            <div className="bg-gray-50 rounded-2xl p-6 shadow-inner">
               {activeTab === 'info' && (
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">About Me</h3>
-                  <p>
-                    Nothing to display
-                  </p>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-1">
+                    <UserInfo user={user} />
+                  </div>
+                  <div className="lg:col-span-2">
+                    <div className="space-y-8">
+                      {!isTailorOrSeller && <UpdateRoleUser user={user} setUser={setUser} />}
+                      <UserMeasurements user={user} />
+                    </div>
+                  </div>
                 </div>
               )}
-              {
-                activeTab === 'favorites' && (
-                  <div>
-                    <h3 className="text-xl font-semibold mb-4">Favorites</h3>
-                    <p>No favorites yet.</p>
-                  </div>
-                )
-              }
+
+              {activeTab === 'favorites' && (
+                <InstagramStyleFavorites userId={user?.id} />
+              )}
+
+              {activeTab === 'posts' && (
+                <UserPosts userId={user?.id} />
+              )}
+
               {activeTab === 'friends' && (
-                <div>
-                  <h3 className="text-xl font-semibold mb-4">Friends</h3>
-                  <p>No friends yet.</p>
-                </div>
+                <FriendsList userId={user?.id} showUnfollowButton={true} />
               )}
             </div>
           </div>
         </div>
 
-        {/* Sidebar */}
-        <div className="mt-8 bg-white rounded-2xl shadow-xl p-6">
-          <h2 className="text-xl font-semibold mb-4">Badges</h2>
-          <div className="flex flex-wrap gap-2">
-            {badges.map((badge, index) => (
-              <div key={index} className={`${badge.color} w-12 h-12 rounded-full flex items-center justify-center text-2xl`}>
-                {badge.icon}
-              </div>
-            ))}
-          </div>
-
-          <h2 className="text-xl font-semibold mt-8 mb-4">Friends</h2>
-          <div className="grid grid-cols-3 gap-4">
-            {[...Array(6)].map((_, index) => (
-              <div key={index} className="text-center">
-                <img src="/placeholder.svg?height=60&width=60" alt={`Friend ${index + 1}`} className="w-12 h-12 rounded-full mx-auto" />
-                <p className="mt-2 text-sm">Friend {index + 1}</p>
+        {/* Statistics */}
+        <div className="mt-8 bg-white rounded-2xl shadow-xl p-6 transform transition-all duration-300 hover:scale-[1.02]">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800">Statistiques</h2>
+          <div className="grid grid-cols-3 gap-6">
+            {[
+              { label: 'Posts', value: user?.posts?.length || 0, icon: <ImageIcon size={24} className="text-blue-500" /> },
+              { label: 'Followers', value: user?.followers?.length || 0, icon: <Users size={24} className="text-green-500" /> },
+              { label: 'Likes', value: user?.likes || '0', icon: <Heart size={24} className="text-red-500" /> }
+            ].map(({ label, value, icon }) => (
+              <div key={label} className="bg-gray-50 rounded-xl p-6 text-center shadow-md hover:shadow-lg transition-shadow duration-300">
+                {icon}
+                <p className="font-bold text-3xl mt-2 text-gray-800">{value}</p>
+                <p className="text-gray-600 mt-1">{label}</p>
               </div>
             ))}
           </div>

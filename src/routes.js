@@ -10,10 +10,11 @@ const MainFeed = lazy(() => import('./components/MAinFeed'));
 const Login = lazy(() => import('./components/Login'));
 const ProfilePage = lazy(() => import('./components/ui/ProfilePage'));
 const ProfilePageBis = lazy(() => import('./components/ui/ProfilePageBis'));
-const MessagingPage = lazy(() => import('./components/Messaging'));
 const Register = lazy(() => import('./components/Register'));
 const Messages = lazy(() => import('./components/Messages2'));
 const ProfilePage2 = lazy(() => import('./components/ProfilePage2'));
+const VendeurProfile = lazy(() => import('./components/VendeurProfile'));
+const ShoppingCart = lazy(() => import('./components/ShoppingCart'));
 
 const AppRoutes = () => {
   
@@ -32,6 +33,8 @@ const AppRoutes = () => {
         <Route path="/messages" element={<MessageInterface />} />
         <Route path="/messages2" element={<Messages />} />
         <Route path="/profile2" element={<ProfilePage2 />} />
+        <Route path="/vendeurProfile" element={<VendeurProfile />} />
+        <Route path="/shoppingCart" element={<ShoppingCart />} />
       </Routes>
     </Suspense>
   );

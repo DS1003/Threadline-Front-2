@@ -17,7 +17,8 @@ import {
   UserPlus,
   MessageCircle,
   Flag,
-  Edit
+  Edit,
+  ShoppingCart
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AiOutlineHeart, AiOutlineComment, AiOutlineMail } from 'react-icons/ai';
@@ -41,22 +42,6 @@ const Navbar = ({ user = null }) => {
   const handleProfileClick = () => {
     navigate('/profile');
   };
-
-  /*const notifications = {
-    all: [
-      { id: 1, type: 'message', user: 'Alice Durand', content: 'vous a envoyé un message', time: '5 min ago', userImage: '/placeholder.svg?height=40&width=40' },
-      { id: 2, type: 'abonnement', user: 'Bob Martin', content: 's\'est abonné à vous', time: '30 min ago', userImage: '/placeholder.svg?height=40&width=40' },
-      { id: 3, type: 'report', user: 'Charlie Dupont', content: 'a signalé votre publication', time: '1 h ago', userImage: '/placeholder.svg?height=40&width=40' },
-      { id: 4, type: 'like', users: ['David Lefebvre', 'Emma Moreau'], othersCount: 3, content: 'ont aimé votre publication', time: '2 h ago', userImages: ['/placeholder.svg?height=40&width=40', '/placeholder.svg?height=40&width=40'] },
-      { id: 5, type: 'comment', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' },
-    ],
-    comments: [{ id: 5, type: 'comment', user: 'Franck Dubois', content: 'a commenté votre publication', time: '3 h ago', userImage: '/placeholder.svg?height=40&width=40' }],
-    likes: [],
-    messages: [],
-    follows: [],
-    reports: [],
-
-  };*/
 
   useEffect(() => {
     const handleScroll = () => {
@@ -149,42 +134,11 @@ const Navbar = ({ user = null }) => {
         : 'text-[#77696A] hover:text-[#CC8C87]'
         }`}
     >
-       {icon && <span>{icon}</span>}
+      {icon && <span>{icon}</span>}
       <span className="capitalize">{type} </span>
       {count > 0 && <span className="ml-1 text-xs bg-[#CC8C87] text-white rounded-full px-2 py-1">{count}</span>}
     </button>
   );
-
-  // const NotificationItem = ({ notification }) => (
-  //   <div className="py-3 px-4 border-b border-gray-200 hover:bg-[#FDF1F2] transition-colors duration-200">
-  //     <div className="flex items-start">
-  //       <div className="flex-shrink-0 mr-3">
-  //         {notification.type === 'like' ? (
-  //           <div className="relative w-10 h-10">
-  //             <img src={notification.userImages[0]} alt="" className="w-8 h-8 rounded-full absolute top-0 left-0" />
-  //             <img src={notification.userImages[1]} alt="" className="w-8 h-8 rounded-full absolute bottom-0 right-0" />
-  //           </div>
-  //         ) : (
-  //           <img src={notification.userImage} alt="" className="w-10 h-10 rounded-full" />
-  //         )}
-  //       </div>
-  //       <div className="flex-grow min-w-0">
-  //         <p className="text-sm text-[#242424]">
-  //           <span className="font-semibold">
-  //             {notification.type === 'like'
-  //               ? `${notification.users[0]}, ${notification.users[1]} et ${notification.othersCount} autres `
-  //               : `${notification.user} `}
-  //           </span>
-  //           {notification.content}
-  //         </p>
-  //         <p className="mt-1 text-xs text-[#77696A]">{notification.time}</p>
-  //       </div>
-  //       <div className="flex-shrink-0 ml-3">
-  //         {getNotificationIcon(notification.type)}
-  //       </div>
-  //     </div>
-  //   </div>
-  // );
 
   return (
     <motion.nav
@@ -215,6 +169,8 @@ const Navbar = ({ user = null }) => {
             <NavItem to="/feed" icon={Layout} />
             <NavItem to="/network" icon={Users} />
             <NavItem to="/messages" icon={Mail} notificationCount={3} />
+            {/* //shopping Cart */}
+
             <div className="relative">
               <button
                 onClick={() => setIsNotificationsOpen(!isNotificationsOpen)}
@@ -260,7 +216,7 @@ const Navbar = ({ user = null }) => {
                         />
                         <NotificationTab
                           type="Commentaires"
-                          icon={<AiOutlineComment className="w-5 h-5" />} 
+                          icon={<AiOutlineComment className="w-5 h-5" />}
                           isActive={activeNotificationTab === 'comments'}
                           onClick={() => setActiveNotificationTab('comments')}
                           count={24}
@@ -316,6 +272,7 @@ const Navbar = ({ user = null }) => {
           <div className="flex items-center justify-end flex-1">
             {isAuthenticated ? (
               <>
+                {/* Shopping Cart Icon */}
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -328,7 +285,6 @@ const Navbar = ({ user = null }) => {
                     className="w-8 h-8 rounded-full object-cover mr-2 border-2 border-[#EAB0B7]"
                   />
                   <ChevronDown className="w-4 h-4 text-[#242424]" />
-
                 </motion.button>
 
                 {/* Profile Dropdown */}
@@ -343,8 +299,7 @@ const Navbar = ({ user = null }) => {
                     <div className="px-4 py-3 border-b border-[#EAB0B7] bg-gradient-to-r from-[#CC8C87] to-[#EAB0B7]">
                       <div className="flex items-center">
                         <img
-                          src={user.photoUrl}
-                          alt=""
+                          src={user.photoUrl} alt=""
                           className="w-14 h-14 rounded-full object-cover mr-3 border-2 border-white"
                         />
                         <div>
@@ -384,6 +339,7 @@ const Navbar = ({ user = null }) => {
                     </button>
                   </motion.div>
                 )}
+
               </>
             ) : (
               <motion.div
@@ -399,6 +355,16 @@ const Navbar = ({ user = null }) => {
               </motion.div>
             )}
           </div>
+
+          <motion.button
+            /* Redirige vers shoppinCart.jsx */
+            to="/shopping-cart"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 rounded-xl hover:bg-[#FDF1F2] transition-colors duration-200 mr-2"
+          >
+            <ShoppingCart className="w-6 h-6 text-[#4A4A4A]" />
+          </motion.button>
 
           {/* Mobile menu button */}
           <motion.button
@@ -462,6 +428,11 @@ const Navbar = ({ user = null }) => {
                 <NavLink to="/notifications" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
                   <Bell className="w-5 h-5 mr-3 text-[#CC8C87]" />
                   Notifications
+                </NavLink>
+                {/* Add Shopping Cart to mobile menu */}
+                <NavLink to="/cart" className="flex items-center px-3 py-2 text-[#242424] hover:bg-[#FDF1F2] rounded-md transition-all duration-200">
+                  <ShoppingCart className="w-5 h-5 mr-3 text-[#CC8C87]" />
+                  Panier
                 </NavLink>
               </motion.div>
 
