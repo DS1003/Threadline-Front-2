@@ -51,7 +51,7 @@ export default function CreatePostCard(props) {
         icon: 'success',
         confirmButtonText: 'Ok',
       });
-      
+
       setPostContent('');
       setTags([]);
       setSelectedFile(null);
