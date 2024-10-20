@@ -73,16 +73,14 @@ export default function PostCard({user,post}) {
 
         const data = response.posts.map((post) => {
           const rating = post.rates.length|| 0;
-          console.log(rating);
           let starColor;
 
-          // Déterminer la couleur des étoiles en fonction du rating
           if (rating >= 4) {
-            starColor = 'text-yellow-500'; // Couleur jaune pour 4 étoiles et plus
+            starColor = 'text-yellow-500';
           } else if (rating >= 2) {
-            starColor = 'text-gray-500'; // Couleur grise pour 2 à 3 étoiles
+            starColor = 'text-gray-500'; 
           } else {
-            starColor = 'text-red-500'; // Couleur rouge pour 1 étoile ou moins
+            starColor = 'text-red-500'; 
           }
           return {
             ...post,
@@ -268,8 +266,9 @@ export default function PostCard({user,post}) {
   };
 
   const handleDeletePost = async (postId) => {
+    
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      
       const response = await apiService.request(
         "DELETE",
         `/posts/delete/${postId}`,
@@ -303,7 +302,19 @@ export default function PostCard({user,post}) {
     }
   };
 
+
   const handleEditPost = (post) => {
+
+    const user = JSON.parse(localStorage.getItem('user')); 
+    if (!user || user.id !== post.author.id) { 
+        Swal.fire({
+            icon: 'error',
+            title: 'Accès refusé',
+            text: 'Vous n\'êtes pas autorisé à modifier ce post.',
+        });
+        return; // Arrête l'exécution si l'utilisateur n'est pas l'auteur
+    }
+
     setCurrentPost(post);
     setShowEditModal(true);
   };
@@ -484,27 +495,27 @@ export default function PostCard({user,post}) {
                 </button>
                     <span></span>
                     <button
-  onClick={() => {setCurrentPost(post); setShowRatingModal(true)}}
-  className={`${
-    post.rating > 0 ? "text-yellow-500" : "text-gray-500"
-  } transition-colors duration-200`}
->
-  <div className="flex items-center">
-    <Star
-      className={`w-5 h-5 ${
-        post.rating > 0 ? "fill-current" : ""
-      } transform transition-transform duration-200 ${
-        post.rating > 0 ? "scale-125" : ""
-      }`}
-    />
-    {/* Affichage du nombre d'étoiles à côté de l'icône */}
-    {post.rating > 0 && (
-      <span className="ml-1 text-sm font-medium">
-        {post.rating.toFixed(1)} {/* Nombre d'étoiles affiché avec une décimale */}
-      </span>
-    )}
-  </div>
-</button>
+                      onClick={() => {setCurrentPost(post); setShowRatingModal(true)}}
+                      className={`${
+                        post.rating > 0 ? "text-yellow-500" : "text-gray-500"
+                      } transition-colors duration-200`}
+                    >
+                      <div className="flex items-center">
+                        <Star
+                          className={`w-5 h-5 ${
+                            post.rating > 0 ? "fill-current" : ""
+                          } transform transition-transform duration-200 ${
+                            post.rating > 0 ? "scale-125" : ""
+                          }`}
+                        />
+                        {/* Affichage du nombre d'étoiles à côté de l'icône */}
+                        {post.rating > 0 && (
+                          <span className="ml-1 text-sm font-medium">
+                            {post.rating.toFixed(1)} {/* Nombre d'étoiles affiché avec une décimale */}
+                          </span>
+                        )}
+                      </div>
+                    </button>
 
                 <span></span>
               </div>
