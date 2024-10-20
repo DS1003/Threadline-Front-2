@@ -42,11 +42,10 @@ export default function EditPostModal({ post, onClose, onUpdate }) {
       Swal.fire({
         icon: "error",
         title: "Erreur",
-        text: `Erreur: ${
+        text: ` ${
           error.response ? error.response.data.message : error.message
         }`,
       });
-      console.error('Erreur lors de la modification du post:', error);
       console.log('Une erreur est survenue lors de la modification du post.');
     }
   };

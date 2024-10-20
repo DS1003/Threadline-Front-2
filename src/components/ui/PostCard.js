@@ -30,7 +30,8 @@ import { format } from "date-fns";
 import Swal from "sweetalert2";
 import Loader from "./Loader";
 
-export default function PostCard({ user }) {
+
+export default function PostCard({user,post}) {
   const navigate = useNavigate();
   const handleProfileClick = (userId) => {
     navigate(`/profileBis/${userId}`);
@@ -71,6 +72,16 @@ export default function PostCard({ user }) {
         }
 
         const data = response.posts.map((post) => {
+          const rating = post.rates.length|| 0;
+          let starColor;
+
+          if (rating >= 4) {
+            starColor = 'text-yellow-500';
+          } else if (rating >= 2) {
+            starColor = 'text-gray-500'; 
+          } else {
+            starColor = 'text-red-500'; 
+          }
           return {
             ...post,
             liked: post.postLikes.some((like) => like.userId === user.id),
@@ -78,6 +89,9 @@ export default function PostCard({ user }) {
             commentCount: post.comments.length,
             bookmarked: post.favorites.some((favorite) => favorite.userId === user.id),
             favoriteCount: post._count?.favorites || post.favorites.length || 0,
+            starColor,
+            rating,
+            
           };
         });
 
@@ -92,7 +106,6 @@ export default function PostCard({ user }) {
       fetchPosts();
     }
   }, [reload]);
-
   // Fonction pour forcer le rechargement des posts
   const triggerReload = () => {
     console.log("Dans la fonction trigger reload");
@@ -204,10 +217,43 @@ export default function PostCard({ user }) {
   };
 
 
-  const handleRating = (newRating) => {
-    setRating(newRating);
-    setShowRatingModal(false);
+  const handleRating= async (postId, stars, description) => {
+    
+    try {
+      console.log(`Post ID: ${postId}, Rating: ${rating}, Description: ${description}`);
+      const user = JSON.parse(localStorage.getItem("user"));
+      const response = await apiService.request(
+        "POST",
+        `/rates/create-rate/${postId}`,
+        { stars, description },
+        user.token
+      );
+  
+      // Mise à jour du post dans l'état local après l'évaluation réussie
+      if (response) {
+        setPosts((prevPosts) =>
+          prevPosts.map((post) =>
+            post.id === postId ? { ...post, stars: response.newRating } : post
+          )
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Évaluation réussie",
+          text: "Votre évaluation a été soumise.",
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Erreur",
+        text: ` ${
+          error.response ? error.response.data.message : error.message
+        }`,
+      });
+    }
   };
+  
+  
 
   const toggleMenu = (postId) => {
     setPosts((prevPosts) =>
@@ -220,8 +266,9 @@ export default function PostCard({ user }) {
   };
 
   const handleDeletePost = async (postId) => {
+    
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
+      
       const response = await apiService.request(
         "DELETE",
         `/posts/delete/${postId}`,
@@ -246,14 +293,28 @@ export default function PostCard({ user }) {
       Swal.fire({
         icon: "error",
         title: "Erreur",
-        text: `Erreur: ${error.response ? error.response.data.message : error.message
-          }`,
+        text: ` ${
+          error.response ? error.response.data.message : error.message
+        }`,
+
       });
       console.error("Erreur lors de la suppression du post:", error);
     }
   };
 
+
   const handleEditPost = (post) => {
+
+    const user = JSON.parse(localStorage.getItem('user')); 
+    if (!user || user.id !== post.author.id) { 
+        Swal.fire({
+            icon: 'error',
+            title: 'Accès refusé',
+            text: 'Vous n\'êtes pas autorisé à modifier ce post.',
+        });
+        return; // Arrête l'exécution si l'utilisateur n'est pas l'auteur
+    }
+
     setCurrentPost(post);
     setShowEditModal(true);
   };
@@ -432,27 +493,40 @@ export default function PostCard({ user }) {
                       }`}
                   />
                 </button>
+                    <span></span>
+                    <button
+                      onClick={() => {setCurrentPost(post); setShowRatingModal(true)}}
+                      className={`${
+                        post.rating > 0 ? "text-yellow-500" : "text-gray-500"
+                      } transition-colors duration-200`}
+                    >
+                      <div className="flex items-center">
+                        <Star
+                          className={`w-5 h-5 ${
+                            post.rating > 0 ? "fill-current" : ""
+                          } transform transition-transform duration-200 ${
+                            post.rating > 0 ? "scale-125" : ""
+                          }`}
+                        />
+                        {/* Affichage du nombre d'étoiles à côté de l'icône */}
+                        {post.rating > 0 && (
+                          <span className="ml-1 text-sm font-medium">
+                            {post.rating.toFixed(1)} {/* Nombre d'étoiles affiché avec une décimale */}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+
                 <span></span>
-                <button
-                  onClick={() => setShowRatingModal(true)}
-                  className={`${rating > 0 ? "text-yellow-500" : "text-gray-500"
-                    } transition-colors duration-200`}
-                >
-                  <Star
-                    className={`w-5 h-5 ${rating > 0 ? "fill-current" : ""
-                      } transform transition-transform duration-200 ${rating > 0 ? "scale-125" : ""
-                      }`}
-                  />
-                </button>
               </div>
             </div>
           </div>
         </div>
       ))}
-      {showRatingModal && (
+      {showRatingModal && currentPost &&(
         <RatingModal
           onClose={() => setShowRatingModal(false)}
-          onRate={handleRating}
+          onRate={(stars, description) => handleRating(currentPost.id, stars, description)}
         />
       )}
       {showCommentModal && (
