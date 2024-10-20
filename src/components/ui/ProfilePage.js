@@ -90,9 +90,9 @@ const ProfilePage = () => {
                 <UserPosts posts={posts} />
               )}
 
-              {activeTab === 'friends' && (
-                <FriendsList />
-              )}
+ {activeTab === 'friends' && (
+  <FriendsList userId={user.id} showUnfollowButton={true} />
+)}
             </div>
           </div>
         </div>
