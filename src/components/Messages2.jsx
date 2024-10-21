@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "./ui/Avatar";
 import apiService from '../services/ApiService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useQuery } from '@tanstack/react-query'
 
 const MessageInterface = () => {
   const [users, setUsers] = useState([]);
@@ -22,6 +23,13 @@ const MessageInterface = () => {
   const connectedUserId = userInfo?.id || null;
   const token = userInfo?.token || null;
 
+  const { data: fetchedMessages = [], refetch } = useQuery({
+    queryKey: ['messages', selectedChat?.id],
+    queryFn: () => fetchMessages(selectedChat?.id, token),
+    enabled: !!selectedChat && !!token,
+    refetchInterval: 5000,
+  });
+
   useEffect(() => {
     if (connectedUserId && token) {
       fetchUsers();
@@ -30,22 +38,34 @@ const MessageInterface = () => {
 
   useEffect(() => {
     if (selectedChat && token) {
-      fetchMessages();
+      refetch();
     }
-  }, [selectedChat, token]);
+  }, [selectedChat, token, refetch]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
+  useEffect(() => {
+    if (fetchedMessages.length > 0) {
+      setMessages(fetchedMessages);
+      scrollToBottom();
+    }
+  }, [fetchedMessages]);
+
   const fetchUsers = async () => {
     try {
-      const response = await apiService.request('GET', '/users/getAll', null, token);
+      const response = await apiService.request('GET', '/users/getAllBis', null, token);
       if (Array.isArray(response.users)) {
         const filteredUsers = response.users.filter(user => user.id !== connectedUserId);
-        setUsers(filteredUsers);
-        if (filteredUsers.length > 0) {
-          setSelectedChat(filteredUsers[0]);
+        const sortedUsers = filteredUsers.sort((a, b) => {
+          const lastMessageA = a.lastMessage ? new Date(a.lastMessage.createdAt) : new Date(0);
+          const lastMessageB = b.lastMessage ? new Date(b.lastMessage.createdAt) : new Date(0);
+          return lastMessageB - lastMessageA;
+        });
+        setUsers(sortedUsers);
+        if (sortedUsers.length > 0) {
+          setSelectedChat(sortedUsers[0]);
         }
       } else {
         console.error('Expected an array of users, but received:', response);
@@ -57,27 +77,31 @@ const MessageInterface = () => {
     }
   };
 
-  const fetchMessages = async () => {
-    if (!selectedChat) return;
+  const fetchMessages = async (chatId, authToken) => {
+    if (!chatId || !authToken) {
+      console.log('No chat selected or missing token');
+      return []; // Retourne un tableau vide si pas de chat sélectionné ou pas de token
+    }
     
     try {
-      const response = await apiService.request('GET', `/messages/connected-user?receiverId=${selectedChat.id}`, null, token);
+      const response = await apiService.request('GET', `/messages/connected-user?receiverId=${chatId}`, null, authToken);
       if (Array.isArray(response.messages)) {
-        const formattedMessages = response.messages.map(msg => ({
+        return response.messages.map(msg => ({
           id: msg.id,
-          sender: msg.senderId === connectedUserId ? 'You' : 'Other',
+          sender: msg.senderId === connectedUserId ? 'You' : selectedChat,
           content: msg.content,
           time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           type: 'text',
         }));
-        setMessages(formattedMessages);
       } else {
         console.error('Expected an array of messages, but received:', response);
         toast.error('Error loading messages');
+        return []; // Retourne un tableau vide en cas d'erreur
       }
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Failed to load messages');
+      return []; // Retourne un tableau vide en cas d'erreur
     }
   };
 
@@ -104,6 +128,7 @@ const MessageInterface = () => {
           setMessages(prevMessages => [...prevMessages, newMsg]);
           setNewMessage('');
           console.log('Message sent successfully');
+          fetchUsers(); // Mettre à jour la liste des utilisateurs pour refléter le dernier message
         } else {
           throw new Error(response.msg || 'Failed to send message');
         }
@@ -137,7 +162,7 @@ const MessageInterface = () => {
         apiService.request('POST', '/messages/audio', formData, token)
           .then(() => {
             toast.success('Audio message sent');
-            fetchMessages(); // Refresh messages to include the new audio message
+            fetchMessages(selectedChat.id, token); // Refresh messages to include the new audio message
           })
           .catch(error => {
             toast.error('Failed to send audio message');
@@ -212,12 +237,20 @@ const MessageInterface = () => {
               key={message.id}
               className={`flex mb-4 ${message.sender === 'You' ? 'justify-end' : 'justify-start'}`}
             >
+              {message.sender !== 'You' && (
+                <Avatar className="w-8 h-8 mr-2">
+                  <AvatarImage src={message.sender.photoUrl} alt={`${message.sender.firstname} ${message.sender.lastname}`} />
+                </Avatar>
+              )}
               <div className={`max-w-xs md:max-w-md ${
                 message.sender === 'You' 
                   ? 'bg-blue-500 text-white rounded-l-lg rounded-br-lg' 
                   : 'bg-white text-gray-800 rounded-r-lg rounded-bl-lg'
               } p-3 shadow`}
               >
+                {message.sender !== 'You' && (
+                  <p className="text-xs font-semibold mb-1">{`${message.sender.firstname} ${message.sender.lastname}`}</p>
+                )}
                 {message.type === 'text' ? (
                   <p>{message.content}</p>
                 ) : (
