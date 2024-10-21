@@ -8,7 +8,7 @@ const Badge = ({ text, color, bgColor, borderColor, shadowColor }) => (
     rounded-lg text-xs font-semibold
     ${color} ${bgColor} 
     border-2 ${borderColor}
-    shadow-sm ${shadowColor}
+    shadow-sm $a{shadowColor}
     transform hover:scale-105 transition-all duration-300
     before:content-[''] before:absolute before:inset-0 
     before:bg-white before:opacity-20 before:rounded-lg

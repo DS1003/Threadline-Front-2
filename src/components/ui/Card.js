@@ -54,9 +54,18 @@ CardHeader.propTypes = {
   children: PropTypes.node,
 };
 
+//Card footer 
+const CardFooter = ({ children, className }) => {
+  return (
+    <div className={`card-footer ${className}`}>
+      {children}
+    </div>
+  );
+};
+
 // Ajout des `displayName` pour la compatibilité avec `React.Children.map`
 Card.displayName = 'Card';
 CardContent.displayName = 'CardContent';
 CardHeader.displayName = 'CardHeader';
 
-export { Card, CardContent, CardHeader, CardTitle };
+export { Card, CardContent, CardHeader, CardTitle, CardFooter };

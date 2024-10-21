@@ -52,7 +52,7 @@ export default function CreatePostCard({ user, onPostCreate }) {
         icon: 'success',
         confirmButtonText: 'Ok',
       });
-      
+
       setPostContent('');
       setTags([]);
       setSelectedFile(null);
