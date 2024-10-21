@@ -4,11 +4,7 @@ class ApiService {
 
     constructor() {
         this.api = axios.create({
-<<<<<<< HEAD
-             //baseURL: 'http://localhost:8000/api/v1',
-=======
             //baseURL: 'http://localhost:8000/api/v1',
->>>>>>> 0c711dd (freak- api-services)
             baseURL: 'https://beyond-fashion-api-ts.onrender.com/api/v1',
         });
     }
