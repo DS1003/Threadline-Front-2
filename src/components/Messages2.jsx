@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Search, Send, ChevronLeft, ChevronRight, Mic, StopCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Search, Send, ChevronLeft, ChevronRight, Mic, StopCircle,Smile } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "./ui/Button";
 import { Input } from "./ui/Input";
@@ -8,13 +8,14 @@ import apiService from '../services/ApiService';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useQuery } from '@tanstack/react-query'
-
+import EmojiPicker from 'emoji-picker-react';
 const MessageInterface = () => {
   const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [audioURL, setAudioURL] = useState(null);
+  const [isEmojiPickerOpen, setIsEmojiPickerOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [selectedChat, setSelectedChat] = useState(null);
   const messagesEndRef = useRef(null);
@@ -108,6 +109,10 @@ const MessageInterface = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  const onEmojiClick = useCallback((emojiObject) => {
+    setNewMessage((prevMessage) => prevMessage + emojiObject.emoji);
+  }, []);
+
 
   const handleSendMessage = async () => {
     if (newMessage.trim() !== '' && selectedChat && token) {
@@ -265,6 +270,14 @@ const MessageInterface = () => {
 
         <div className="bg-white border-t border-gray-200 p-4">
           <div className="flex items-center">
+          <Button variant="ghost" onClick={() => setIsEmojiPickerOpen(!isEmojiPickerOpen)} className="mr-2">
+            <Smile />
+          </Button>
+          {isEmojiPickerOpen && (
+            <div className="absolute bottom-16">
+              <EmojiPicker onEmojiClick={onEmojiClick} />
+            </div>
+          )}
             <Input
               type="text"
               placeholder="Type a message..."
