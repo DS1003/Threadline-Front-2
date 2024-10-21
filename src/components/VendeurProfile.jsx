@@ -11,10 +11,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/Tabs"
 
 // Sample data
 const categories = [
-  { id: 1, name: "Sewing Tools", image: "/placeholder.svg?height=100&width=200", unit: "piece" },
-  { id: 2, name: "Fabrics", image: "/placeholder.svg?height=100&width=200", unit: "meter" },
-  { id: 3, name: "Notions", image: "/placeholder.svg?height=100&width=200", unit: "box" },
-  { id: 4, name: "Machines", image: "/placeholder.svg?height=100&width=200", unit: "piece" },
+  { id: 1, name: "Sewing Tools", image: "https://i.pinimg.com/enabled_hi/564x/85/54/d6/8554d6137f68c28197cdd273ba940623.jpg", unit: "piece" },
+  { id: 2, name: "Fabrics", image: "https://i.pinimg.com/enabled_hi/564x/85/54/d6/8554d6137f68c28197cdd273ba940623.jpg", unit: "meter" },
+  { id: 3, name: "Notions", image: "https://i.pinimg.com/enabled_hi/564x/85/54/d6/8554d6137f68c28197cdd273ba940623.jpg", unit: "box" },
+  { id: 4, name: "Machines", image: "https://i.pinimg.com/enabled_hi/564x/85/54/d6/8554d6137f68c28197cdd273ba940623.jpg", unit: "piece" },
 ]
 
 const products = [
