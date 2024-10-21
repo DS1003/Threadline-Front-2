@@ -56,7 +56,7 @@ const MessageInterface = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await apiService.request('GET', '/users/getAllBis', null, token);
+      const response = await apiService.request('GET', '/users/get-all-for-message', null, null);
       if (Array.isArray(response.users)) {
         const filteredUsers = response.users.filter(user => user.id !== connectedUserId);
         const sortedUsers = filteredUsers.sort((a, b) => {
