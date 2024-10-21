@@ -318,6 +318,9 @@ const Stories = () => {
       setError(error.message || 'Failed to fetch stories. Please try again.');
     }
   };
+  const canViewUserStories = user.roles.some(role => role.name === 'TAILOR');
+  console.log(canViewUserStories);
+
 
   const handleAddStory = (newStory) => {
     setStories(prevStories => {
@@ -389,7 +392,7 @@ const Stories = () => {
         ref={carouselRef}
         className="flex space-x-4 overflow-x-hidden scroll-smooth"
       >
-        <UserStories />
+         {canViewUserStories && <UserStories stories={stories} />}
         {displayedStories.map(([authorId, authorStories]) => (
           <StoryCircle
             key={authorId}
