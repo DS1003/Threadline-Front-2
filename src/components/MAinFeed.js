@@ -13,9 +13,10 @@ import withAuth from '../hoc/withAuth';
 import UserSuggestions from './UserSuggestions';
 
 const MainFeed = (props) => {
+    const user = props.user;
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isRightElementsOpen, setIsRightElementsOpen] = useState(false);
-    const [balance, setBalance] = useState(500);
+    const [balance, setBalance] = useState(user?.credit);
     const [purchaseHistory, setPurchaseHistory] = useState([
         { date: '2024-10-15', amount: 100 },
         { date: '2024-10-01', amount: 50 },
@@ -30,21 +31,12 @@ const MainFeed = (props) => {
         setIsRightElementsOpen(!isRightElementsOpen);
     };
 
-    const handleRefresh = async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        setBalance(prevBalance => prevBalance + Math.floor(Math.random() * 50));
-    };
 
-    const handlePurchase = () => {
-        const amount = 100;
-        setBalance(prevBalance => prevBalance + amount);
-        setPurchaseHistory(prevHistory => [
-            { date: new Date().toISOString(), amount },
-            ...prevHistory
-        ]);
-    };
+    const handlePostCreationAnUpdateBalance = (deduction) => {
+        setBalance(prevBalance => prevBalance - deduction);
+    }
 
-    const user = props.user;
+    
     const isTailor = user.roles.some(role => role.name === 'TAILOR');
 
     return (
@@ -58,10 +50,9 @@ const MainFeed = (props) => {
                     {isTailor && (
                         <Balanced
                             balance={balance}
+                            updateBalance={setBalance}
                             lastPurchaseDate="2024-05-24"
                             purchaseHistory={purchaseHistory}
-                            onRefresh={handleRefresh}
-                            onPurchase={handlePurchase}
                             user={user}
                         />
                     )}
@@ -75,7 +66,7 @@ const MainFeed = (props) => {
                     <div className="mb-6">
                         <StoryCircles />
                     </div>
-                    <CreatePostCard user={props.user} />
+                    <CreatePostCard user={props.user} onPostCreate={handlePostCreationAnUpdateBalance}/>
                     <Post user={user}/>
                     {/* Add more posts as needed */}
                 </div>
@@ -99,8 +90,6 @@ const MainFeed = (props) => {
                             balance={balance}
                             lastPurchaseDate="2024-05-24"
                             purchaseHistory={purchaseHistory}
-                            onRefresh={handleRefresh}
-                            onPurchase={handlePurchase}
                             user={user}
                         />
                     )}

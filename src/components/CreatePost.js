@@ -4,8 +4,7 @@ import ApiService from '../services/ApiService';
 import Swal from 'sweetalert2';
 
 
-export default function CreatePostCard(props) {
-  const {user} = props;
+export default function CreatePostCard({ user, onPostCreate }) {
   const [postContent, setPostContent] = useState('');
   const [tags, setTags] = useState([]);
   const [currentTag, setCurrentTag] = useState('');
@@ -43,7 +42,9 @@ export default function CreatePostCard(props) {
 
     try {
       const response = await ApiService.request('POST', '/posts/create', formData, user.token);
-      console.log('Post créé avec succès:', response);
+      onPostCreate(2);
+      user.credit = user.credit -2;;
+      localStorage.setItem('user', JSON.stringify(user));
 
       Swal.fire({
         title: 'Succès!',
