@@ -27,13 +27,14 @@ import CommentModal from "./CommentModal";
 import apiService from "../../services/ApiService";
 import EditPostModal from "../../components/modal/EditPostModal";
 import ReportModal from "../../components/modal/ReportModal";
+import UserSuggestionModal from "../../components/modal/UserSuggestionModal";
 import { format } from "date-fns";
 
 import Swal from "sweetalert2";
 import Loader from "./Loader";
 
 
-export default function PostCard({user,post}) {
+export default function PostCard({user,post, postId, shareCount}) {
   const navigate = useNavigate();
   const handleProfileClick = (userId) => {
     navigate(`/profileBis/${userId}`);
@@ -42,7 +43,7 @@ export default function PostCard({user,post}) {
   const [bookmarked, setBookmarked] = useState(false);
   const [likeCount, setLikeCount] = useState([]);
   const [commentCount, setCommentCount] = useState([]);
-  const [shareCount, setShareCount] = useState(5);
+  // const [shareCount, setShareCount] = useState(0);
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [showCommentModal, setShowCommentModal] = useState(false);
   const [rating, setRating] = useState(0);
@@ -59,6 +60,18 @@ export default function PostCard({user,post}) {
 
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
+
+  //------------Debut Share --------------------
+  const [isModalOpen, setModalOpen] = useState(false);
+  const handleShareClick = () => {
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+  };
+//--------------Fin Share--------------------------------------------------
+
 
   //const user = JSON.parse(localStorage.getItem("user"));
 
@@ -225,7 +238,7 @@ export default function PostCard({user,post}) {
   const handleRating= async (postId, stars, description) => {
     
     try {
-      console.log(`Post ID: ${postId}, Rating: ${rating}, Description: ${description}`);
+      // console.log(`Post ID: ${postId}, Rating: ${rating}, Description: ${description}`);
       const user = JSON.parse(localStorage.getItem("user"));
       const response = await apiService.request(
         "POST",
@@ -543,7 +556,7 @@ export default function PostCard({user,post}) {
                   <MessageCircle className="w-5 h-5" />
                   <span>{post.commentCount}</span>
                 </button>
-                <button className="flex items-center space-x-1 text-gray-500">
+                <button className="flex items-center space-x-1 text-gray-500" onClick={handleShareClick}>
                   <Share2 className="w-5 h-5" />
                   <span>{shareCount}</span>
                 </button>
@@ -632,6 +645,10 @@ export default function PostCard({user,post}) {
             </button>
           </div>
         </div>
+      )}
+
+      {isModalOpen && (
+        <UserSuggestionModal postId={postId} onClose={handleCloseModal} />
       )}
     </div>
   );
